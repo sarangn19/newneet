@@ -192,7 +192,7 @@ function ScreenWelcome({ goNext }) {
           padding: '14px', borderRadius: 12, border: 'none',
           background: 'var(--primary)', color: '#fff',
           fontSize: 16, fontWeight: 700, fontFamily: 'inherit',
-          cursor: 'pointer', boxShadow: '0 4px 14px rgba(249,115,22,0.3)',
+          cursor: 'pointer',
         }}>
         Get Started
       </button>
@@ -241,7 +241,6 @@ function ScreenExamType({ examType, setExamType, goNext }) {
           border: 'none', fontFamily: 'inherit', fontSize: 16, fontWeight: 700,
           cursor: 'pointer',
           background: 'var(--primary)', color: '#fff',
-          boxShadow: '0 4px 14px rgba(249,115,22,0.3)',
         }}>
         Continue
       </button>
@@ -251,29 +250,23 @@ function ScreenExamType({ examType, setExamType, goNext }) {
 
 function ScreenAvatar({ avatar, setAvatar, goNext }) {
   return (
-    <div style={{
-      flex: 1, display: 'flex', flexDirection: 'column',
-      justifyContent: 'center', gap: 20,
-    }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 20 }}>
       <div>
         <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text)', marginBottom: 6 }}>
-          Choose your avatar
+          Pick your study buddy
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-2)' }}>
-          Pick a study buddy to represent you
+          Choose an avatar to get started
         </div>
       </div>
-      <div style={{
-        display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14,
-        justifyItems: 'center',
-      }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
         {PROFILE_PICS.map(src => (
           <button key={src} onClick={() => setAvatar(src)}
             style={{
               width: 80, height: 80, borderRadius: 20, padding: 0,
               border: avatar === src ? '3px solid var(--primary)' : '3px solid var(--border)',
               background: 'var(--card-bg)', cursor: 'pointer', overflow: 'hidden',
-              boxShadow: avatar === src ? '0 4px 14px rgba(249,115,22,0.25)' : 'none',
+              boxShadow: avatar === src ? '0 0 0 2px var(--primary)' : 'none',
               transition: 'all 0.15s',
             }}>
             <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -286,7 +279,6 @@ function ScreenAvatar({ avatar, setAvatar, goNext }) {
           border: 'none', fontFamily: 'inherit', fontSize: 16, fontWeight: 700,
           cursor: 'pointer',
           background: 'var(--primary)', color: '#fff',
-          boxShadow: '0 4px 14px rgba(249,115,22,0.3)',
         }}>
         Continue
       </button>
@@ -322,7 +314,7 @@ function ScreenReady({ avatar, finish }) {
           padding: '16px', borderRadius: 12, border: 'none',
           background: 'var(--primary)', color: '#fff',
           fontSize: 16, fontWeight: 700, fontFamily: 'inherit',
-          cursor: 'pointer', boxShadow: '0 4px 14px rgba(249,115,22,0.3)',
+          cursor: 'pointer',
         }}>
         Start Learning
       </button>

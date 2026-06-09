@@ -244,7 +244,7 @@ export default function Auth() {
               cursor: loading ? 'not-allowed' : 'pointer',
               background: loading ? '#E5E0D5' : 'var(--primary)',
               color: loading ? '#B0ABA0' : '#fff',
-              boxShadow: loading ? 'none' : '0 4px 0 var(--primary-dark), 0 6px 16px rgba(249,115,22,0.25)',
+              boxShadow: loading ? 'none' : '0 4px 0 var(--primary-dark)',
               letterSpacing: '0.02em',
               transition: 'all 0.08s',
               opacity: loading ? 0.6 : 1,

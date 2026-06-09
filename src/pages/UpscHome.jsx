@@ -8,7 +8,7 @@ import { generateRevisionContent } from '../lib/revisionAI'
 import { upscMCQs } from '../data/upsc/questions'
 import { upscSubjects } from '../data/upsc/subjects'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
-import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, TrendingUp, Clock, Search, FileText, SkipForward, Zap, Target } from 'lucide-react'
+import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, TrendingUp, Clock, Search, FileText, Zap, Target } from 'lucide-react'
 
 export default function UpscHome() {
   const navigate = useNavigate()
@@ -308,7 +308,7 @@ export default function UpscHome() {
                               style={{
                                 width: '100%', padding: '13px 0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
                                 cursor: 'pointer', border: 'none', background: 'var(--primary)', color: '#fff',
-                                borderRadius: 12, letterSpacing: '0.01em', boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
+                                borderRadius: 12, letterSpacing: '0.01em',
                               }}
                             >Start Practice</motion.button>
                           ) : (
@@ -322,22 +322,15 @@ export default function UpscHome() {
               })}
             </div>
 
-            {/* Dot indicators + Skip */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
-              <div style={{ display: 'flex', gap: 5 }}>
-                {remainingFeed.slice(0, 10).map((_, i) => (
-                  <div key={i} onClick={() => setFeedIdx(i)} style={{
-                    width: i === feedIdx ? 22 : 6, height: 6, borderRadius: 3,
-                    background: i === feedIdx ? 'var(--primary)' : 'var(--text-3)',
-                    transition: 'all 0.3s', cursor: 'pointer', opacity: i === feedIdx ? 1 : 0.5,
-                  }} />
-                ))}
-              </div>
-              {feedIdx < remainingFeed.length - 1 && (
-                <motion.button whileTap={{ scale: 0.95 }} onClick={skipTopic}
-                  style={{ padding: '5px 12px', fontSize: 10, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 4 }}
-                >Skip <SkipForward size={12} /></motion.button>
-              )}
+            {/* Dot indicators */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10 }}>
+              {remainingFeed.slice(0, 10).map((_, i) => (
+                <div key={i} onClick={() => setFeedIdx(i)} style={{
+                  width: i === feedIdx ? 22 : 6, height: 6, borderRadius: 3,
+                  background: i === feedIdx ? 'var(--primary)' : 'var(--text-3)',
+                  transition: 'all 0.3s', cursor: 'pointer', opacity: i === feedIdx ? 1 : 0.5,
+                }} />
+              ))}
             </div>
           </div>
         )}
