@@ -42,23 +42,25 @@ export default function Navbar() {
     return (
       <AnimatePresence>
         {!inBattle && !hideNav && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+          <motion.nav
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 30, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 24 }}
             style={{
               position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-              display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
-              background: 'linear-gradient(180deg, rgba(10,10,15,0) 0%, rgba(10,10,15,0.95) 100%)',
-              pointerEvents: 'none',
+              display: 'flex', justifyContent: 'center', alignItems: 'center',
+              height: 56,
+              background: 'var(--nav-bg)',
+              borderTop: '1px solid var(--border)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
             }}
           >
             <div style={{
               display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
-              padding: '72px 0 28px', gap: 32,
-              width: 440, maxWidth: '100%',
-              pointerEvents: 'auto',
+              gap: 36,
+              maxWidth: '100%',
             }}>
               {tabs.map((tab) => {
                 const IconComp = iconMap[tab.icon];
@@ -74,7 +76,7 @@ export default function Navbar() {
                         <IconComp
                           size={24}
                           strokeWidth={isActive ? 2.5 : 1.8}
-                          color={isActive ? '#FFFFFF' : '#606060'}
+                          color={isActive ? 'var(--primary)' : 'var(--text-3)'}
                         />
                       </div>
                     )}
@@ -82,7 +84,7 @@ export default function Navbar() {
                 );
               })}
             </div>
-          </motion.div>
+          </motion.nav>
         )}
       </AnimatePresence>
     );
