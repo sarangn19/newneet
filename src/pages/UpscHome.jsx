@@ -16,7 +16,12 @@ export default function UpscHome() {
   const { allTopics } = useRecommendations('upsc')
   const [dailyMix] = useState(() => getRevisionMix(allTopics, topicScores, revisionSchedule, 5))
   const [feedIdx, setFeedIdx] = useState(0)
-  const [feedDone, setFeedDone] = useState(new Set())
+  const [feedDone, setFeedDone] = useState(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    const raw = localStorage.getItem('daily_topic_queue')
+    const existing = raw ? JSON.parse(raw) : null
+    return new Set(existing?.date === today ? existing.completed : [])
+  })
 
   const remainingFeed = useMemo(() => dailyMix.filter(t => !feedDone.has(t.id)), [dailyMix, feedDone])
   const currentTopic = remainingFeed[feedIdx]
@@ -144,6 +149,15 @@ export default function UpscHome() {
         saveMastery(revisionPopupTopic.id, pct)
         markTopicReviewed(revisionPopupTopic.id)
         setFeedDone(prev => new Set([...prev, revisionPopupTopic.id]))
+        const today = new Date().toISOString().slice(0, 10)
+        const raw = localStorage.getItem('daily_topic_queue')
+        if (raw) {
+          const q = JSON.parse(raw)
+          if (q.date === today && !q.completed.includes(revisionPopupTopic.id)) {
+            q.completed.push(revisionPopupTopic.id)
+            localStorage.setItem('daily_topic_queue', JSON.stringify(q))
+          }
+        }
       }
       endSession()
       setPracticeDone(true)
