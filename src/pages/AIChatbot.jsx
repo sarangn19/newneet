@@ -53,6 +53,7 @@ export default function AIChatbot() {
   const [showHistory, setShowHistory] = useState(false)
   const [savedNotes, setSavedNotes] = useState(new Set())
   const [quizState, setQuizState] = useState(null)
+  const [muted, setMuted] = useState(true)
   const inputRef = useRef(null)
   const endRef = useRef(null)
 
@@ -151,8 +152,10 @@ export default function AIChatbot() {
     }
 
     setMessages(prev => [...prev, { role: 'bot', text: response }])
-    const u = new SpeechSynthesisUtterance(response.replace(/[A-D]\)/g, '').replace(/Answer.*/i, ''))
-    u.rate = 0.9; speechSynthesis.speak(u)
+    if (!muted) {
+      const u = new SpeechSynthesisUtterance(response.replace(/[A-D]\)/g, '').replace(/Answer.*/i, ''))
+      u.rate = 0.9; speechSynthesis.speak(u)
+    }
     setLoading(false)
 
     if (mode === 'quiz') {
@@ -284,6 +287,12 @@ export default function AIChatbot() {
             <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Chatbot</div>
             <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your UPSC study assistant</div>
           </div>
+          <button onClick={() => setMuted(!muted)} style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex',
+            color: muted ? 'var(--text-3)' : 'var(--primary)',
+          }}>
+            <Volume2 size={18} />
+          </button>
           <motion.button whileTap={{scale:0.96}} onClick={() => setShowHistory(!showHistory)} style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', position: 'relative',
           }}>
@@ -354,12 +363,12 @@ export default function AIChatbot() {
                       }}>
                         {savedNotes.has(msg.text.slice(0, 50)) ? 'Saved' : 'Save as note'}
                       </motion.button>
-                      <motion.button whileTap={{scale:0.96}} onClick={() => generateFlashcards(msg.text)} style={{
+                      <button onClick={() => generateFlashcards(msg.text)} style={{
                         background: 'none', border: 'none', cursor: 'pointer',
                         fontSize: 10, color: 'var(--phys)', fontWeight: 600, padding: 0, fontFamily: 'inherit',
                       }}>
                         Flashcards
-                      </motion.button>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -451,7 +460,7 @@ export default function AIChatbot() {
             }}>
               <Mic size={14} color={listening ? '#fff' : 'var(--text-3)'} />
             </motion.button>
-            <motion.button whileTap={{scale:0.94}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
+            <motion.button whileTap={input.trim() && !loading ? {scale:0.94} : {}} onClick={() => { if (input.trim() && !loading) sendMessage() }} style={{
               width: 28, height: 28, borderRadius: 8, border: 'none', flexShrink: 0,
               background: input.trim() && !loading ? 'var(--primary)' : 'transparent',
               cursor: input.trim() && !loading ? 'pointer' : 'default',
@@ -547,7 +556,7 @@ export default function AIChatbot() {
                   </div>
                 </motion.div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <motion.button whileTap={{scale:0.96}} onClick={() => {
+                  <button onClick={() => {
                     if (flashcardIdx < flashcards.length - 1) { setFlashcardIdx(p => p + 1); setFlashcardFlipped(false) }
                     else setFlashcards(null)
                   }} style={{
@@ -555,16 +564,16 @@ export default function AIChatbot() {
                     background: '#8B5CF6', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                   }}>
                     {flashcardIdx < flashcards.length - 1 ? 'Next' : 'Done'}
-                  </motion.button>
+                  </button>
                 </div>
               </>
             ) : (
               <div style={{ textAlign: 'center', padding: 20 }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 6 }}>All done!</div>
-                <motion.button whileTap={{scale:0.96}} onClick={() => setFlashcards(null)} style={{
+                <button onClick={() => setFlashcards(null)} style={{
                   marginTop: 12, padding: '10px 24px', borderRadius: 12, border: 'none',
                   background: '#8B5CF6', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-                }}>Close</motion.button>
+                }}>Close</button>
               </div>
             )}
           </motion.div>
