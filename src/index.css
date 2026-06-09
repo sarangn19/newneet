@@ -207,15 +207,7 @@
   background: var(--card-bg) !important;
 }
 
-.upsc-mode .floating-nav {
-  background: var(--glass-bg) !important;
-  border-color: var(--glass-border) !important;
-  backdrop-filter: blur(16px) !important;
-}
-
-.upsc-mode .nav-item.active::before {
-  background: var(--primary-light) !important;
-}
+/* (removed .upsc-mode .floating-nav / .nav-item — navbar redesigned) */
 
 .upsc-mode .card-3d {
   background: var(--card-bg) !important;
@@ -848,16 +840,7 @@ button, [role="button"], .card-tap {
   box-shadow: 0 3px 0 0 var(--card-bg);
 }
 
-/* ── Floating Glass Navigation ──────────────────────────────────── */
-.floating-nav {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
-  border-radius: 1rem;
-  padding: 0.5rem 0.75rem;
-}
+/* ── (removed floating-nav / nav-item — UPSC navbar redesigned) ── */
 
 .upsc-mode .floating-nav {
   background: rgba(21, 21, 42, 0.92);

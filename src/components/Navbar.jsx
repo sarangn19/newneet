@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Flame, ClipboardList, BarChart3, BookOpen, Newspaper, Bot } from 'lucide-react';
+import { Home, Flame, ClipboardList, BarChart3, BookOpen, Newspaper, Bot, Circle } from 'lucide-react';
 import useStore from '../store/useStore';
 
 const iconMap = {
@@ -42,50 +42,45 @@ export default function Navbar() {
     return (
       <AnimatePresence>
         {!inBattle && !hideNav && (
-          <div style={{ position: 'fixed', bottom: 16, left: 16, right: 16, zIndex: 100, maxWidth: 480, margin: '0 auto' }}>
-            <motion.nav
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 30, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 24 }}
-              className="floating-nav"
-              style={{
-                display: 'flex', justifyContent: 'space-around', alignItems: 'center',
-                padding: '8px 4px',
-              }}
-            >
-              {tabs.map((tab) => {
-                const IconComp = iconMap[tab.icon];
-                return (
-                  <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
-                    textDecoration: 'none', position: 'relative', fontFamily: 'inherit',
-                    WebkitTapHighlightColor: 'transparent',
-                  }}>
-                    {({ isActive }) => (
-                      <div className={`nav-item ${isActive ? 'active' : ''}`}
-                        style={{
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                          width: 48, padding: '6px 0', position: 'relative',
-                          background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                        }}
-                      >
-                        <IconComp size={22} strokeWidth={isActive ? 2.5 : 1.8}
-                          color={isActive ? 'var(--primary)' : 'var(--text-3)'}
-                        />
-                        <span style={{
-                          fontSize: 9, fontWeight: isActive ? 800 : 600,
-                          color: isActive ? 'var(--primary)' : 'var(--text-3)',
-                          letterSpacing: '0.03em',
-                        }}>
-                          {tab.label}
-                        </span>
-                      </div>
-                    )}
-                  </NavLink>
-                );
-              })}
-            </motion.nav>
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
+              display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
+              background: 'linear-gradient(180deg, rgba(10,10,15,0) 0%, rgba(10,10,15,0.95) 100%)',
+              pointerEvents: 'none',
+            }}
+          >
+            <div style={{
+              display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
+              padding: '72px 0 28px', gap: 32,
+              width: 440, maxWidth: '100%',
+              pointerEvents: 'auto',
+            }}>
+              {tabs.map((tab) => (
+                <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
+                  textDecoration: 'none', WebkitTapHighlightColor: 'transparent', fontFamily: 'inherit',
+                }}>
+                  {({ isActive }) => (
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width: 24, height: 24, cursor: 'pointer',
+                    }}>
+                      <Circle
+                        size={24}
+                        strokeWidth={2}
+                        color={isActive ? '#FFFFFF' : '#606060'}
+                        fill={isActive ? '#FFFFFF' : 'none'}
+                      />
+                    </div>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     );
