@@ -7,11 +7,11 @@ import { usePerformanceAlerts } from '../lib/usePerformanceAlerts'
 import { generateRevisionContent } from '../lib/revisionAI'
 import { upscMCQs } from '../data/upsc/questions'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
-import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, Clock, Search, FileText, SkipForward, Zap, Target } from 'lucide-react'
+import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, TrendingUp, Clock, Search, FileText, SkipForward, Zap, Target } from 'lucide-react'
 
 export default function UpscHome() {
   const navigate = useNavigate()
-  const { user, topicScores, saveTopicScore, recordQuestionAttempt, startSession, endSession, updateStats, revisionSchedule, markTopicReviewed, revisionMastery, setRevisionMastery, recordSeenQuestion } = useStore()
+  const { user, topicScores, saveTopicScore, recordQuestionAttempt, startSession, endSession, updateStats, revisionSchedule, revisionSeenQuestions, markTopicReviewed, revisionMastery, setRevisionMastery, recordSeenQuestion } = useStore()
   const { allTopics } = useRecommendations('upsc')
   const todayStr = new Date().toISOString().slice(0, 10)
   const [dailyMix] = useState(() => getRevisionMix(allTopics, topicScores, revisionSchedule, 5))
