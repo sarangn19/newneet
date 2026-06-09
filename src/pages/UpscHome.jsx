@@ -199,7 +199,7 @@ export default function UpscHome() {
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0', touchAction: 'none', userSelect: 'none' }}
             onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
           >
-            <div style={{ position: 'relative', width: '100%', minHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: '100%', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {[-1, 0, 1].map((offset) => {
                 const idx = feedIdx + offset
                 if (idx < 0 || idx >= remainingFeed.length) return null
@@ -207,46 +207,85 @@ export default function UpscHome() {
                 const isCenter = offset === 0
                 const pi = isCenter ? priorityInfo : calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const reason = pi?.weakness >= 0.6 ? `Weak — ${t.accuracy || 0}% accuracy` : pi?.forgetting >= 0.8 ? 'Over 2 weeks since review' : pi?.forgetting >= 0.5 ? 'Due for review' : pi?.importance >= 0.6 ? 'High-yield topic' : 'Keep fresh'
+                const accentColor = pi?.weakness >= 0.6 ? '#ef4444' : pi?.forgetting >= 0.5 ? '#f59e0b' : 'var(--primary)'
+                const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'
+                const badgeBg = pi?.weakness >= 0.6 ? 'var(--error-light)' : pi?.forgetting >= 0.5 ? 'var(--warning-light)' : 'var(--primary-light)'
+                const badgeColor = pi?.weakness >= 0.6 ? '#dc2626' : pi?.forgetting >= 0.5 ? '#d97706' : 'var(--primary)'
+                const level = getMastery(t.id, revisionMastery)
                 return (
                   <motion.div key={t.id}
-                    animate={{ x: offset * 180, scale: isCenter ? 1 : 0.88, opacity: isCenter ? 1 : 0.5, zIndex: isCenter ? 10 : 5 }}
+                    animate={{ x: offset * 200, scale: isCenter ? 1 : 0.85, opacity: isCenter ? 1 : 0.4, zIndex: isCenter ? 10 : 5 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     onClick={() => { if (isCenter) openRevision(t); else setFeedIdx(idx) }}
-                    style={{ position: 'absolute', width: 290, cursor: 'pointer', overflow: 'hidden', background: 'var(--card-bg)', borderRadius: 16, boxShadow: isCenter ? '0 8px 32px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.06)' }}
+                    style={{ position: 'absolute', width: 340, cursor: 'pointer', perspective: 1200 }}
+                    onMouseMove={(e) => {
+                      if (!isCenter) return
+                      const rect = e.currentTarget.firstChild.getBoundingClientRect()
+                      const rotateX = ((e.clientY - rect.top - rect.height / 2) / rect.height / 2) * -10
+                      const rotateY = ((e.clientX - rect.left - rect.width / 2) / rect.width / 2) * 10
+                      e.currentTarget.firstChild.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.firstChild.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
+                    }}
                   >
-                    {/* Top accent bar */}
-                    <div style={{ height: 4, background: pi?.weakness >= 0.6 ? '#ef4444' : pi?.forgetting >= 0.5 ? '#f59e0b' : 'var(--primary)' }} />
+                    <div style={{
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--border)',
+                      backdropFilter: 'blur(40px)',
+                      borderRadius: 32,
+                      overflow: 'hidden',
+                      transformStyle: 'preserve-3d',
+                      transition: 'transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1)',
+                      boxShadow: isCenter ? '0 30px 60px -15px rgba(0,0,0,0.5)' : '0 8px 20px -8px rgba(0,0,0,0.3)',
+                    }}>
+                      {/* Top accent bar */}
+                      <div style={{ height: 6, width: '100%', background: accentColor }} />
 
-                    {/* Subject + badge */}
-                    <div style={{ padding: '14px 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.subjectName}</div>
-                        <div style={{ fontSize: isCenter ? 16 : 14, fontWeight: 800, color: 'var(--text)', lineHeight: 1.2, marginTop: 2 }}>{t.name}</div>
+                      <div style={{ padding: 24 }}>
+                        {/* Subject + badge */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.subjectName}</div>
+                          <div style={{ padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: 700, background: badgeBg, color: badgeColor }}>{badgeLabel}</div>
+                        </div>
+
+                        {/* Topic name */}
+                        <div style={{ fontSize: isCenter ? 20 : 17, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginTop: 6, letterSpacing: '-0.02em' }}>{t.name}</div>
+
+                        {/* Meta line */}
+                        <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6, fontWeight: 500 }}>
+                          GS I · L{level}/4 · {reason}
+                        </div>
+
+                        {/* Stats row */}
+                        <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
+                          {t.total > 0 && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <Target size={11} color="var(--primary)" />
+                              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)' }}>{t.accuracy}%</span>
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <Clock size={11} color="var(--text-3)" />
+                            <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{level === 1 ? '3m' : '5m'}</span>
+                          </div>
+                        </div>
+
+                        {/* Action */}
+                        <div style={{ marginTop: 20 }}>
+                          {isCenter ? (
+                            <motion.button whileTap={{ scale: 0.97 }} onClick={(e) => { e.stopPropagation(); openRevision(t) }}
+                              style={{
+                                width: '100%', padding: '14px 0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
+                                cursor: 'pointer', border: 'none', background: 'var(--primary)', color: '#fff',
+                                borderRadius: 12, letterSpacing: '0.01em', boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
+                              }}
+                            >Start Practice</motion.button>
+                          ) : (
+                            <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em' }}>Tap to view →</div>
+                          )}
+                        </div>
                       </div>
-                      <div style={{ padding: '2px 7px', borderRadius: 5, fontSize: 9, fontWeight: 700, whiteSpace: 'nowrap', background: pi?.weakness >= 0.6 ? 'var(--error-light)' : pi?.forgetting >= 0.5 ? 'var(--warning-light)' : 'var(--primary-light)', color: pi?.weakness >= 0.6 ? '#dc2626' : pi?.forgetting >= 0.5 ? '#d97706' : 'var(--primary)' }}>
-                        {pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'}
-                      </div>
-                    </div>
-
-                    {/* Reason */}
-                    <div style={{ padding: '4px 16px 0', fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>{reason}</div>
-
-                    {/* Stats row */}
-                    <div style={{ padding: '8px 16px 0', display: 'flex', gap: 14 }}>
-                      {t.total > 0 && <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Target size={10} color="var(--primary)" /><span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-2)' }}>{t.accuracy}%</span></div>}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Clock size={10} color="var(--text-3)" /><span style={{ fontSize: 10, color: 'var(--text-3)' }}>{getMastery(t.id, revisionMastery) === 1 ? '3m' : '5m'}</span></div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Zap size={10} color="var(--text-3)" /><span style={{ fontSize: 10, color: 'var(--text-3)' }}>L{getMastery(t.id, revisionMastery)}/4</span></div>
-                    </div>
-
-                    {/* Action */}
-                    <div style={{ padding: '12px 16px' }}>
-                      {isCenter ? (
-                        <motion.button whileTap={{ scale: 0.97 }} onClick={(e) => { e.stopPropagation(); openRevision(t) }}
-                          style={{ width: '100%', padding: '9px 0', fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', border: 'none', background: 'linear-gradient(135deg, var(--primary), var(--phys))', color: '#fff', borderRadius: 10, letterSpacing: '0.02em' }}
-                        >Start Practice</motion.button>
-                      ) : (
-                        <div style={{ textAlign: 'center', fontSize: 10, color: 'var(--text-3)' }}>Tap to view</div>
-                      )}
                     </div>
                   </motion.div>
                 )
@@ -254,16 +293,20 @@ export default function UpscHome() {
             </div>
 
             {/* Dot indicators + Skip */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-              <div style={{ display: 'flex', gap: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+              <div style={{ display: 'flex', gap: 5 }}>
                 {remainingFeed.slice(0, 10).map((_, i) => (
-                  <div key={i} onClick={() => setFeedIdx(i)} style={{ width: i === feedIdx ? 18 : 5, height: 5, borderRadius: 3, background: i === feedIdx ? 'var(--primary)' : 'var(--text-3)', transition: 'all 0.2s', cursor: 'pointer' }} />
+                  <div key={i} onClick={() => setFeedIdx(i)} style={{
+                    width: i === feedIdx ? 22 : 6, height: 6, borderRadius: 3,
+                    background: i === feedIdx ? 'var(--primary)' : 'var(--text-3)',
+                    transition: 'all 0.3s', cursor: 'pointer', opacity: i === feedIdx ? 1 : 0.5,
+                  }} />
                 ))}
               </div>
               {feedIdx < remainingFeed.length - 1 && (
                 <motion.button whileTap={{ scale: 0.95 }} onClick={skipTopic}
-                  style={{ padding: '4px 10px', fontSize: 10, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 3 }}
-                >Skip <SkipForward size={11} /></motion.button>
+                  style={{ padding: '5px 12px', fontSize: 10, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 4 }}
+                >Skip <SkipForward size={12} /></motion.button>
               )}
             </div>
           </div>

@@ -75,6 +75,8 @@ const chapterNameToIdMap = {
   'Reproduction': ['b21', 'b22', 'b23', 'b24'],
 }
 
+const getQCount = (chapterId, questions) => questions.filter(q => q.chapter === chapterId).length
+
 export default function MCQPractice() {
   const navigate = useNavigate()
   const examType = useStore(s => s.examType) || 'neet'
