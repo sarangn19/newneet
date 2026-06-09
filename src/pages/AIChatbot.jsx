@@ -431,7 +431,7 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '6px 12px calc(10px + env(safe-area-inset-bottom, 0px))', gap: 12, background: '#121217' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '6px 16px calc(10px + env(safe-area-inset-bottom, 0px))', gap: 12, background: '#121217', borderRadius: 28, margin: '0 12px 12px' }}>
             {/* Input pill */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 14px', gap: 4, height: 40, background: '#202025', border: '1px solid #2D2D31', borderRadius: 20 }}>
               <input
