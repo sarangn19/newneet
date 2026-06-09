@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
-import { Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2, VolumeX } from 'lucide-react'
+import { Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
 
 const MODES = [
   { id: 'explain', label: 'Explain', icon: BookOpen, color: '#3B82F6' },
@@ -53,7 +53,6 @@ export default function AIChatbot() {
   const [showHistory, setShowHistory] = useState(false)
   const [savedNotes, setSavedNotes] = useState(new Set())
   const [quizState, setQuizState] = useState(null)
-  const [muted, setMuted] = useState(false)
   const inputRef = useRef(null)
   const endRef = useRef(null)
 
@@ -152,10 +151,6 @@ export default function AIChatbot() {
     }
 
     setMessages(prev => [...prev, { role: 'bot', text: response }])
-    if (!muted) {
-      const u = new SpeechSynthesisUtterance(response.replace(/[A-D]\)/g, '').replace(/Answer.*/i, ''))
-      u.rate = 0.9; speechSynthesis.speak(u)
-    }
     setLoading(false)
 
     if (mode === 'quiz') {
@@ -287,12 +282,6 @@ export default function AIChatbot() {
             <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Chatbot</div>
             <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your UPSC study assistant</div>
           </div>
-          <button onClick={() => { setMuted(!muted); if (!muted) speechSynthesis.cancel() }} style={{
-            background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex',
-            color: muted ? 'var(--text-3)' : 'var(--primary)',
-          }}>
-            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-          </button>
           <motion.button whileTap={{scale:0.96}} onClick={() => setShowHistory(!showHistory)} style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', position: 'relative',
           }}>
