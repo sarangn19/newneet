@@ -53,6 +53,7 @@ export default function AIChatbot() {
   const [showHistory, setShowHistory] = useState(false)
   const [savedNotes, setSavedNotes] = useState(new Set())
   const [quizState, setQuizState] = useState(null)
+  const [speakingIdx, setSpeakingIdx] = useState(null)
   const inputRef = useRef(null)
   const endRef = useRef(null)
 
@@ -338,12 +339,23 @@ export default function AIChatbot() {
                   {msg.text}
                   {msg.role === 'bot' && (
                     <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                      <motion.button whileTap={{scale:0.96}} onClick={() => { const u = new SpeechSynthesisUtterance(msg.text); u.rate = 0.9; speechSynthesis.speak(u) }} title="Read aloud" style={{
+                      <motion.button whileTap={{scale:0.96}} onClick={() => {
+                        if (speakingIdx === i) { speechSynthesis.cancel(); setSpeakingIdx(null) }
+                        else {
+                          speechSynthesis.cancel()
+                          const u = new SpeechSynthesisUtterance(msg.text)
+                          u.rate = 0.9
+                          u.onend = () => setSpeakingIdx(null)
+                          u.onerror = () => setSpeakingIdx(null)
+                          speechSynthesis.speak(u)
+                          setSpeakingIdx(i)
+                        }
+                      }} title={speakingIdx === i ? 'Stop' : 'Read aloud'} style={{
                         background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 10, color: 'var(--text-3)', fontWeight: 600, padding: 0, fontFamily: 'inherit',
+                        fontSize: 10, color: speakingIdx === i ? 'var(--primary)' : 'var(--text-3)', fontWeight: 600, padding: 0, fontFamily: 'inherit',
                         display: 'flex', alignItems: 'center', gap: 3,
                       }}>
-                        <Volume2 size={12} /> Speak
+                        <Volume2 size={12} /> {speakingIdx === i ? 'Stop' : 'Speak'}
                       </motion.button>
                       <motion.button whileTap={{scale:0.96}} onClick={() => saveAsNote(msg.text, messages[i-1]?.text)} style={{
                         background: 'none', border: 'none', cursor: 'pointer',
