@@ -1,0 +1,12 @@
+node_modules
+dist
+.env.local
+.env
+.env.vercel
+
+# Large binary files
+*.exe
+*.crdownload
+*.gif
+*.mp4
+.vercel
