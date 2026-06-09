@@ -6,6 +6,7 @@ import { useRecommendations } from '../lib/useRecommendations'
 import { usePerformanceAlerts } from '../lib/usePerformanceAlerts'
 import { generateRevisionContent } from '../lib/revisionAI'
 import { upscMCQs } from '../data/upsc/questions'
+import { upscSubjects } from '../data/upsc/subjects'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
 import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, TrendingUp, Clock, Search, FileText, SkipForward, Zap, Target } from 'lucide-react'
 
@@ -212,6 +213,8 @@ export default function UpscHome() {
                 const badgeBg = pi?.weakness >= 0.6 ? 'var(--error-light)' : pi?.forgetting >= 0.5 ? 'var(--warning-light)' : 'var(--primary-light)'
                 const badgeColor = pi?.weakness >= 0.6 ? '#dc2626' : pi?.forgetting >= 0.5 ? '#d97706' : 'var(--primary)'
                 const level = getMastery(t.id, revisionMastery)
+                const subj = upscSubjects.find(s => s.id === t.subjectId)
+                const subjGradient = subj?.gradient || 'linear-gradient(135deg, var(--primary-dark), var(--primary))'
                 return (
                   <motion.div key={t.id}
                     animate={{ x: offset * 200, scale: isCenter ? 1 : 0.85, opacity: isCenter ? 1 : 0.4, zIndex: isCenter ? 10 : 5 }}
@@ -220,12 +223,25 @@ export default function UpscHome() {
                     style={{ position: 'absolute', width: 340, cursor: 'pointer', perspective: 1200 }}
                     onMouseMove={(e) => {
                       if (!isCenter) return
-                      const rect = e.currentTarget.firstChild.getBoundingClientRect()
-                      const rotateX = ((e.clientY - rect.top - rect.height / 2) / rect.height / 2) * -10
-                      const rotateY = ((e.clientX - rect.left - rect.width / 2) / rect.width / 2) * 10
-                      e.currentTarget.firstChild.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`
+                      const el = e.currentTarget.firstChild
+                      const rect = el.getBoundingClientRect()
+                      const rotateX = ((e.clientY - rect.top - rect.height / 2) / rect.height / 2) * -12
+                      const rotateY = ((e.clientX - rect.left - rect.width / 2) / rect.width / 2) * 12
+                      el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
+                    }}
+                    onTouchMove={(e) => {
+                      if (!isCenter) return
+                      const touch = e.touches[0]
+                      const el = e.currentTarget.firstChild
+                      const rect = el.getBoundingClientRect()
+                      const rotateX = ((touch.clientY - rect.top - rect.height / 2) / rect.height / 2) * -12
+                      const rotateY = ((touch.clientX - rect.left - rect.width / 2) / rect.width / 2) * 12
+                      el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
                     }}
                     onMouseLeave={(e) => {
+                      e.currentTarget.firstChild.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
+                    }}
+                    onTouchEnd={(e) => {
                       e.currentTarget.firstChild.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
                     }}
                   >
@@ -239,10 +255,24 @@ export default function UpscHome() {
                       transition: 'transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1)',
                       boxShadow: isCenter ? '0 30px 60px -15px rgba(0,0,0,0.5)' : '0 8px 20px -8px rgba(0,0,0,0.3)',
                     }}>
-                      {/* Top accent bar */}
-                      <div style={{ height: 6, width: '100%', background: accentColor }} />
+                      {/* Image area — no padding */}
+                      <div style={{
+                        height: 150, width: '100%', background: subjGradient,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        position: 'relative', overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0%, transparent 60%), radial-gradient(circle at 70% 60%, rgba(255,255,255,0.06) 0%, transparent 50%)',
+                        }} />
+                        <div style={{
+                          fontSize: 48, fontWeight: 900, color: 'rgba(255,255,255,0.12)',
+                          letterSpacing: '-0.06em', userSelect: 'none',
+                          textTransform: 'uppercase',
+                        }}>{t.subjectName}</div>
+                      </div>
 
-                      <div style={{ padding: 24 }}>
+                      <div style={{ padding: 20 }}>
                         {/* Subject + badge */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.subjectName}</div>
@@ -250,15 +280,15 @@ export default function UpscHome() {
                         </div>
 
                         {/* Topic name */}
-                        <div style={{ fontSize: isCenter ? 20 : 17, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginTop: 6, letterSpacing: '-0.02em' }}>{t.name}</div>
+                        <div style={{ fontSize: isCenter ? 18 : 16, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginTop: 5, letterSpacing: '-0.02em' }}>{t.name}</div>
 
                         {/* Meta line */}
-                        <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6, fontWeight: 500 }}>
+                        <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 5, fontWeight: 500 }}>
                           GS I · L{level}/4 · {reason}
                         </div>
 
                         {/* Stats row */}
-                        <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
+                        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
                           {t.total > 0 && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                               <Target size={11} color="var(--primary)" />
@@ -272,11 +302,11 @@ export default function UpscHome() {
                         </div>
 
                         {/* Action */}
-                        <div style={{ marginTop: 20 }}>
+                        <div style={{ marginTop: 16 }}>
                           {isCenter ? (
                             <motion.button whileTap={{ scale: 0.97 }} onClick={(e) => { e.stopPropagation(); openRevision(t) }}
                               style={{
-                                width: '100%', padding: '14px 0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
+                                width: '100%', padding: '13px 0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
                                 cursor: 'pointer', border: 'none', background: 'var(--primary)', color: '#fff',
                                 borderRadius: 12, letterSpacing: '0.01em', boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
                               }}
