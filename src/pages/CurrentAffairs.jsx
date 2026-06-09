@@ -160,9 +160,6 @@ export default function CurrentAffairs() {
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <motion.button whileTap={{scale:0.96}} onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-            <ChevronLeft size={18} color="var(--text)" />
-          </motion.button>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Current Affairs</div>
             <div style={{ fontSize: 11, color: 'var(--text-2)' }}>UPSC-focused news feed</div>

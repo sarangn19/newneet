@@ -1,13 +1,11 @@
-import { useNavigate } from 'react-router-dom'
-import { useState, useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronLeft, Brain, TrendingUp, Clock, CheckCircle, BookOpen, MessageSquare, Globe, BarChart3, Flame, Target, Rotate3D } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
 import useStore from '../store/useStore'
+import { Brain, TrendingUp, Clock, CheckCircle, BookOpen, MessageSquare, Globe, BarChart3, Flame, Target, Rotate3D } from 'lucide-react'
 import { upscSubjects } from '../data/upsc/subjects'
 import { supabase } from '../lib/supabase'
 
 export default function UpscAnalytics() {
-  const navigate = useNavigate()
   const { stats, topicScores, questionHistory, revisionSchedule, user } = useStore()
   const [notesCount, setNotesCount] = useState(0)
   const [chatCount, setChatCount] = useState(0)
@@ -99,9 +97,6 @@ export default function UpscAnalytics() {
         {/* Header */}
         <div style={{ padding: '48px 16px 14px', background: 'var(--card-bg)', borderBottom: '2px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button className="pill-3d" onClick={() => navigate('/')} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'var(--surface-alt)', border: '2px solid var(--border)', borderRadius: 9999, padding: 0 }}>
-              <ChevronLeft size={18} color="var(--text-2)" />
-            </button>
             <div>
               <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text)' }}>Unified Analytics</div>
               <div style={{ fontSize: 11, color: 'var(--text-2)', fontWeight: 500, marginTop: 1 }}>All learning activity in one place</div>

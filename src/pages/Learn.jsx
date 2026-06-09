@@ -5,7 +5,7 @@ import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { upscSubjects } from '../data/upsc/subjects'
 import { getAllUpscQuestions } from '../data/upsc/questions'
-import { BookOpen, FileText, Search, ChevronLeft, ChevronRight, Plus, Zap, CheckCircle, XCircle, RefreshCw, Rotate3D, Star, Bookmark, Check } from 'lucide-react'
+import { BookOpen, FileText, Search, ChevronRight, Plus, Zap, CheckCircle, XCircle, RefreshCw, Rotate3D, Star, Bookmark, Check } from 'lucide-react'
 import { card as cardStyle, cardHover, spring, spacing, font, colors, btn } from '../lib/designTokens'
 
 const TABS = [
@@ -24,9 +24,6 @@ export default function Learn() {
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: spacing.header, borderBottom: `1px solid ${colors.borderLight}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <motion.button onClick={() => navigate('/')} whileTap={{ scale: 0.97 }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-            <ChevronLeft size={18} color="#111827" />
-          </motion.button>
           <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Learn</div>
         </div>
         {/* Tab bar */}

@@ -1,9 +1,8 @@
-import { useNavigate } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
-import { ChevronLeft, Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
+import { Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
 
 const MODES = [
   { id: 'explain', label: 'Explain', icon: BookOpen, color: '#3B82F6' },
@@ -30,7 +29,6 @@ const FALLBACK_RESPONSES = {
 }
 
 export default function AIChatbot() {
-  const navigate = useNavigate()
   const { userId } = useStore()
   const [messages, setMessages] = useState([
     { role: 'bot', text: 'Hello! I\'m your AI study assistant. Ask me anything about UPSC topics, or pick a mode below.' },
@@ -261,13 +259,10 @@ export default function AIChatbot() {
   }
 
   return (
-    <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: 130, boxSizing: 'border-box' }}>
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <motion.button whileTap={{scale:0.96}} onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-            <ChevronLeft size={18} color="var(--text)" />
-          </motion.button>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Chatbot</div>
             <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your UPSC study assistant</div>
@@ -419,7 +414,7 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ padding: '8px 14px calc(14px + env(safe-area-inset-bottom, 0px))', background: 'var(--card-bg)', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 101 }}>
+          <div style={{ padding: '8px 14px calc(14px + env(safe-area-inset-bottom, 0px))', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
               <div style={{ flex: 1, position: 'relative' }}>
                 <input
