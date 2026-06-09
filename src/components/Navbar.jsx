@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Flame, ClipboardList, BarChart3, BookOpen, Newspaper, Bot, Circle } from 'lucide-react';
+import { Home, Flame, ClipboardList, BarChart3, BookOpen, Newspaper, Bot } from 'lucide-react';
 import useStore from '../store/useStore';
 
 const iconMap = {
@@ -60,25 +60,27 @@ export default function Navbar() {
               width: 440, maxWidth: '100%',
               pointerEvents: 'auto',
             }}>
-              {tabs.map((tab) => (
-                <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
-                  textDecoration: 'none', WebkitTapHighlightColor: 'transparent', fontFamily: 'inherit',
-                }}>
-                  {({ isActive }) => (
-                    <div style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      width: 24, height: 24, cursor: 'pointer',
-                    }}>
-                      <Circle
-                        size={24}
-                        strokeWidth={2}
-                        color={isActive ? '#FFFFFF' : '#606060'}
-                        fill={isActive ? '#FFFFFF' : 'none'}
-                      />
-                    </div>
-                  )}
-                </NavLink>
-              ))}
+              {tabs.map((tab) => {
+                const IconComp = iconMap[tab.icon];
+                return (
+                  <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
+                    textDecoration: 'none', WebkitTapHighlightColor: 'transparent', fontFamily: 'inherit',
+                  }}>
+                    {({ isActive }) => (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: 28, height: 28, cursor: 'pointer',
+                      }}>
+                        <IconComp
+                          size={24}
+                          strokeWidth={isActive ? 2.5 : 1.8}
+                          color={isActive ? '#FFFFFF' : '#606060'}
+                        />
+                      </div>
+                    )}
+                  </NavLink>
+                );
+              })}
             </div>
           </motion.div>
         )}
