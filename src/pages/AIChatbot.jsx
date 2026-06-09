@@ -28,6 +28,16 @@ const FALLBACK_RESPONSES = {
   deepdive: `Deep Dive Analysis\n\nThis topic requires comprehensive understanding across multiple dimensions. Focus on interlinkages with current affairs and other GS papers for a holistic UPSC preparation strategy.`,
 }
 
+const PLACEHOLDERS = [
+  'Ask a question...',
+  'Paste a newspaper article...',
+  'Explain Directive Principles...',
+  'Generate 5 MCQs from my notes...',
+  'Summarise today\'s editorials...',
+  'Create flashcards on Polity...',
+  'Compare Fundamental Rights vs DPSP...',
+]
+
 export default function AIChatbot() {
   const { userId } = useStore()
   const [messages, setMessages] = useState([
@@ -37,12 +47,19 @@ export default function AIChatbot() {
   const [mode, setMode] = useState('explain')
   const [loading, setLoading] = useState(false)
   const [listening, setListening] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const [placeholderIdx, setPlaceholderIdx] = useState(0)
   const [history, setHistory] = useState([])
   const [showHistory, setShowHistory] = useState(false)
   const [savedNotes, setSavedNotes] = useState(new Set())
   const [quizState, setQuizState] = useState(null)
   const inputRef = useRef(null)
   const endRef = useRef(null)
+
+  useEffect(() => {
+    const t = setInterval(() => setPlaceholderIdx(i => (i + 1) % PLACEHOLDERS.length), 3200)
+    return () => clearInterval(t)
+  }, [])
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -414,35 +431,42 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ padding: '8px 14px calc(14px + env(safe-area-inset-bottom, 0px))', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
+          <div style={{ padding: '12px 14px calc(16px + env(safe-area-inset-bottom, 0px))', background: 'var(--card-bg)', borderTop: '1px solid var(--border)', boxShadow: '0 -4px 20px rgba(0,0,0,0.2)', position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
+                width: 34, height: 34, borderRadius: 10, border: 'none', flexShrink: 0,
+                background: listening ? '#EF4444' : 'var(--surface-alt)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Mic size={14} color={listening ? '#fff' : 'var(--text-3)'} />
+              </motion.button>
               <div style={{ flex: 1, position: 'relative' }}>
                 <input
                   ref={inputRef}
                   value={input}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setFocused(false)}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                  placeholder="Ask a question..."
+                  placeholder={PLACEHOLDERS[placeholderIdx]}
                   style={{
-                    width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid var(--border)',
-                    fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', boxSizing: 'border-box',
+                    width: '100%', padding: '11px 14px', borderRadius: 12,
+                    border: focused ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
+                    fontSize: 12, outline: 'none', fontFamily: 'inherit',
+                    background: '#1e1e2a', color: 'var(--text)', boxSizing: 'border-box',
+                    transition: 'border-color 0.15s, box-shadow 0.15s',
+                    boxShadow: focused ? '0 0 0 3px rgba(59,130,246,0.12)' : 'none',
                   }}
                 />
               </div>
-              <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
-                width: 36, height: 36, borderRadius: 12, border: 'none', flexShrink: 0,
-                background: listening ? '#EF4444' : 'var(--surface-alt)', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Mic size={15} color={listening ? '#fff' : 'var(--text-3)'} />
-              </motion.button>
-              <motion.button whileTap={{scale:0.96}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
-                width: 36, height: 36, borderRadius: 12, border: 'none',
+              <motion.button whileTap={{scale:0.94}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
+                width: 40, height: 40, borderRadius: 12, border: 'none', flexShrink: 0,
                 background: input.trim() && !loading ? 'var(--primary)' : 'var(--border)',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: input.trim() && !loading ? '0 2px 8px rgba(59,130,246,0.3)' : 'none',
               }}>
-                <Send size={16} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
+                <Send size={17} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
               </motion.button>
             </div>
           </div>
