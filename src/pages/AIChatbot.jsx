@@ -48,7 +48,6 @@ export default function AIChatbot() {
   const [mode, setMode] = useState('explain')
   const [loading, setLoading] = useState(false)
   const [listening, setListening] = useState(false)
-  const [focused, setFocused] = useState(false)
   const [placeholderIdx, setPlaceholderIdx] = useState(0)
   const [history, setHistory] = useState([])
   const [showHistory, setShowHistory] = useState(false)
@@ -432,46 +431,39 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ padding: '8px 10px calc(10px + env(safe-area-inset-bottom, 0px))', background: 'transparent', borderTop: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 -4px 20px rgba(0,0,0,0.25)', position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '0 6px', gap: 12, height: 56, background: '#121217', borderRadius: 28 }}>
-              {/* Input pill */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 14px', gap: 4, height: 40, background: '#202025', border: '1px solid #2D2D31', borderRadius: 20 }}>
-                <input
-                  ref={inputRef}
-                  value={input}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                  placeholder={PLACEHOLDERS[placeholderIdx]}
-                  style={{
-                    flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                    fontSize: 14, fontWeight: 400, letterSpacing: '-0.15px',
-                    fontFamily: 'inherit', color: 'var(--text)', padding: 0,
-                    transition: 'box-shadow 0.15s',
-                    boxShadow: focused ? `0 0 0 1px rgba(96,165,250,0.3), 0 4px 20px rgba(96,165,250,0.08)` : 'none',
-                    borderRadius: 20,
-                  }}
-                />
-                <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
-                  width: 24, height: 24, borderRadius: 12, border: 'none', flexShrink: 0,
-                  background: 'transparent', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                }}>
-                  <Mic size={16} color={listening ? '#fff' : 'rgba(255,255,255,0.4)'} />
-                </motion.button>
-              </div>
-              {/* Send button */}
-              <motion.button whileTap={{scale:0.94}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
-                display: 'flex', flexDirection: 'row', alignItems: 'center',
-                padding: '3px 16px 3px 14px', gap: 6,
-                height: 32, border: 'none', borderRadius: 16, flexShrink: 0,
-                background: input.trim() && !loading ? 'var(--primary)' : 'transparent',
-                cursor: input.trim() && !loading ? 'pointer' : 'default',
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '6px 12px calc(10px + env(safe-area-inset-bottom, 0px))', gap: 12, background: '#121217' }}>
+            {/* Input pill */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 14px', gap: 4, height: 40, background: '#202025', border: '1px solid #2D2D31', borderRadius: 20 }}>
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+                placeholder={PLACEHOLDERS[placeholderIdx]}
+                style={{
+                  flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                  fontSize: 14, fontWeight: 400, letterSpacing: '-0.15px',
+                  fontFamily: 'inherit', color: 'var(--text)', padding: 0,
+                }}
+              />
+              <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
+                width: 24, height: 24, borderRadius: 12, border: 'none', flexShrink: 0,
+                background: 'transparent', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
               }}>
-                <Send size={15} color={input.trim() && !loading ? '#fff' : 'rgba(255,255,255,0.25)'} />
+                <Mic size={16} color={listening ? '#fff' : 'rgba(255,255,255,0.4)'} />
               </motion.button>
             </div>
+            {/* Send button */}
+            <motion.button whileTap={{scale:0.94}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
+              display: 'flex', flexDirection: 'row', alignItems: 'center',
+              padding: '3px 16px 3px 14px', gap: 6,
+              height: 32, border: 'none', borderRadius: 16, flexShrink: 0,
+              background: input.trim() && !loading ? 'var(--primary)' : 'transparent',
+              cursor: input.trim() && !loading ? 'pointer' : 'default',
+            }}>
+              <Send size={15} color={input.trim() && !loading ? '#fff' : 'rgba(255,255,255,0.25)'} />
+            </motion.button>
           </div>
         </div>
 
