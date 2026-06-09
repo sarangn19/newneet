@@ -276,7 +276,7 @@ export default function AIChatbot() {
   }
 
   return (
-    <motion.div layout className="upsc-mode" style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: 100, boxSizing: 'border-box' }}>
+    <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: 100, boxSizing: 'border-box' }}>
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -431,7 +431,7 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ margin: '0 14px 8px', padding: '0 14px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, height: 48, background: 'var(--surface-alt)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
+          <div style={{ margin: '0 14px 8px', padding: '0 14px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, height: 48, background: 'var(--surface-alt)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow-card)' }}>
             <input
               ref={inputRef}
               value={input}

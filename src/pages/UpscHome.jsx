@@ -155,7 +155,7 @@ export default function UpscHome() {
               UPSC<span style={{ color: 'var(--primary)' }}>.</span>
             </h1>
             <p style={{ fontSize: 12, color: 'var(--text-3)', margin: '2px 0 0', fontWeight: 500 }}>
-              {remainingCount > 0 ? `${remainingCount} topics today` : 'All done!'} · {dayLabels[dayOfWeek]}
+              {dayLabels[dayOfWeek]}
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
