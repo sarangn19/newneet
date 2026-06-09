@@ -113,6 +113,126 @@
   --error-dark:         #BE123C;
 }
 
+/* ── UPSC dark mode ────────────────────────────────────────── */
+.upsc-mode {
+  --page-bg:       #0f172a;
+  --card-bg:       #1e293b;
+  --warning:       #f59e0b;
+  --warning-light: #422006;
+  --primary:       #818cf8;
+  --primary-dark:  #6366f1;
+  --primary-light: #1e1b4b;
+  --yellow:        #818cf8;
+  --icon-active-filter: brightness(0) saturate(100%) invert(60%) sepia(51%) saturate(665%) hue-rotate(200deg) brightness(101%);
+  --icon-inactive-filter: brightness(0) saturate(100%) invert(60%);
+  --accent-secondary: #818cf8;
+  --accent-secondary-dark: #6366f1;
+  --accent-2:      #38bdf8;
+  --bg:            #0f172a;
+  --white:         #1e293b;
+  --surface-alt:   #334155;
+  --border:        #334155;
+  --text:          #f1f5f9;
+  --text-2:        #94a3b8;
+  --text-3:        #64748b;
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     16px;
+  --radius-xl:     24px;
+  --radius-pill:   999px;
+  --shadow-card:   0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+  --shadow-float:  0 2px 4px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.25);
+  --shadow-strong: 0 4px 8px rgba(0,0,0,0.35), 0 12px 32px rgba(0,0,0,0.3);
+  --shadow-hover:  0 4px 12px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.25);
+  --shadow-active: 0 0 0 2px var(--accent), 0 4px 16px rgba(129,140,248,0.3);
+  --shadow-button: 0 2px 8px rgba(99,102,241,0.3);
+  --shadow-button-hover: 0 4px 16px rgba(99,102,241,0.4);
+  --shadow-button-3d: 0 5px 0 #6366f1, 0 6px 12px rgba(129,140,248,0.3);
+  --glass-bg: rgba(30,41,59,0.85);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 4px 20px rgba(0,0,0,0.3);
+  --surface-raised: #1e293b;
+  --surface-subtle: #1e293b;
+  --surface-glass:      rgba(30,41,59,0.6);
+  --nav-bg:             rgba(15,23,42,0.95);
+  --bio:           #34d399;
+  --bio-light:     #064e3b;
+  --chem:          #818cf8;
+  --chem-light:    #1e1b4b;
+  --phys:          #a78bfa;
+  --phys-light:    #2e1065;
+  --accent:        #818cf8;
+  --primary-alt:         #818cf8;
+  --primary-alt-dark:    #6366f1;
+  --primary-alt-light:   #1e1b4b;
+  --success:       #34d399;
+  --success-light: #064e3b;
+  --success-dark:  #d1fae5;
+  --error:         #f87171;
+  --error-light:   #7f1d1d;
+  --error-dark:    #fecaca;
+}
+
+/* Force UPSC dark mode on hardcoded backgrounds */
+.upsc-mode [style*="background: #f4f6f8"],
+.upsc-mode [style*="background:#f4f6f8"],
+.upsc-mode [style*="background: #F8F9FA"],
+.upsc-mode [style*="background:#F8F9FA"],
+.upsc-mode [style*="background: #F3F4F6"],
+.upsc-mode [style*="background:#F3F4F6"],
+.upsc-mode [style*="background: #F0FDF4"],
+.upsc-mode [style*="background:#F0FDF4"],
+.upsc-mode [style*="background: #FEF3C7"],
+.upsc-mode [style*="background:#FEF3C7"],
+.upsc-mode [style*="background: #fffbeb"],
+.upsc-mode [style*="background:#fffbeb"],
+.upsc-mode [style*="background: #EFF6FF"],
+.upsc-mode [style*="background:#EFF6FF"],
+.upsc-mode [style*="background: #eef2ff"],
+.upsc-mode [style*="background:#eef2ff"],
+.upsc-mode [style*="background: #FFF7ED"],
+.upsc-mode [style*="background:#FFF7ED"],
+.upsc-mode [style*="background: #FEF2F2"],
+.upsc-mode [style*="background:#FEF2F2"],
+.upsc-mode [style*="background: rgb(240, 253, 244)"],
+.upsc-mode [style*="background: rgb(254, 243, 199)"],
+.upsc-mode [style*="background: rgb(255, 251, 235)"],
+.upsc-mode [style*="background: rgb(239, 246, 255)"],
+.upsc-mode [style*="background: rgb(238, 242, 255)"],
+.upsc-mode [style*="background: rgb(255, 247, 237)"],
+.upsc-mode [style*="background: rgb(254, 242, 242)"],
+.upsc-mode [style*="background: rgb(243, 244, 246)"],
+.upsc-mode [style*="background: rgb(244, 246, 248)"],
+.upsc-mode [style*="background: rgb(248, 249, 250)"] {
+  background: var(--card-bg) !important;
+}
+
+.upsc-mode .floating-nav {
+  background: var(--glass-bg) !important;
+  border-color: var(--glass-border) !important;
+  backdrop-filter: blur(16px) !important;
+}
+
+.upsc-mode .nav-item.active::before {
+  background: var(--primary-light) !important;
+}
+
+.upsc-mode .card-3d {
+  background: var(--card-bg) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 6px 0 0 #1e293b, 0 4px 12px rgba(0,0,0,0.2) !important;
+}
+
+.upsc-mode .pill-3d {
+  background: var(--surface-alt) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 3px 0 0 #0f172a !important;
+}
+
+.upsc-mode .page-header {
+  box-shadow: 0 4px 20px rgba(129,140,248,0.25);
+}
+
 /* ── NEET dark mode global overrides ──────────────────────── */
 .neet-mode .screen,
 .neet-mode .screen-white,
@@ -204,6 +324,95 @@
 }
 
 .neet-mode .divider {
+  background: var(--border) !important;
+}
+
+/* ── UPSC dark mode global overrides ──────────────────────── */
+.upsc-mode .screen,
+.upsc-mode .screen-white,
+.upsc-mode .page-white,
+.upsc-mode [style*="background: #f4f6f8"],
+.upsc-mode [style*="background:#f4f6f8"],
+.upsc-mode [style*="background: #F8F9FA"],
+.upsc-mode [style*="background:#F8F9FA"],
+.upsc-mode [style*="background: #F3F4F6"],
+.upsc-mode [style*="background:#F3F4F6"] {
+  background: var(--page-bg) !important;
+}
+
+.upsc-mode .card {
+  background: var(--card-bg) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+.upsc-mode .back-btn-dark {
+  background: var(--surface-alt) !important;
+  border-color: var(--border) !important;
+  color: var(--text-2) !important;
+}
+
+.upsc-mode .mcq-option {
+  background: var(--surface-alt) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+.upsc-mode .mcq-option.selected {
+  border-color: var(--primary) !important;
+  background: rgba(129,140,248,0.08) !important;
+}
+.upsc-mode .mcq-option.correct {
+  border-color: #10B981 !important;
+  background: rgba(16,185,129,0.1) !important;
+  color: #6ee7b7 !important;
+}
+.upsc-mode .mcq-option.wrong {
+  border-color: #e53935 !important;
+  background: rgba(229,57,53,0.08) !important;
+  color: #fca5a5 !important;
+}
+
+.upsc-mode .mcq-label {
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--text-3) !important;
+}
+
+.upsc-mode .progress-track {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+.upsc-mode .page-header {
+  box-shadow: 0 4px 20px rgba(129,140,248,0.25);
+}
+
+.upsc-mode .btn-primary {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 5px 0 var(--primary-dark), 0 6px 16px rgba(129,140,248,0.25) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em !important;
+  transition: transform 0.08s, box-shadow 0.08s !important;
+}
+.upsc-mode .btn-primary:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 var(--primary-dark) !important;
+}
+.upsc-mode .btn-primary:disabled {
+  background: var(--surface-alt) !important;
+  color: var(--text-3) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.upsc-mode .btn-secondary {
+  background: var(--surface-alt) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.upsc-mode .divider {
   background: var(--border) !important;
 }
 
@@ -450,7 +659,7 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
 /* ── Progress bar ──────────────────────────────────────────────── */
 .progress-track {
   height: 6px;
-  background: #EEECE8;
+  background: var(--surface-alt);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -600,20 +809,33 @@ button, [role="button"], .card-tap {
   border-color: #cbd5e1;
 }
 
+.upsc-mode .card-3d {
+  background: var(--card-bg);
+  border-color: var(--border);
+  box-shadow: 0 6px 0 0 var(--surface-alt);
+}
+
 /* ── 3D Primary Button ─────────────────────────────────────────── */
 .btn-primary-3d {
-  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: #ffffff;
   border-radius: 0.875rem;
   font-weight: 700;
-  border: 1px solid #4338ca;
-  box-shadow: 0 4px 0 0 #312e81, 0 8px 10px -2px rgba(79, 70, 229, 0.3);
+  border: 1px solid var(--primary-dark);
+  box-shadow: 0 4px 0 0 var(--primary-dark), 0 8px 10px -2px rgba(99, 102, 241, 0.3);
   transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
   text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 .btn-primary-3d:active {
   transform: translateY(4px);
-  box-shadow: 0 0px 0 0 #312e81, 0 4px 6px -2px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 0px 0 0 var(--primary-dark), 0 4px 6px -2px rgba(99, 102, 241, 0.3);
+}
+
+.upsc-mode .btn-primary-3d {
+  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #ffffff;
+  border-color: var(--primary-dark);
+  box-shadow: 0 4px 0 0 #4f46e5, 0 8px 10px -2px rgba(129, 140, 248, 0.3);
 }
 
 /* ── 3D Pill ────────────────────────────────────────────────────── */
@@ -629,6 +851,12 @@ button, [role="button"], .card-tap {
   box-shadow: 0 0px 0 0 #cbd5e1;
 }
 
+.upsc-mode .pill-3d {
+  background: var(--surface-alt);
+  border-color: var(--border);
+  box-shadow: 0 3px 0 0 var(--card-bg);
+}
+
 /* ── Floating Glass Navigation ──────────────────────────────────── */
 .floating-nav {
   background: rgba(255, 255, 255, 0.85);
@@ -639,32 +867,51 @@ button, [role="button"], .card-tap {
   border-radius: 1rem;
   padding: 0.5rem 0.75rem;
 }
+
+.upsc-mode .floating-nav {
+  background: rgba(21, 21, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.4);
+}
+
 .nav-item {
   position: relative;
   transition: all 0.2s ease;
-  color: #94a3b8;
+  color: var(--text-3);
   background: none;
   border: none;
   cursor: pointer;
   font-family: inherit;
 }
 .nav-item.active {
-  color: #4f46e5;
+  color: var(--primary);
 }
 .nav-item.active::before {
   content: '';
   position: absolute;
   inset: -4px -12px;
-  background: #e0e7ff;
+  background: var(--primary-light);
   border-radius: 1rem;
   z-index: -1;
   box-shadow: inset 0 -2px 0 0 rgba(199, 210, 254, 0.5);
+}
+
+.upsc-mode .nav-item.active {
+  color: var(--primary);
+}
+.upsc-mode .nav-item.active::before {
+  background: rgba(129, 140, 248, 0.12);
+  box-shadow: inset 0 -2px 0 0 rgba(129, 140, 248, 0.2);
 }
 
 /* ── Dot Grid Background ─────────────────────────────────────────── */
 .bg-pattern {
   background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
   background-size: 20px 20px;
+}
+
+.upsc-mode .bg-pattern {
+  background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
 }
 
 /* Smooth momentum scrolling on iOS */

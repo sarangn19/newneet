@@ -158,28 +158,28 @@ export default function CurrentAffairs() {
       </AnimatePresence>
 
       {/* Header */}
-      <div style={{ background: '#fff', padding: '48px 16px 10px', borderBottom: '1px solid #F3F4F6' }}>
+      <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <motion.button whileTap={{scale:0.96}} onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-            <ChevronLeft size={18} color="#111827" />
+            <ChevronLeft size={18} color="var(--text)" />
           </motion.button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>Current Affairs</div>
-            <div style={{ fontSize: 11, color: '#6B7280' }}>UPSC-focused news feed</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Current Affairs</div>
+            <div style={{ fontSize: 11, color: 'var(--text-2)' }}>UPSC-focused news feed</div>
           </div>
           <motion.button whileTap={{scale:0.96}} onClick={loadNews} style={{
-            width: 34, height: 34, borderRadius: 12, border: '1px solid #E5E7EB',
-            background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 34, height: 34, borderRadius: 12, border: '1px solid var(--border)',
+            background: 'var(--surface-alt)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <RefreshCw size={16} color="#6B7280" className={loading ? 'spin' : ''} />
+            <RefreshCw size={16} color="var(--text-2)" className={loading ? 'spin' : ''} />
           </motion.button>
         </div>
         {/* Search */}
         <div style={{ position: 'relative' }}>
-          <Search size={14} color="#9CA3AF" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
+          <Search size={14} color="var(--text-3)" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search articles..." style={{
-            width: '100%', padding: '8px 8px 8px 32px', borderRadius: 8, border: '1px solid #E5E7EB',
-            fontSize: 12, outline: 'none', fontFamily: 'inherit', background: '#F9FAFB', boxSizing: 'border-box',
+            width: '100%', padding: '8px 8px 8px 32px', borderRadius: 8, border: '1px solid var(--border)',
+            fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', boxSizing: 'border-box',
           }} />
         </div>
       </div>
@@ -187,14 +187,14 @@ export default function CurrentAffairs() {
       {/* Category tabs */}
       <div style={{
         display: 'flex', gap: 4, padding: '8px 14px', overflowX: 'auto', scrollbarWidth: 'none',
-        background: '#fff', borderBottom: '1px solid #F3F4F6',
+        background: 'var(--card-bg)', borderBottom: '1px solid var(--border)',
       }}>
         {CATEGORIES.map(cat => (
           <motion.button whileTap={{scale:0.96}} key={cat} onClick={() => setActiveCategory(cat)} style={{
             padding: '4px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
             fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
-            background: activeCategory === cat ? '#3B82F6' : '#F3F4F6',
-            color: activeCategory === cat ? '#fff' : '#6B7280',
+            background: activeCategory === cat ? 'var(--primary)' : 'var(--surface-alt)',
+            color: activeCategory === cat ? '#fff' : 'var(--text-3)',
           }}>
             {cat}
           </motion.button>
@@ -206,14 +206,14 @@ export default function CurrentAffairs() {
         <div style={{ flex: 1, padding: '10px 14px', overflowY: 'auto' }}>
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #E5E7EB', borderTopColor: '#3B82F6', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
-              <div style={{ fontSize: 12, color: '#9CA3AF' }}>Loading news...</div>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--primary)', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
+              <div style={{ fontSize: 12, color: 'var(--text-3)' }}>Loading news...</div>
             </div>
           ) : filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
               <div style={{ fontSize: 32, marginBottom: 8 }}>📰</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#6B7280' }}>No articles found</div>
-              <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>Try a different category or check back later</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No articles found</div>
+              <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>Try a different category or check back later</div>
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -228,7 +228,7 @@ export default function CurrentAffairs() {
                     whileHover={{ y: -3 }}
                     onClick={() => setSelectedArticle(a)}
                     style={{
-                      background: '#fff', borderRadius: 14, border: selectedArticle?.title === a.title ? '2px solid #3B82F6' : '1px solid #E5E7EB',
+                      background: 'var(--card-bg)', borderRadius: 14, border: selectedArticle?.title === a.title ? '2px solid var(--primary)' : '1px solid var(--border)',
                       cursor: 'pointer', overflow: 'hidden', transition: '0.15s',
                     }}
                   >
@@ -247,20 +247,20 @@ export default function CurrentAffairs() {
                       </span>
                     </div>
                     <div style={{ padding: '10px 12px 12px' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', lineHeight: 1.4, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {a.title}
                       </div>
                       {a.summary && (
-                        <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 6 }}>
+                        <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 6 }}>
                           {a.summary}
                         </div>
                       )}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ fontSize: 10, color: '#9CA3AF' }}>{a.date}</div>
+                        <div style={{ fontSize: 10, color: 'var(--text-3)' }}>{a.date}</div>
                         <motion.button whileTap={{scale:0.9}} onClick={e => { e.stopPropagation(); toggleBookmark(a) }} style={{
                           background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex',
                         }}>
-                          <Bookmark size={13} color={bookmarked.has(a.title) ? '#3B82F6' : '#D1D5DB'} fill={bookmarked.has(a.title) ? '#3B82F6' : 'none'} />
+                          <Bookmark size={13} color={bookmarked.has(a.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(a.title) ? 'var(--primary)' : 'none'} />
                         </motion.button>
                       </div>
                     </div>

@@ -70,11 +70,11 @@ export default function Navbar() {
                         }}
                       >
                         <IconComp size={22} strokeWidth={isActive ? 2.5 : 1.8}
-                          color={isActive ? '#4f46e5' : '#94a3b8'}
+                          color={isActive ? 'var(--primary)' : 'var(--text-3)'}
                         />
                         <span style={{
                           fontSize: 9, fontWeight: isActive ? 800 : 600,
-                          color: isActive ? '#4f46e5' : '#94a3b8',
+                          color: isActive ? 'var(--primary)' : 'var(--text-3)',
                           letterSpacing: '0.03em',
                         }}>
                           {tab.label}

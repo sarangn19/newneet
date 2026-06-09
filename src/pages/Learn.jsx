@@ -22,23 +22,23 @@ export default function Learn() {
   return (
     <motion.div layout style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
       {/* Header */}
-      <div style={{ background: '#fff', padding: spacing.header, borderBottom: `1px solid ${colors.borderLight}` }}>
+      <div style={{ background: 'var(--card-bg)', padding: spacing.header, borderBottom: `1px solid ${colors.borderLight}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <motion.button onClick={() => navigate('/')} whileTap={{ scale: 0.97 }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
             <ChevronLeft size={18} color="#111827" />
           </motion.button>
-          <div style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>Learn</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Learn</div>
         </div>
         {/* Tab bar */}
-        <div style={{ display: 'flex', gap: 4, background: '#F3F4F6', borderRadius: 10, padding: 3 }}>
+        <div style={{ display: 'flex', gap: 4, background: 'var(--surface-alt)', borderRadius: 10, padding: 3 }}>
           {TABS.map(t => {
             const Icon = t.icon
             const active = tab === t.id
             return (
               <motion.button key={t.id} onClick={() => setTab(t.id)} whileTap={{ scale: 0.97 }} style={{
                 flex: 1, padding: '7px 0', borderRadius: 12, border: 'none', cursor: 'pointer',
-                background: active ? '#fff' : 'transparent', fontFamily: 'inherit',
-                fontSize: 11, fontWeight: 600, color: active ? '#111827' : '#6B7280',
+                background: active ? 'var(--card-bg)' : 'transparent', fontFamily: 'inherit',
+                fontSize: 11, fontWeight: 600, color: active ? 'var(--text)' : 'var(--text-3)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
                 boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', transition: '0.15s',
               }}>
@@ -137,15 +137,15 @@ function NotesTab() {
       {/* Search + View toggle + New */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
         <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={14} color="#9CA3AF" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
+          <Search size={14} color="var(--text-3)" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search notes..." style={{
-            width: '100%', padding: '8px 8px 8px 32px', borderRadius: 8, border: '1px solid #E5E7EB',
-            fontSize: 12, outline: 'none', fontFamily: 'inherit', background: '#fff', boxSizing: 'border-box',
+            width: '100%', padding: '8px 8px 8px 32px', borderRadius: 8, border: '1px solid var(--border)',
+            fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--card-bg)', boxSizing: 'border-box',
           }} />
         </div>
 
         <motion.button onClick={() => setShowForm(!showForm)} whileTap={{ scale: 0.97 }} style={{
-          padding: '0 14px', borderRadius: 12, border: 'none', background: '#3B82F6',
+          padding: '0 14px', borderRadius: 12, border: 'none', background: 'var(--primary)',
           color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
           display: 'flex', alignItems: 'center', gap: 4,
         }}>
@@ -158,13 +158,13 @@ function NotesTab() {
         <motion.button key="all" onClick={() => setSubjectFilter('all')} whileTap={{ scale: 0.97 }} style={{
           padding: '6px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
           fontSize: 11, fontWeight: 700, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 5,
-          background: subjectFilter === 'all' ? '#3B82F6' : '#F3F4F6',
-          color: subjectFilter === 'all' ? '#fff' : '#6B7280',
+          background: subjectFilter === 'all' ? 'var(--primary)' : 'var(--surface-alt)',
+          color: subjectFilter === 'all' ? '#fff' : 'var(--text-3)',
         }}>
           All
           <span style={{
             fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99,
-            background: subjectFilter === 'all' ? 'rgba(255,255,255,0.2)' : '#E5E7EB',
+            background: subjectFilter === 'all' ? 'rgba(255,255,255,0.2)' : 'var(--border)',
           }}>{subjectCounts.all}</span>
         </motion.button>
         {upscSubjects.map(s => {
@@ -173,13 +173,13 @@ function NotesTab() {
             <motion.button key={s.id} onClick={() => setSubjectFilter(s.id)} whileTap={{ scale: 0.97 }} style={{
               padding: '6px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
               fontSize: 11, fontWeight: 700, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 5,
-              background: active ? s.color : '#F3F4F6',
-              color: active ? '#fff' : '#6B7280',
+              background: active ? s.color : 'var(--surface-alt)',
+              color: active ? '#fff' : 'var(--text-3)',
             }}>
               {s.name}
               <span style={{
                 fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99,
-                background: active ? 'rgba(255,255,255,0.2)' : '#E5E7EB',
+                background: active ? 'rgba(255,255,255,0.2)' : 'var(--border)',
               }}>{subjectCounts[s.id]}</span>
             </motion.button>
           )
@@ -189,32 +189,32 @@ function NotesTab() {
       {/* Add Note form */}
       {showForm && (
         <motion.div style={{ ...cardStyle, padding: 14, marginBottom: 10 }} whileHover={cardHover}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 8 }}>+ New Note</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>+ New Note</div>
           <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Title (optional)" style={{
-            width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #E5E7EB',
+            width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)',
             fontSize: 12, outline: 'none', fontFamily: 'inherit', marginBottom: 8, boxSizing: 'border-box',
           }} />
           <select value={noteSubject} onChange={e => setNoteSubject(e.target.value)} style={{
-            width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #E5E7EB',
-            fontSize: 12, outline: 'none', fontFamily: 'inherit', marginBottom: 8, background: '#fff', boxSizing: 'border-box',
+            width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)',
+            fontSize: 12, outline: 'none', fontFamily: 'inherit', marginBottom: 8, background: 'var(--card-bg)', boxSizing: 'border-box',
           }}>
             {upscSubjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
           <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Write your note..." rows={5} style={{
-            width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #E5E7EB',
+            width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)',
             fontSize: 12, outline: 'none', fontFamily: 'inherit', resize: 'vertical', marginBottom: 8, boxSizing: 'border-box',
           }} />
           <div style={{ display: 'flex', gap: 8 }}>
             <motion.button onClick={saveNote} disabled={!content.trim()} whileTap={{ scale: 0.97 }} style={{
               flex: 1, padding: '9px 0', borderRadius: 12, border: 'none',
-              background: content.trim() ? '#3B82F6' : '#D1D5DB', color: '#fff',
+              background: content.trim() ? 'var(--primary)' : 'var(--border)', color: '#fff',
               fontSize: 12, fontWeight: 700, cursor: content.trim() ? 'pointer' : 'default', fontFamily: 'inherit',
             }}>
               Save Note
             </motion.button>
             <motion.button onClick={() => setShowForm(false)} whileTap={{ scale: 0.97 }} style={{
-              padding: '9px 14px', borderRadius: 12, border: '1.5px solid #E5E7EB',
-              background: '#fff', color: '#6B7280', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+              padding: '9px 14px', borderRadius: 12, border: '1.5px solid var(--border)',
+              background: 'var(--card-bg)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
             }}>
               Cancel
             </motion.button>
@@ -225,15 +225,15 @@ function NotesTab() {
       {/* Notes - 2-column grid */}
       {filteredNotes.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 14px' }}>
-          <BookOpen size={32} color="#D1D5DB" style={{ marginBottom: 8 }} />
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#6B7280' }}>No notes yet</div>
-          <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>Create a new note to get started</div>
+          <BookOpen size={32} color="var(--text-3)" style={{ marginBottom: 8 }} />
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No notes yet</div>
+          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>Create a new note to get started</div>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {filteredNotes.map((n, index) => {
             const subjectObj = upscSubjects.find(s => s.id === n.subject)
-            const subjectColor = subjectObj?.color || '#6B7280'
+            const subjectColor = subjectObj?.color || 'var(--text-3)'
             const preview = (() => {
               const raw = n.content || ''
               const stripped = raw.replace(/<[^>]*>/g, '').replace(/==/g, '').replace(/\*\*/g, '').replace(/\[image\]\([^)]*\)/g, '[image]')
@@ -244,7 +244,7 @@ function NotesTab() {
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}
                 whileHover={{ y: -3 }}
                   style={{
-                    background: '#fff', borderRadius: 14, border: '1px solid #E5E7EB', padding: 14,
+                    background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--border)', padding: 14,
                     cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', gap: 6,
                     overflow: 'hidden', wordBreak: 'break-word',
                   }}>
@@ -257,22 +257,22 @@ function NotesTab() {
                     {subjectObj?.name || n.subject}
                   </span>
                 )}
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.title || 'Untitled'}</div>
-                <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.title || 'Untitled'}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {preview}
                 </div>
-                <div style={{ fontSize: 10, color: '#D1D5DB', marginTop: 'auto', paddingTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 'auto', paddingTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>{new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                   <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(n.id) }} whileTap={{ scale: 0.85 }} style={{
                     background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex',
                   }}>
-                    <Bookmark size={13} color={bookmarkedIds.has(n.id) ? '#F59E0B' : '#D1D5DB'} fill={bookmarkedIds.has(n.id) ? '#F59E0B' : 'none'} />
+                    <Bookmark size={13} color={bookmarkedIds.has(n.id) ? '#F59E0B' : 'var(--text-3)'} fill={bookmarkedIds.has(n.id) ? '#F59E0B' : 'none'} />
                   </motion.button>
                 </div>
                 <motion.button onClick={e => { e.stopPropagation(); deleteNote(n.id) }} whileTap={{ scale: 0.9 }} style={{
                   position: 'absolute', top: 8, right: 8, width: 22, height: 22, borderRadius: '50%',
-                  background: '#F3F4F6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, color: '#9CA3AF', lineHeight: 1,
+                  background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, color: 'var(--text-3)', lineHeight: 1,
                 }}>×</motion.button>
               </motion.div>
             )
@@ -300,7 +300,7 @@ function tagSkill(q) {
 }
 
 const SKILL_LABELS = { recall: 'Recall', elimination: 'Elimination', analysis: 'Analysis', pattern: 'Pattern', application: 'Application' }
-const SKILL_COLORS = { recall: '#3B82F6', elimination: '#8B5CF6', analysis: '#F59E0B', pattern: '#10B981', application: '#EF4444' }
+const SKILL_COLORS = { recall: 'var(--primary)', elimination: 'var(--phys)', analysis: '#F59E0B', pattern: '#10B981', application: '#EF4444' }
 
 function saveSession(subject, topic, questions, answers, confidence, qTimes, expectedScore, savePracticeDecay) {
   try {
@@ -396,7 +396,7 @@ function getLearnerProfile(decayData) {
       if (e.correct) skillStats[e.skill].correct++
     })
     const skills = Object.entries(skillStats).map(([s, v]) => ({
-      skill: s, label: SKILL_LABELS[s] || s, color: SKILL_COLORS[s] || '#6B7280',
+      skill: s, label: SKILL_LABELS[s] || s, color: SKILL_COLORS[s] || 'var(--text-3)',
       accuracy: Math.round(v.correct / v.total * 100), total: v.total,
     })).sort((a, b) => a.accuracy - b.accuracy)
     return { total, accuracy, avgConf, guessed, misinformed, knowledge, guessingTendency, bias, overconfident, underconfident, last5, selfAware, decaying, skills }
@@ -599,61 +599,61 @@ function PracticeMCQTab() {
           <motion.div key="result" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <motion.div style={{ ...cardStyle, padding: 20, textAlign: 'center' }} whileHover={cardHover}>
               <div style={{ fontSize: 36, marginBottom: 8 }}>{pct >= 60 ? '🎉' : pct >= 30 ? '👍' : '💪'}</div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: '#111827' }}>{score}/{questions.length}</div>
-              <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>{pct}% accuracy</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)' }}>{score}/{questions.length}</div>
+              <div style={{ fontSize: 13, color: 'var(--text-2)', marginTop: 4 }}>{pct}% accuracy</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, margin: '14px 0' }}>
-                <div style={{ background: '#D1FAE5', borderRadius: 8, padding: '8px' }}>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: '#059669' }}>{score}</div>
-                  <div style={{ fontSize: 10, color: '#059669' }}>Correct</div>
+                <div style={{ background: 'var(--success-light)', borderRadius: 8, padding: '8px' }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--success)' }}>{score}</div>
+                  <div style={{ fontSize: 10, color: 'var(--success)' }}>Correct</div>
                 </div>
-                <div style={{ background: '#FEF2F2', borderRadius: 8, padding: '8px' }}>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: '#EF4444' }}>{questions.length - score}</div>
-                  <div style={{ fontSize: 10, color: '#EF4444' }}>Incorrect</div>
+                <div style={{ background: 'var(--error-light)', borderRadius: 8, padding: '8px' }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--error)' }}>{questions.length - score}</div>
+                  <div style={{ fontSize: 10, color: 'var(--error)' }}>Incorrect</div>
                 </div>
               </div>
               {/* Decision Quality */}
               {totalWithConf > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#111827', marginBottom: 6, textAlign: 'left' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', marginBottom: 6, textAlign: 'left' }}>
                     Decision Quality
-                    {avgSpeed !== null && <span style={{ fontWeight: 400, color: '#9CA3AF', marginLeft: 6 }}>· Avg {Math.round(avgSpeed / 1000)}s/q</span>}
+                    {avgSpeed !== null && <span style={{ fontWeight: 400, color: 'var(--text-3)', marginLeft: 6 }}>· Avg {Math.round(avgSpeed / 1000)}s/q</span>}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 8 }}>
-                    <div style={{ background: '#F0FDF4', borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: '#059669' }}>{dCounts.knowledge}</div>
-                      <div style={{ fontSize: 9, color: '#059669' }}>Knowledge</div>
+                    <div style={{ background: 'var(--success-light)', borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--success)' }}>{dCounts.knowledge}</div>
+                      <div style={{ fontSize: 9, color: 'var(--success)' }}>Knowledge</div>
                     </div>
-                    <div style={{ background: '#FEF3C7', borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
+                    <div style={{ background: 'var(--warning-light)', borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
                       <div style={{ fontSize: 14, fontWeight: 800, color: '#D97706' }}>{dCounts.guessed}</div>
                       <div style={{ fontSize: 9, color: '#D97706' }}>Guessed</div>
                     </div>
-                    <div style={{ background: '#FEF2F2', borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: '#EF4444' }}>{dCounts.misinformed}</div>
-                      <div style={{ fontSize: 9, color: '#EF4444' }}>Misinformed</div>
+                    <div style={{ background: 'var(--error-light)', borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--error)' }}>{dCounts.misinformed}</div>
+                      <div style={{ fontSize: 9, color: 'var(--error)' }}>Misinformed</div>
                     </div>
-                    <div style={{ background: '#EFF6FF', borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: '#3B82F6' }}>{dCounts.beginner}</div>
-                      <div style={{ fontSize: 9, color: '#3B82F6' }}>Beginner</div>
+                    <div style={{ background: 'var(--primary-light)', borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--primary)' }}>{dCounts.beginner}</div>
+                      <div style={{ fontSize: 9, color: 'var(--primary)' }}>Beginner</div>
                     </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 10 }}>
-                    <div style={{ background: '#F0FDF4', borderRadius: 8, padding: '6px' }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: '#059669' }}>{calibration}%</div>
-                      <div style={{ fontSize: 9, color: '#059669' }}>Calibration</div>
+                    <div style={{ background: 'var(--success-light)', borderRadius: 8, padding: '6px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--success)' }}>{calibration}%</div>
+                      <div style={{ fontSize: 9, color: 'var(--success)' }}>Calibration</div>
                     </div>
-                    <div style={{ background: '#EFF6FF', borderRadius: 8, padding: '6px' }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: '#3B82F6' }}>{avgConf}%</div>
-                      <div style={{ fontSize: 9, color: '#3B82F6' }}>Avg Confidence</div>
+                    <div style={{ background: 'var(--primary-light)', borderRadius: 8, padding: '6px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--primary)' }}>{avgConf}%</div>
+                      <div style={{ fontSize: 9, color: 'var(--primary)' }}>Avg Confidence</div>
                     </div>
-                    <div style={{ background: riskPct > 30 ? '#FEF2F2' : '#F3F4F6', borderRadius: 8, padding: '6px' }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: riskPct > 30 ? '#EF4444' : '#6B7280' }}>{riskPct}%</div>
-                      <div style={{ fontSize: 9, color: riskPct > 30 ? '#EF4444' : '#6B7280' }}>Risk (fast+unsure)</div>
+                    <div style={{ background: riskPct > 30 ? 'var(--error-light)' : 'var(--surface-alt)', borderRadius: 8, padding: '6px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: riskPct > 30 ? '#EF4444' : 'var(--text-2)' }}>{riskPct}%</div>
+                      <div style={{ fontSize: 9, color: riskPct > 30 ? '#EF4444' : 'var(--text-2)' }}>Risk (fast+unsure)</div>
                     </div>
                   </div>
                   {predError !== null && (
                     <div style={{
                       display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
-                      background: selfAwareness >= 80 ? '#F0FDF4' : '#FEF3C7',
+                      background: selfAwareness >= 80 ? 'var(--success-light)' : 'var(--warning-light)',
                       borderRadius: 8, padding: '8px 12px',
                     }}>
                       <div style={{ flex: 1 }}>
@@ -672,23 +672,23 @@ function PracticeMCQTab() {
                   {/* Skill breakdown */}
                   {sessionSkillList.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#111827', marginBottom: 4, textAlign: 'left' }}>Cognitive Skills</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', marginBottom: 4, textAlign: 'left' }}>Cognitive Skills</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                         {sessionSkillList.map(sk => (
                           <div key={sk.skill} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <span style={{ fontSize: 9, fontWeight: 600, width: 60, color: sk.color }}>{sk.label}</span>
-                            <div style={{ flex: 1, height: 6, background: '#F3F4F6', borderRadius: 99, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, height: 6, background: 'var(--surface-alt)', borderRadius: 99, overflow: 'hidden' }}>
                               <div style={{ width: `${sk.accuracy}%`, height: '100%', background: sk.color, borderRadius: 99 }} />
                             </div>
                             <span style={{ fontSize: 9, fontWeight: 700, color: sk.accuracy >= 60 ? '#059669' : '#EF4444', width: 30, textAlign: 'right' }}>{sk.accuracy}%</span>
-                            <span style={{ fontSize: 8, color: '#9CA3AF', width: 20, textAlign: 'right' }}>{sk.total}</span>
+                            <span style={{ fontSize: 8, color: 'var(--text-3)', width: 20, textAlign: 'right' }}>{sk.total}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
                   <div style={{
-                    background: calibration !== null && calibration >= 80 ? '#F0FDF4' : '#FEF3C7',
+                    background: calibration !== null && calibration >= 80 ? 'var(--success-light)' : 'var(--warning-light)',
                     borderRadius: 8, padding: '10px 12px', fontSize: 11, lineHeight: 1.5,
                     color: calibration !== null && calibration >= 80 ? '#065F46' : '#92400E',
                     textAlign: 'left',
@@ -699,7 +699,7 @@ function PracticeMCQTab() {
               )}
               <motion.button onClick={() => setPhase('setup')} whileTap={{ scale: 0.97 }} style={{
                 width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
-                background: '#3B82F6', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 Practice Again
               </motion.button>
@@ -719,13 +719,13 @@ function PracticeMCQTab() {
         <motion.div key="practice" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: '#3B82F6' }}>Q{currentQ + 1}/{questions.length}</div>
-              <div style={{ flex: 1, height: 4, background: '#F3F4F6', borderRadius: 99 }}>
-                <div style={{ width: `${((currentQ + 1) / questions.length) * 100}%`, height: '100%', background: '#3B82F6', borderRadius: 99 }} />
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)' }}>Q{currentQ + 1}/{questions.length}</div>
+              <div style={{ flex: 1, height: 4, background: 'var(--surface-alt)', borderRadius: 99 }}>
+                <div style={{ width: `${((currentQ + 1) / questions.length) * 100}%`, height: '100%', background: 'var(--primary)', borderRadius: 99 }} />
               </div>
             </div>
             <motion.div style={{ ...cardStyle, padding: 14, marginBottom: 10 }} whileHover={cardHover}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#111827', lineHeight: 1.6, marginBottom: 14 }}>{q.q}</div>
+              <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', lineHeight: 1.6, marginBottom: 14 }}>{q.q}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {q.options.map((opt, oi) => {
                   const selected = answers[currentQ] === oi
@@ -735,14 +735,14 @@ function PracticeMCQTab() {
                     <motion.button key={oi} onClick={() => selectAnswer(oi)} disabled={answered} whileTap={{ scale: 0.97 }} style={{
                       display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
                       borderRadius: 12, cursor: answered ? 'default' : 'pointer', fontFamily: 'inherit', fontSize: 12, textAlign: 'left', lineHeight: 1.4,
-                      border: showCorrect ? '2px solid #10B981' : showWrong ? '2px solid #EF4444' : selected ? '2px solid #3B82F6' : '1.5px solid #E5E7EB',
-                      background: showCorrect ? '#F0FDF4' : showWrong ? '#FEF2F2' : selected ? '#EFF6FF' : '#fff',
-                      color: '#111827', width: '100%', transition: '0.1s',
+                      border: showCorrect ? '2px solid #10B981' : showWrong ? '2px solid #EF4444' : selected ? '2px solid var(--primary)' : '1.5px solid var(--border)',
+                      background: showCorrect ? 'var(--success-light)' : showWrong ? 'var(--error-light)' : selected ? 'var(--primary-light)' : 'var(--card-bg)',
+                      color: 'var(--text)', width: '100%', transition: '0.1s',
                     }}>
                       <div style={{
                         width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: showCorrect ? '#10B981' : showWrong ? '#EF4444' : selected ? '#3B82F6' : '#F3F4F6',
+                        background: showCorrect ? '#10B981' : showWrong ? '#EF4444' : selected ? 'var(--primary)' : 'var(--surface-alt)',
                         color: '#fff', fontSize: 10, fontWeight: 700,
                       }}>
                         {showCorrect ? <CheckCircle size={12} /> : showWrong ? <XCircle size={12} /> : String.fromCharCode(65 + oi)}
@@ -753,27 +753,27 @@ function PracticeMCQTab() {
                 })}
               </div>
               {answered && q.explanation && (
-                <div style={{ marginTop: 10, background: '#EFF6FF', borderRadius: 8, padding: 10, fontSize: 11, color: '#1E40AF', lineHeight: 1.5 }}>
+                <div style={{ marginTop: 10, background: 'var(--primary-light)', borderRadius: 8, padding: 10, fontSize: 11, color: 'var(--primary)', lineHeight: 1.5 }}>
                   <strong>Explanation:</strong> {q.explanation}
                 </div>
               )}
               {/* Confidence slider */}
               {answered && waitingConfidence && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ marginTop: 8 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>How sure were you? (This self-assessment trains your calibration)</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)', marginBottom: 6 }}>How sure were you? (This self-assessment trains your calibration)</div>
                   <div style={{ display: 'flex', gap: 4 }}>
                     {[1, 2, 3, 4, 5].map(r => (
                       <motion.button key={r} onClick={() => setConfidenceRating(r)} whileTap={{ scale: 0.95 }} style={{
                         flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                        background: confidence[currentQ] === r ? '#3B82F6' : '#F3F4F6',
-                        color: confidence[currentQ] === r ? '#fff' : '#6B7280',
+                        background: confidence[currentQ] === r ? 'var(--primary)' : 'var(--surface-alt)',
+                        color: confidence[currentQ] === r ? '#fff' : 'var(--text-3)',
                         fontSize: 12, fontWeight: 700,
                       }}>
                         {r}
                       </motion.button>
                     ))}
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#9CA3AF', marginTop: 2, padding: '0 4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: 'var(--text-3)', marginTop: 2, padding: '0 4px' }}>
                     <span>Guess</span>
                     <span>Sure</span>
                   </div>
@@ -783,7 +783,7 @@ function PracticeMCQTab() {
             {answered && !waitingConfidence && (
               <motion.button onClick={nextQ} whileTap={{ scale: 0.97 }} style={{
                 width: '100%', padding: '11px 0', borderRadius: 12, border: 'none',
-                background: '#3B82F6', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 {currentQ < questions.length - 1 ? 'Next Question →' : 'See Results'}
               </motion.button>
@@ -806,10 +806,10 @@ function PracticeMCQTab() {
             <div style={{
               ...cardStyle, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8,
             }}>
-              <Search size={15} color="#9CA3AF" />
+              <Search size={15} color="var(--text-3)" />
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Search chapters..."
-                style={{ border: 'none', outline: 'none', flex: 1, fontSize: 13, fontFamily: 'inherit', background: 'transparent', color: '#111827' }}
+                style={{ border: 'none', outline: 'none', flex: 1, fontSize: 13, fontFamily: 'inherit', background: 'transparent', color: 'var(--text)' }}
               />
             </div>
 
@@ -824,19 +824,19 @@ function PracticeMCQTab() {
                       width: 28, height: 28, borderRadius: 8, background: '#8B5CF615',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
                     }}>🧠</div>
-                    <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: '#111827' }}>Your Brain Profile</div>
-                    <span style={{ fontSize: 10, color: '#9CA3AF' }}>{profile.total} questions</span>
+                    <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>Your Brain Profile</div>
+                    <span style={{ fontSize: 10, color: 'var(--text-3)' }}>{profile.total} questions</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 6 }}>
-                    <div style={{ background: '#F0FDF4', borderRadius: 8, padding: '5px', textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: '#059669' }}>{profile.accuracy}%</div>
-                      <div style={{ fontSize: 9, color: '#059669' }}>Mastery</div>
+                    <div style={{ background: 'var(--success-light)', borderRadius: 8, padding: '5px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--success)' }}>{profile.accuracy}%</div>
+                      <div style={{ fontSize: 9, color: 'var(--success)' }}>Mastery</div>
                     </div>
-                    <div style={{ background: '#EFF6FF', borderRadius: 8, padding: '5px', textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: '#3B82F6' }}>{profile.avgConf}%</div>
-                      <div style={{ fontSize: 9, color: '#3B82F6' }}>Avg Confidence</div>
+                    <div style={{ background: 'var(--primary-light)', borderRadius: 8, padding: '5px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--primary)' }}>{profile.avgConf}%</div>
+                      <div style={{ fontSize: 9, color: 'var(--primary)' }}>Avg Confidence</div>
                     </div>
-                    <div style={{ background: profile.bias === 'calibrated' ? '#F0FDF4' : '#FEF3C7', borderRadius: 8, padding: '5px', textAlign: 'center' }}>
+                    <div style={{ background: profile.bias === 'calibrated' ? 'var(--success-light)' : 'var(--warning-light)', borderRadius: 8, padding: '5px', textAlign: 'center' }}>
                       <div style={{ fontSize: 13, fontWeight: 800, color: profile.bias === 'calibrated' ? '#059669' : '#D97706' }}>{profile.guessingTendency}%</div>
                       <div style={{ fontSize: 9, color: profile.bias === 'calibrated' ? '#059669' : '#D97706' }}>Guess Rate</div>
                     </div>
@@ -844,8 +844,8 @@ function PracticeMCQTab() {
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 6 }}>
                     <span style={{
                       fontSize: 9, padding: '2px 8px', borderRadius: 99,
-                      background: profile.bias === 'calibrated' ? '#F0FDF4' : profile.bias === 'overconfident' ? '#FEF2F2' : '#EFF6FF',
-                      color: profile.bias === 'calibrated' ? '#059669' : profile.bias === 'overconfident' ? '#EF4444' : '#3B82F6',
+                      background: profile.bias === 'calibrated' ? 'var(--success-light)' : profile.bias === 'overconfident' ? 'var(--error-light)' : 'var(--primary-light)',
+                      color: profile.bias === 'calibrated' ? '#059669' : profile.bias === 'overconfident' ? '#EF4444' : 'var(--primary)',
                       fontWeight: 600,
                     }}>
                       {profile.bias === 'calibrated' ? '✓ Calibrated' : profile.bias === 'overconfident' ? `! ${profile.overconfident} overconfident` : `? ${profile.underconfident} underconfident`}
@@ -853,21 +853,21 @@ function PracticeMCQTab() {
                     {profile.selfAware !== null && (
                       <span style={{
                         fontSize: 9, padding: '2px 8px', borderRadius: 99,
-                        background: profile.selfAware >= 70 ? '#F0FDF4' : '#FEF3C7',
+                        background: profile.selfAware >= 70 ? 'var(--success-light)' : 'var(--warning-light)',
                         color: profile.selfAware >= 70 ? '#059669' : '#D97706', fontWeight: 600,
                       }}>
                         Self-aware: {profile.selfAware}%
                       </span>
                     )}
                     {profile.decaying > 0 && (
-                      <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 99, background: '#FEF2F2', color: '#EF4444', fontWeight: 600 }}>
+                      <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 99, background: 'var(--error-light)', color: 'var(--error)', fontWeight: 600 }}>
                         {profile.decaying} decaying
                       </span>
                     )}
                   </div>
                   {profile.last5.length >= 2 && (
                     <div style={{ marginTop: 4 }}>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: '#9CA3AF', marginBottom: 3 }}>Recent accuracy trend</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-3)', marginBottom: 3 }}>Recent accuracy trend</div>
                       <div style={{ display: 'flex', gap: 4, alignItems: 'flex-end', height: 28 }}>
                         {profile.last5.map((s, i) => (
                           <div key={i} style={{
@@ -875,7 +875,7 @@ function PracticeMCQTab() {
                             background: s.pct >= 60 ? '#10B981' : s.pct >= 40 ? '#F59E0B' : '#EF4444',
                             position: 'relative',
                           }}>
-                            <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', fontSize: 8, fontWeight: 700, color: '#6B7280', whiteSpace: 'nowrap' }}>
+                            <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', fontSize: 8, fontWeight: 700, color: 'var(--text-2)', whiteSpace: 'nowrap' }}>
                               {s.pct}%
                             </div>
                           </div>
@@ -885,12 +885,12 @@ function PracticeMCQTab() {
                   )}
                   {profile.skills.length > 0 && (
                     <div style={{ marginTop: 8 }}>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: '#9CA3AF', marginBottom: 3 }}>Cognitive Skills</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-3)', marginBottom: 3 }}>Cognitive Skills</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                         {profile.skills.map(sk => (
                           <div key={sk.skill} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <span style={{ fontSize: 9, fontWeight: 600, width: 60, color: sk.color }}>{sk.label}</span>
-                            <div style={{ flex: 1, height: 6, background: '#F3F4F6', borderRadius: 99, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, height: 6, background: 'var(--surface-alt)', borderRadius: 99, overflow: 'hidden' }}>
                               <div style={{ width: `${sk.accuracy}%`, height: '100%', background: sk.color, borderRadius: 99 }} />
                             </div>
                             <span style={{ fontSize: 9, fontWeight: 700, color: sk.accuracy >= 60 ? '#059669' : '#EF4444', width: 30, textAlign: 'right' }}>{sk.accuracy}%</span>
@@ -905,7 +905,7 @@ function PracticeMCQTab() {
 
             {/* Subject multi-select */}
             <motion.div style={{ ...cardStyle, padding: 14, marginBottom: 10 }} whileHover={cardHover}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#111827', marginBottom: 8 }}>Select Subjects</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>Select Subjects</div>
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {upscSubjects.map(s => {
                   const active = selectedSubjects.includes(s.id)
@@ -924,13 +924,13 @@ function PracticeMCQTab() {
                       padding: '8px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
                       fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
                       display: 'flex', alignItems: 'center', gap: 5,
-                      background: active ? s.color : '#F3F4F6',
-                      color: active ? '#fff' : '#6B7280',
+                      background: active ? s.color : 'var(--surface-alt)',
+                      color: active ? '#fff' : 'var(--text-2)',
                     }}>
                       {s.name}
                       <span style={{
                         fontSize: 9, fontWeight: 600, padding: '1px 5px', borderRadius: 99,
-                        background: active ? 'rgba(255,255,255,0.2)' : '#E5E7EB',
+                        background: active ? 'rgba(255,255,255,0.2)' : 'var(--border)',
                       }}>{subjectQuestionCounts[s.id] || 0}Q</span>
                     </motion.button>
                   )
@@ -945,8 +945,8 @@ function PracticeMCQTab() {
               return (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
                   marginBottom: 8, padding: '8px 12px', borderRadius: 10,
-                  background: '#FEF2F2', border: '1px solid #FECACA',
-                  fontSize: 11, color: '#991B1B', display: 'flex', alignItems: 'center', gap: 6,
+                  background: 'var(--error-light)', border: '1px solid var(--border)',
+                  fontSize: 11, color: 'var(--error-dark)', display: 'flex', alignItems: 'center', gap: 6,
                 }}>
                   <Zap size={13} color="#EF4444" />
                   <strong>{decaying.length}</strong> chapter(s) likely forgetting — last practiced 7+ days ago
@@ -962,33 +962,33 @@ function PracticeMCQTab() {
                   marginBottom: 6, marginLeft: 2,
                 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: sub.color }}>{sub.name}</div>
-                  <span style={{ fontSize: 10, color: '#9CA3AF' }}>
+                  <span style={{ fontSize: 10, color: 'var(--text-3)' }}>
                     {sub.chapters.filter(c => selectedChapters.includes(c.id)).reduce((s, c) => s + c.qCount, 0)} / {sub.chapters.reduce((s, c) => s + c.qCount, 0)} Q selected
                   </span>
                 </div>
                 {sub.chapters.map(ch => {
                   const sel = selectedChapters.includes(ch.id)
                   const ret = getChapterRetention(ch.id, practiceDecay)
-                  const retColor = ret.status === 'fresh' ? '#10B981' : ret.status === 'aging' ? '#F59E0B' : ret.status === 'decaying' ? '#EF4444' : '#D1D5DB'
+                  const retColor = ret.status === 'fresh' ? 'var(--success)' : ret.status === 'aging' ? '#F59E0B' : ret.status === 'decaying' ? 'var(--error)' : 'var(--text-3)'
                   return (
                     <motion.div key={ch.id} onClick={() => toggleChapter(ch.id)}
                       whileTap={{ scale: 0.98 }}
                       style={{
-                        background: '#fff', borderRadius: 12, padding: '10px 12px',
+                        background: 'var(--card-bg)', borderRadius: 12, padding: '10px 12px',
                         cursor: 'pointer', marginBottom: 4,
-                        border: sel ? '2px solid #3B82F6' : '2px solid transparent',
+                        border: sel ? '2px solid var(--primary)' : '2px solid transparent',
                         display: 'flex', alignItems: 'center', gap: 10,
-                        boxShadow: sel ? '0 2px 8px rgba(59,130,246,0.15)' : '0 1px 3px rgba(0,0,0,0.05)',
+                        boxShadow: sel ? '0 2px 8px var(--shadow-active)' : '0 1px 3px rgba(0,0,0,0.05)',
                       }}>
                       <div style={{
                         width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-                        background: sel ? '#3B82F6' : '#F3F4F6',
+                        background: sel ? 'var(--primary)' : 'var(--surface-alt)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 11, fontWeight: 800, color: sel ? '#fff' : '#6B7280',
+                        fontSize: 11, fontWeight: 800, color: sel ? '#fff' : 'var(--text-2)',
                       }}>
                         {ch.qCount}
                       </div>
-                      <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         {ch.name}
                         {ret.daysSince !== null && (
                           <span style={{ fontSize: 9, color: retColor, fontWeight: 500, whiteSpace: 'nowrap' }}>
@@ -998,8 +998,24 @@ function PracticeMCQTab() {
                       </div>
                       <div style={{
                         width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                        background: sel ? '#3B82F6' : '#F3F4F6',
-                        border: `2px solid ${sel ? '#3B82F6' : '#D1D5DB'}`,
+                        background: sel ? 'var(--primary)' : 'var(--surface-alt)',
+                        border: `2px solid ${sel ? 'var(--primary)' : 'var(--border)'}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {sel && <Check size={14} color="#fff" />}
+                      </div>
+                      <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {ch.name}
+                        {ret.daysSince !== null && (
+                          <span style={{ fontSize: 9, color: retColor, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                            · {ret.daysSince === 0 ? 'today' : ret.daysSince === 1 ? '1d ago' : `${ret.daysSince}d ago`}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{
+                        width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                        background: sel ? 'var(--primary)' : 'var(--surface-alt)',
+                        border: `2px solid ${sel ? 'var(--primary)' : 'var(--border)'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
                         {sel && <Check size={14} color="#fff" />}
@@ -1016,18 +1032,18 @@ function PracticeMCQTab() {
       {/* Fixed bottom bar */}
       <motion.div initial={{ y: 60 }} animate={{ y: 0 }} style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-        background: '#fff', borderTop: '1px solid #E5E7EB', padding: '10px 16px',
+        background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 16px',
         display: 'flex', alignItems: 'center', gap: 12,
-        boxShadow: '0 -2px 12px rgba(0,0,0,0.08)',
+        boxShadow: '0 -2px 12px rgba(0,0,0,0.3)',
       }}>
-        <div style={{ flex: 1, fontSize: 12, color: '#6B7280' }}>
-          <strong style={{ fontSize: 14, color: '#111827' }}>{selectedChapters.length}</strong> chapters · <strong style={{ fontSize: 14, color: '#111827' }}>{selectedQuestions.length}</strong> questions
+        <div style={{ flex: 1, fontSize: 12, color: 'var(--text-2)' }}>
+          <strong style={{ fontSize: 14, color: 'var(--text)' }}>{selectedChapters.length}</strong> chapters · <strong style={{ fontSize: 14, color: 'var(--text)' }}>{selectedQuestions.length}</strong> questions
         </div>
         <motion.button onClick={() => setShowStartModal(true)}
           disabled={selectedChapters.length === 0}
           whileTap={{ scale: 0.97 }} style={{
             padding: '10px 24px', borderRadius: 12, border: 'none',
-            background: selectedChapters.length > 0 ? '#3B82F6' : '#D1D5DB',
+            background: selectedChapters.length > 0 ? 'var(--primary)' : 'var(--border)',
             color: '#fff', fontSize: 13, fontWeight: 700, cursor: selectedChapters.length > 0 ? 'pointer' : 'default',
             fontFamily: 'inherit', whiteSpace: 'nowrap',
           }}>
@@ -1045,22 +1061,22 @@ function PracticeMCQTab() {
             }}>
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()} style={{
-                background: '#fff', borderRadius: 16, padding: 20, width: '100%', maxWidth: 320,
+                background: 'var(--card-bg)', borderRadius: 16, padding: 20, width: '100%', maxWidth: 320,
               }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 12 }}>Practice Setup</div>
-              <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 12 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 12 }}>Practice Setup</div>
+              <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 12 }}>
                 {selectedChapters.length} chapters · {selectedQuestions.length} questions available
               </div>
 
               {/* Question count */}
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Questions</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>Questions</div>
               <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
                 {[5, 10, 20, 50].map(n => (
                   <motion.button key={n} onClick={() => setNumQ(n)} whileTap={{ scale: 0.97 }} style={{
                     flex: 1, padding: '8px 0', borderRadius: 12, border: 'none', cursor: 'pointer',
                     fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
-                    background: numQ === n ? '#3B82F6' : '#F3F4F6',
-                    color: numQ === n ? '#fff' : '#6B7280',
+                    background: numQ === n ? 'var(--primary)' : 'var(--surface-alt)',
+                    color: numQ === n ? '#fff' : 'var(--text-2)',
                   }}>
                     {n}
                   </motion.button>
@@ -1068,13 +1084,13 @@ function PracticeMCQTab() {
               </div>
 
               {/* Expected score */}
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Expected score?</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>Expected score?</div>
               <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
                 {[0, 20, 50, 80, 100].map(v => (
                   <motion.button key={v} onClick={() => setExpectedScore(v)} whileTap={{ scale: 0.95 }} style={{
                     flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                    background: expectedScore === v ? '#8B5CF6' : '#F3F4F6',
-                    color: expectedScore === v ? '#fff' : '#6B7280',
+                    background: expectedScore === v ? 'var(--phys)' : 'var(--surface-alt)',
+                    color: expectedScore === v ? '#fff' : 'var(--text-2)',
                     fontSize: 12, fontWeight: 700,
                   }}>
                     {v}%
@@ -1084,7 +1100,7 @@ function PracticeMCQTab() {
 
               <motion.button onClick={() => startPractice(numQ)} whileTap={{ scale: 0.97 }} style={{
                 width: '100%', padding: '11px 0', borderRadius: 12, border: 'none',
-                background: '#3B82F6', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 Begin Quiz ({Math.min(numQ, selectedQuestions.length)} Q)
               </motion.button>
@@ -1180,23 +1196,23 @@ function FlashcardsTab() {
           <motion.div key="summary" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <motion.div style={{ ...cardStyle, padding: 20, textAlign: 'center' }} whileHover={cardHover}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>🎯</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 4 }}>Session Complete</div>
-              <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 14 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>Session Complete</div>
+              <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 14 }}>
                 {known.length} known · {review.length} to review
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
-                <div style={{ background: '#D1FAE5', borderRadius: 8, padding: 10 }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: '#059669' }}>{known.length}</div>
-                  <div style={{ fontSize: 10, color: '#059669' }}>Know It</div>
+                <div style={{ background: 'var(--success-light)', borderRadius: 8, padding: 10 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--success)' }}>{known.length}</div>
+                  <div style={{ fontSize: 10, color: 'var(--success)' }}>Know It</div>
                 </div>
-                <div style={{ background: '#EFF6FF', borderRadius: 8, padding: 10 }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: '#3B82F6' }}>{review.length}</div>
-                  <div style={{ fontSize: 10, color: '#3B82F6' }}>Review</div>
+                <div style={{ background: 'var(--primary-light)', borderRadius: 8, padding: 10 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary)' }}>{review.length}</div>
+                  <div style={{ fontSize: 10, color: 'var(--primary)' }}>Review</div>
                 </div>
               </div>
               <motion.button onClick={() => setPhase('setup')} whileTap={{ scale: 0.97 }} style={{
                 width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
-                background: '#3B82F6', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 New Session
               </motion.button>
@@ -1214,9 +1230,9 @@ function FlashcardsTab() {
         <motion.div key="study" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: '#3B82F6' }}>{currentIdx + 1}/{cards.length}</div>
-              <div style={{ flex: 1, height: 4, background: '#F3F4F6', borderRadius: 99 }}>
-                <div style={{ width: `${((currentIdx + 1) / cards.length) * 100}%`, height: '100%', background: '#3B82F6', borderRadius: 99 }} />
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)' }}>{currentIdx + 1}/{cards.length}</div>
+              <div style={{ flex: 1, height: 4, background: 'var(--surface-alt)', borderRadius: 99 }}>
+                <div style={{ width: `${((currentIdx + 1) / cards.length) * 100}%`, height: '100%', background: 'var(--primary)', borderRadius: 99 }} />
               </div>
             </div>
 
@@ -1234,19 +1250,19 @@ function FlashcardsTab() {
               >
                 {!flipped ? (
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 6, lineHeight: 1.5 }}>{card.term}</div>
-                    <div style={{ fontSize: 11, color: '#3B82F6', fontWeight: 500 }}>Tap to reveal</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 6, lineHeight: 1.5 }}>{card.term}</div>
+                    <div style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 500 }}>Tap to reveal</div>
                   </div>
                 ) : (
-                  <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.7 }}>{card.def}</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.7 }}>{card.def}</div>
                 )}
               </motion.div>
             </motion.div>
 
             <div style={{ display: 'flex', gap: 8 }}>
               <motion.button onClick={markReview} whileTap={{ scale: 0.97 }} style={{
-                flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #D1D5DB',
-                background: '#fff', color: '#6B7280', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid var(--border)',
+                background: 'var(--card-bg)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 Need Review
               </motion.button>
@@ -1281,16 +1297,16 @@ function FlashcardsTab() {
             <div style={{
               ...cardStyle, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8,
             }}>
-              <Search size={15} color="#9CA3AF" />
+              <Search size={15} color="var(--text-3)" />
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Search chapters..."
-                style={{ border: 'none', outline: 'none', flex: 1, fontSize: 13, fontFamily: 'inherit', background: 'transparent', color: '#111827' }}
+                style={{ border: 'none', outline: 'none', flex: 1, fontSize: 13, fontFamily: 'inherit', background: 'transparent', color: 'var(--text)' }}
               />
             </div>
 
             {/* Subject pills — multi-select */}
             <motion.div style={{ ...cardStyle, padding: 14, marginBottom: 10 }} whileHover={cardHover}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#111827', marginBottom: 8 }}>Subjects</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>Subjects</div>
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {upscSubjects.map(s => {
                   const isActive = selectedSubjects.includes(s.id)
@@ -1302,14 +1318,14 @@ function FlashcardsTab() {
                       padding: '8px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
                       fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
                       display: 'flex', alignItems: 'center', gap: 5,
-                      background: isActive ? s.color : '#F3F4F6',
-                      color: isActive ? '#fff' : '#6B7280',
+                      background: isActive ? s.color : 'var(--surface-alt)',
+                      color: isActive ? '#fff' : 'var(--text-2)',
                     }}>
                       {isActive && <CheckCircle size={12} />}
                       {s.name}
                       <span style={{
                         fontSize: 9, fontWeight: 600, padding: '1px 5px', borderRadius: 99,
-                        background: isActive ? 'rgba(255,255,255,0.2)' : '#E5E7EB',
+                        background: isActive ? 'rgba(255,255,255,0.2)' : 'var(--border)',
                       }}>{subjectQuestionCounts[s.id] || 0}Q</span>
                     </motion.button>
                   )
@@ -1331,27 +1347,27 @@ function FlashcardsTab() {
                         <motion.div key={ch.id} onClick={() => toggleChapter(ch.id)}
                           whileTap={{ scale: 0.98 }}
                           style={{
-                            background: '#fff', borderRadius: 12, padding: '10px 12px',
+                            background: 'var(--card-bg)', borderRadius: 12, padding: '10px 12px',
                             cursor: 'pointer', marginBottom: 4,
-                            border: sel ? '2px solid #3B82F6' : '2px solid transparent',
+                            border: sel ? '2px solid var(--primary)' : '2px solid transparent',
                             display: 'flex', alignItems: 'center', gap: 10,
-                            boxShadow: sel ? '0 2px 8px rgba(59,130,246,0.15)' : '0 1px 3px rgba(0,0,0,0.05)',
+                            boxShadow: sel ? '0 2px 8px var(--shadow-active)' : '0 1px 3px rgba(0,0,0,0.05)',
                           }}>
                           <div style={{
                             width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-                            background: sel ? '#3B82F6' : '#F3F4F6',
+                            background: sel ? 'var(--primary)' : 'var(--surface-alt)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 11, fontWeight: 800, color: sel ? '#fff' : '#6B7280',
+                            fontSize: 11, fontWeight: 800, color: sel ? '#fff' : 'var(--text-2)',
                           }}>
                             {ch.qCount}
                           </div>
-                          <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>
+                          <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
                             {ch.name}
                           </div>
                           <div style={{
                             width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                            background: sel ? '#3B82F6' : '#F3F4F6',
-                            border: `2px solid ${sel ? '#3B82F6' : '#D1D5DB'}`,
+                            background: sel ? 'var(--primary)' : 'var(--surface-alt)',
+                            border: `2px solid ${sel ? 'var(--primary)' : 'var(--border)'}`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                           }}>
                             {sel && <Check size={14} color="#fff" />}
@@ -1364,7 +1380,7 @@ function FlashcardsTab() {
               </div>
             ) : (
               <motion.div style={{ ...cardStyle, padding: 20, textAlign: 'center', marginBottom: 10 }} whileHover={cardHover}>
-                <div style={{ fontSize: 13, color: '#9CA3AF' }}>
+                <div style={{ fontSize: 13, color: 'var(--text-3)' }}>
                   {search ? `No chapters match "${search}"` : 'Select a subject to see chapters'}
                 </div>
               </motion.div>
@@ -1376,17 +1392,17 @@ function FlashcardsTab() {
       {/* Fixed bottom bar */}
       <motion.div initial={{ y: 60 }} animate={{ y: 0 }} style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-        background: '#fff', borderTop: '1px solid #E5E7EB', padding: '10px 16px',
+        background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 16px',
         display: 'flex', alignItems: 'center', gap: 12,
-        boxShadow: '0 -2px 12px rgba(0,0,0,0.08)',
+        boxShadow: '0 -2px 12px rgba(0,0,0,0.3)',
       }}>
-        <div style={{ flex: 1, fontSize: 12, color: '#6B7280' }}>
-          <strong style={{ fontSize: 14, color: '#111827' }}>{selectedChapters.length || subjectsWithChapters.flatMap(s => s.chapters).length}</strong> chapters · <strong style={{ fontSize: 14, color: '#111827' }}>{totalFCards}</strong> cards
+        <div style={{ flex: 1, fontSize: 12, color: 'var(--text-2)' }}>
+          <strong style={{ fontSize: 14, color: 'var(--text)' }}>{selectedChapters.length || subjectsWithChapters.flatMap(s => s.chapters).length}</strong> chapters · <strong style={{ fontSize: 14, color: 'var(--text)' }}>{totalFCards}</strong> cards
         </div>
         <motion.button onClick={startFlashcards}
           whileTap={{ scale: 0.97 }} style={{
             padding: '10px 24px', borderRadius: 12, border: 'none',
-            background: '#3B82F6', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer',
             fontFamily: 'inherit', whiteSpace: 'nowrap',
             display: 'flex', alignItems: 'center', gap: 6,
           }}>

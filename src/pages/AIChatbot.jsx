@@ -263,28 +263,28 @@ export default function AIChatbot() {
   return (
     <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ background: '#fff', padding: '48px 16px 10px', borderBottom: '1px solid #F3F4F6' }}>
+      <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <motion.button whileTap={{scale:0.96}} onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-            <ChevronLeft size={18} color="#111827" />
+            <ChevronLeft size={18} color="var(--text)" />
           </motion.button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>AI Chatbot</div>
-            <div style={{ fontSize: 11, color: '#6B7280' }}>Your UPSC study assistant</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Chatbot</div>
+            <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your UPSC study assistant</div>
           </div>
           <motion.button whileTap={{scale:0.96}} onClick={() => setShowHistory(!showHistory)} style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', position: 'relative',
           }}>
-            <MessageSquare size={18} color="#6B7280" />
+            <MessageSquare size={18} color="var(--text-2)" />
             {history.length > 0 && (
-              <div style={{ position: 'absolute', top: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: '#3B82F6' }} />
+              <div style={{ position: 'absolute', top: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: 'var(--primary)' }} />
             )}
           </motion.button>
         </div>
       </div>
 
       {/* Mode chips */}
-      <div style={{ display: 'flex', gap: 4, padding: '8px 14px', background: '#fff', borderBottom: '1px solid #F3F4F6', overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <div style={{ display: 'flex', gap: 4, padding: '8px 14px', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)', overflowX: 'auto', scrollbarWidth: 'none' }}>
         {MODES.map(m => {
           const Icon = m.icon
           const active = mode === m.id
@@ -292,8 +292,8 @@ export default function AIChatbot() {
               <motion.button whileTap={{scale:0.96}} key={m.id} onClick={() => setMode(m.id)} style={{
                 display: 'flex', alignItems: 'center', gap: 4, padding: '7px 14px', borderRadius: 12, border: 'none',
                 cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit',
-                background: active ? m.color + '15' : '#F3F4F6',
-                color: active ? m.color : '#6B7280', fontSize: 12, fontWeight: 600,
+                background: active ? m.color + '25' : 'var(--surface-alt)',
+                color: active ? m.color : 'var(--text-3)', fontSize: 12, fontWeight: 600,
               }}>
                 <Icon size={15} />
                 {m.label}
@@ -320,9 +320,9 @@ export default function AIChatbot() {
               >
                 <div style={{
                   maxWidth: '85%', padding: '10px 14px', borderRadius: 14, fontSize: 12, lineHeight: 1.6,
-                  background: msg.role === 'user' ? '#3B82F6' : '#fff',
-                  color: msg.role === 'user' ? '#fff' : '#111827',
-                  border: msg.role === 'user' ? 'none' : '1px solid #E5E7EB',
+                  background: msg.role === 'user' ? 'var(--primary)' : 'var(--card-bg)',
+                  color: msg.role === 'user' ? '#fff' : 'var(--text)',
+                  border: msg.role === 'user' ? 'none' : '1px solid var(--border)',
                   whiteSpace: 'pre-wrap',
                 }}>
                   {msg.text}
@@ -330,21 +330,21 @@ export default function AIChatbot() {
                     <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                       <motion.button whileTap={{scale:0.96}} onClick={() => { const u = new SpeechSynthesisUtterance(msg.text); u.rate = 0.9; speechSynthesis.speak(u) }} title="Read aloud" style={{
                         background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 10, color: '#6B7280', fontWeight: 600, padding: 0, fontFamily: 'inherit',
+                        fontSize: 10, color: 'var(--text-3)', fontWeight: 600, padding: 0, fontFamily: 'inherit',
                         display: 'flex', alignItems: 'center', gap: 3,
                       }}>
                         <Volume2 size={12} /> Speak
                       </motion.button>
                       <motion.button whileTap={{scale:0.96}} onClick={() => saveAsNote(msg.text, messages[i-1]?.text)} style={{
                         background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 10, color: savedNotes.has(msg.text.slice(0, 50)) ? '#10B981' : '#3B82F6',
+                        fontSize: 10, color: savedNotes.has(msg.text.slice(0, 50)) ? 'var(--success)' : 'var(--primary)',
                         fontWeight: 600, padding: 0, fontFamily: 'inherit',
                       }}>
                         {savedNotes.has(msg.text.slice(0, 50)) ? 'Saved' : 'Save as note'}
                       </motion.button>
                       <motion.button whileTap={{scale:0.96}} onClick={() => generateFlashcards(msg.text)} style={{
                         background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 10, color: '#8B5CF6', fontWeight: 600, padding: 0, fontFamily: 'inherit',
+                        fontSize: 10, color: 'var(--phys)', fontWeight: 600, padding: 0, fontFamily: 'inherit',
                       }}>
                         Flashcards
                       </motion.button>
@@ -357,7 +357,7 @@ export default function AIChatbot() {
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 10 }}>
                 <div style={{
-                  background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14,
+                  background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 14,
                   padding: '10px 16px', display: 'flex', gap: 4,
                 }}>
                   {[0, 1, 2].map(i => (
@@ -419,7 +419,7 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ padding: '8px 14px 14px', background: '#fff', borderTop: '1px solid #F3F4F6' }}>
+          <div style={{ padding: '8px 14px 14px', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
               <div style={{ flex: 1, position: 'relative' }}>
                 <input
@@ -429,25 +429,25 @@ export default function AIChatbot() {
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
                   placeholder="Ask a question..."
                   style={{
-                    width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid #E5E7EB',
-                    fontSize: 12, outline: 'none', fontFamily: 'inherit', background: '#F9FAFB', boxSizing: 'border-box',
+                    width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid var(--border)',
+                    fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', boxSizing: 'border-box',
                   }}
                 />
               </div>
               <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
                 width: 36, height: 36, borderRadius: 12, border: 'none', flexShrink: 0,
-                background: listening ? '#EF4444' : '#F3F4F6', cursor: 'pointer',
+                background: listening ? '#EF4444' : 'var(--surface-alt)', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Mic size={15} color={listening ? '#fff' : '#6B7280'} />
+                <Mic size={15} color={listening ? '#fff' : 'var(--text-3)'} />
               </motion.button>
               <motion.button whileTap={{scale:0.96}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
                 width: 36, height: 36, borderRadius: 12, border: 'none',
-                background: input.trim() && !loading ? '#3B82F6' : '#E5E7EB',
+                background: input.trim() && !loading ? 'var(--primary)' : 'var(--border)',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <Send size={16} color={input.trim() && !loading ? '#fff' : '#9CA3AF'} />
+                <Send size={16} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
               </motion.button>
             </div>
           </div>
