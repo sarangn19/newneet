@@ -431,9 +431,9 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '6px 18px calc(10px + env(safe-area-inset-bottom, 0px))', gap: 10, background: '#121217', borderRadius: 28, margin: '0 12px 8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '6px 18px calc(10px + env(safe-area-inset-bottom, 0px))', gap: 10, background: 'var(--card-bg)', borderRadius: 28, margin: '0 12px 8px', border: '1px solid var(--border)' }}>
             {/* Input pill */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px', gap: 6, height: 42, background: '#202025', border: '1px solid #2D2D31', borderRadius: 21 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px', gap: 6, height: 42, background: 'var(--surface-alt)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 21 }}>
               <input
                 ref={inputRef}
                 value={input}
@@ -451,7 +451,7 @@ export default function AIChatbot() {
                 background: 'transparent', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
               }}>
-                <Mic size={16} color={listening ? '#fff' : 'rgba(255,255,255,0.4)'} />
+                <Mic size={16} color={listening ? '#fff' : 'var(--text-3)'} />
               </motion.button>
             </div>
             {/* Send button */}
@@ -462,7 +462,7 @@ export default function AIChatbot() {
               background: input.trim() && !loading ? 'var(--primary)' : 'transparent',
               cursor: input.trim() && !loading ? 'pointer' : 'default',
             }}>
-              <Send size={15} color={input.trim() && !loading ? '#fff' : 'rgba(255,255,255,0.25)'} />
+              <Send size={15} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
             </motion.button>
           </div>
         </div>
