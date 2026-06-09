@@ -395,7 +395,7 @@ export default function NoteEditor() {
   )
 
   return (
-    <div style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+    <div style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', overflowX: 'hidden', paddingBottom: 100, boxSizing: 'border-box' }}>
       <div style={{ background: '#fff', padding: '48px 16px 8px', borderBottom: '1px solid #E5E7EB', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, minWidth: 0 }}>
           <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/learn')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>

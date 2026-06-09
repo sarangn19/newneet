@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
+import { buildRules, createSession, formatPrompt } from '../lib/behaviorEngine'
 import { Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
 
 const MODES = [
@@ -39,8 +40,59 @@ const PLACEHOLDERS = [
   'Quiz me on Environment & Ecology...',
 ]
 
+function buildStudentProfile(topicScores, practiceDecay, revisionSchedule, questionHistory) {
+  try {
+    const scoredTopics = Object.entries(topicScores || {}).filter(([, s]) => s.total > 0)
+    const totalQ = scoredTopics.reduce((sum, [, s]) => sum + s.total, 0)
+    const correctQ = scoredTopics.reduce((sum, [, s]) => sum + s.correct, 0)
+    if (totalQ < 5) return null
+    const overallAccuracy = Math.round(correctQ / totalQ * 100)
+    const topicAccs = scoredTopics.map(([id, s]) => ({ id, accuracy: Math.round(s.correct / s.total * 100), total: s.total }))
+    const weakTopics = topicAccs.filter(t => t.total >= 3).sort((a, b) => a.accuracy - b.accuracy).slice(0, 5)
+    const strongTopics = topicAccs.filter(t => t.total >= 5).sort((a, b) => b.accuracy - a.accuracy).slice(0, 3)
+    const allEntries = Object.values(practiceDecay || {}).flat()
+    let calibration = null
+    if (allEntries.length >= 10) {
+      const avgConf = Math.round(allEntries.reduce((s, e) => s + e.confidence, 0) / allEntries.length * 20)
+      const overcnt = allEntries.filter(e => !e.correct && e.confidence >= 4).length
+      const undercnt = allEntries.filter(e => e.correct && e.confidence <= 2).length
+      const guessed = allEntries.filter(e => e.correct && e.confidence <= 2).length
+      const guessingTendency = correctQ > 0 ? Math.round(guessed / correctQ * 100) : 0
+      const bias = overcnt > undercnt ? 'overconfident' : undercnt > overcnt ? 'underconfident' : 'calibrated'
+      calibration = { bias, avgConfidence: avgConf, guessingTendency }
+    }
+    const DAY = 86400000; const now = Date.now()
+    const chapterLast = {}
+    allEntries.forEach(e => { if (!e.chapter) return; if (!chapterLast[e.chapter] || e.ts > chapterLast[e.chapter]) chapterLast[e.chapter] = e.ts })
+    const decayingCount = Object.values(chapterLast).filter(ts => now - ts > 7 * DAY).length
+    const recent7 = questionHistory.filter(e => e.timestamp && now - new Date(e.timestamp).getTime() < 7 * DAY)
+    const prev7 = questionHistory.filter(e => { if (!e.timestamp) return false; const diff = now - new Date(e.timestamp).getTime(); return diff >= 7 * DAY && diff < 14 * DAY })
+    const calcAcc = arr => arr.length >= 5 ? Math.round(arr.filter(e => e.correct).length / arr.length * 100) : null
+    const recentAcc = calcAcc(recent7); const prevAcc = calcAcc(prev7)
+    let trend = 'stable'
+    if (recentAcc !== null && prevAcc !== null) { if (recentAcc < prevAcc - 5) trend = 'declining'; else if (recentAcc > prevAcc + 5) trend = 'improving' }
+    const overdue = Object.entries(revisionSchedule || {}).filter(([, s]) => { if (!s.lastReviewed) return false; return Math.floor((now - new Date(s.lastReviewed).getTime()) / DAY) > (s.interval || 7) }).length
+    const skillStats = {}
+    allEntries.forEach(e => { if (!e.skill) return; if (!skillStats[e.skill]) skillStats[e.skill] = { total: 0, correct: 0 }; skillStats[e.skill].total++; if (e.correct) skillStats[e.skill].correct++ })
+    const skills = Object.entries(skillStats).map(([s, v]) => ({ skill: s, accuracy: Math.round(v.correct / v.total * 100), total: v.total })).filter(s => s.total >= 3).sort((a, b) => a.accuracy - b.accuracy).slice(0, 5)
+    return {
+      overall: { totalQuestions: totalQ, accuracy: overallAccuracy },
+      topicAccs,
+      topicScores,
+      weakTopics: weakTopics.length > 0 ? weakTopics : undefined,
+      strongTopics: strongTopics.length > 0 ? strongTopics : undefined,
+      calibration,
+      decayingChapters: decayingCount > 0 ? decayingCount : undefined,
+      trend: trend !== 'stable' ? trend : undefined,
+      overdueRevisions: overdue > 0 ? overdue : undefined,
+      skills: skills.length > 0 ? skills : undefined,
+    }
+  } catch { return null }
+}
+
 export default function AIChatbot() {
-  const { userId } = useStore()
+  const { userId, topicScores, questionHistory, practiceDecay, revisionSchedule } = useStore()
+  const sessionRef = useRef(createSession())
   const [messages, setMessages] = useState([
     { role: 'bot', text: 'Hello! I\'m your AI study assistant. Ask me anything about UPSC topics, or pick a mode below.' },
   ])
@@ -80,6 +132,10 @@ export default function AIChatbot() {
     setMessages(prev => [...prev, { role: 'user', text }])
     setLoading(true)
 
+    const profile = buildStudentProfile(topicScores, practiceDecay, revisionSchedule, questionHistory)
+    const rules = buildRules(profile, sessionRef.current, text)
+    const behaviorRules = rules.join('||')
+
     let response = ''
 
     // Try server API route first (works on Vercel — has Gemini + Groq fallback)
@@ -87,7 +143,7 @@ export default function AIChatbot() {
       const apiRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, mode }),
+        body: JSON.stringify({ message: text, mode, behaviorRules }),
       })
       if (apiRes.ok) {
         const data = await apiRes.json()
@@ -98,7 +154,7 @@ export default function AIChatbot() {
     // Fallback: direct Groq from browser
     if (!response && GROQ_API_KEY) {
       try {
-        const systemPrompt = MODE_PROMPTS[mode] || MODE_PROMPTS.explain
+        const systemPrompt = formatPrompt(MODE_PROMPTS[mode] || MODE_PROMPTS.explain, rules)
         const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -112,7 +168,7 @@ export default function AIChatbot() {
               { role: 'user', content: `Topic: ${text}` },
             ],
             temperature: 0.7,
-            max_tokens: 1024,
+            max_tokens: 1280,
           }),
         })
         if (groqRes.ok) {
@@ -127,7 +183,7 @@ export default function AIChatbot() {
     // Fallback: direct Gemini from browser
     if (!response && GEMINI_API_KEY) {
       try {
-        const systemPrompt = MODE_PROMPTS[mode] || MODE_PROMPTS.explain
+        const systemPrompt = formatPrompt(MODE_PROMPTS[mode] || MODE_PROMPTS.explain, rules)
         const prompt = `${systemPrompt}\n\nTopic: ${text}`
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`
         const res = await fetch(url, {
@@ -135,7 +191,7 @@ export default function AIChatbot() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
+            generationConfig: { temperature: 0.7, maxOutputTokens: 1280 },
           }),
         })
         if (res.ok) {

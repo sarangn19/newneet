@@ -1028,7 +1028,7 @@ function PracticeMCQTab() {
 
       {/* Fixed bottom bar */}
       <motion.div initial={{ y: 60 }} animate={{ y: 0 }} style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+        position: 'fixed', bottom: 56, left: 0, right: 0, zIndex: 50,
         background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 16px',
         display: 'flex', alignItems: 'center', gap: 12,
         boxShadow: '0 -2px 12px rgba(0,0,0,0.3)',
@@ -1388,7 +1388,7 @@ function FlashcardsTab() {
 
       {/* Fixed bottom bar */}
       <motion.div initial={{ y: 60 }} animate={{ y: 0 }} style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+        position: 'fixed', bottom: 56, left: 0, right: 0, zIndex: 50,
         background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 16px',
         display: 'flex', alignItems: 'center', gap: 12,
         boxShadow: '0 -2px 12px rgba(0,0,0,0.3)',

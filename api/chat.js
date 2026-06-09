@@ -17,14 +17,17 @@ const FALLBACK = {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { message, mode } = req.body
+  const { message, mode, behaviorRules } = req.body
   if (!message) return res.status(400).json({ error: 'message is required' })
 
   const modeKey = mode || 'explain'
-  const systemPrompt = MODE_PROMPTS[modeKey] || MODE_PROMPTS.explain
+  let systemPrompt = MODE_PROMPTS[modeKey] || MODE_PROMPTS.explain
+  if (behaviorRules) {
+    systemPrompt = '[BEHAVIOR]\n' + behaviorRules.split('||').join('\n') + '\n\n' + systemPrompt
+  }
   const userPrompt = `Topic: ${message}`
 
-  const result = await callAI(systemPrompt, userPrompt, 0.7, 1024)
+  const result = await callAI(systemPrompt, userPrompt, 0.7, 1280)
 
   const response = result.text || (FALLBACK[modeKey] || FALLBACK.explain)
 
