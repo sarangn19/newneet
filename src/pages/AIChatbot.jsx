@@ -276,7 +276,7 @@ export default function AIChatbot() {
   }
 
   return (
-    <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: 130, boxSizing: 'border-box' }}>
+    <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: 100, boxSizing: 'border-box' }}>
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -431,9 +431,9 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '6px 16px calc(10px + env(safe-area-inset-bottom, 0px))', gap: 12, background: '#121217', borderRadius: 28, margin: '0 12px 12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '6px 18px calc(10px + env(safe-area-inset-bottom, 0px))', gap: 10, background: '#121217', borderRadius: 28, margin: '0 12px 8px', border: '1px solid rgba(255,255,255,0.06)' }}>
             {/* Input pill */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 14px', gap: 4, height: 40, background: '#202025', border: '1px solid #2D2D31', borderRadius: 20 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px', gap: 6, height: 42, background: '#202025', border: '1px solid #2D2D31', borderRadius: 21 }}>
               <input
                 ref={inputRef}
                 value={input}
@@ -457,8 +457,8 @@ export default function AIChatbot() {
             {/* Send button */}
             <motion.button whileTap={{scale:0.94}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
               display: 'flex', flexDirection: 'row', alignItems: 'center',
-              padding: '3px 16px 3px 14px', gap: 6,
-              height: 32, border: 'none', borderRadius: 16, flexShrink: 0,
+              padding: '4px 18px 4px 16px', gap: 6,
+              height: 34, border: 'none', borderRadius: 17, flexShrink: 0,
               background: input.trim() && !loading ? 'var(--primary)' : 'transparent',
               cursor: input.trim() && !loading ? 'pointer' : 'default',
             }}>
