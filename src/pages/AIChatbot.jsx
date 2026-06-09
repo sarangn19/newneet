@@ -6,27 +6,27 @@ import { buildRules, createSession, formatPrompt } from '../lib/behaviorEngine'
 import { Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
 
 const MODES = [
-  { id: 'explain', label: 'Explain', icon: BookOpen, color: '#3B82F6' },
-  { id: 'quiz', label: 'Quiz Me', icon: ClipboardList, color: '#8B5CF6' },
-  { id: 'summarise', label: 'Summarise', icon: Search, color: '#10B981' },
-  { id: 'deepdive', label: 'Deep Dive', icon: Sparkles, color: '#3B82F6' },
+  { id: 'explain', label: 'Learn', icon: BookOpen, color: '#3B82F6' },
+  { id: 'quiz', label: 'Practice', icon: ClipboardList, color: '#8B5CF6' },
+  { id: 'summarise', label: 'Revise', icon: Search, color: '#10B981' },
+  { id: 'deepdive', label: 'Master', icon: Sparkles, color: '#8B5CF6' },
 ]
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || ''
 
 const MODE_PROMPTS = {
-  explain: `You are a UPSC CSE mentor. Explain the given topic in detail with a structured breakdown including definition, key features, historical background, contemporary relevance, and exam perspective. Use plain text only - no stars, no hashes, no markdown. Use numbered sections and dashes for lists.`,
-  quiz: `You are a UPSC CSE mentor. Generate a multiple-choice quiz question on the given topic. Include 4 options (A, B, C, D) and indicate the correct answer after the question. Use plain text only - no stars, no hashes, no markdown.`,
-  summarise: `You are a UPSC CSE mentor. Provide a concise summary of the given topic covering key points, must-know facts, and UPSC angle. Use dashes for bullet points, no stars, no hashes, no markdown.`,
-  deepdive: `You are a UPSC CSE mentor. Provide a comprehensive deep dive analysis of the given topic covering multiple dimensions (historical, constitutional, administrative, social, economic), case studies, critical analysis, and interlinkages with other GS papers. Use plain text only - no stars, no hashes, no markdown.`,
+  explain: `You are a UPSC CSE mentor. Use plain text only - no stars, no hashes, no markdown. Use numbered sections and dashes for lists.`,
+  quiz: `You are a UPSC CSE mentor. Generate one multiple-choice question at a time. Wait for the student's answer. Provide feedback on correctness and reasoning. If the answer is incorrect, explain why. Adapt question difficulty to the student's demonstrated level. Use plain text only - no stars, no hashes, no markdown.`,
+  summarise: `You are a UPSC CSE mentor. Assume prior knowledge. Provide a concise, exam-relevant summary using bullet points. Focus on the UPSC angle and common traps. Use plain text only - no stars, no hashes, no markdown.`,
+  deepdive: `You are a UPSC CSE mentor. If the student shows strong understanding, provide advanced analysis, interlinkages, and critical framing. If they struggle, ask diagnostic questions to identify the gap. Use plain text only - no stars, no hashes, no markdown.`,
 }
 
 const FALLBACK_RESPONSES = {
-  explain: `Topic Overview\n\nThis is an important UPSC topic that requires understanding from multiple angles.\n\nKey Aspects:\n- Focus on definitions and basic concepts first\n- Understand the historical context and evolution\n- Link with current affairs for Mains answers\n- Practice previous year questions on this topic`,
-  quiz: `Quiz Time!\n\nQ: What is the primary constitutional basis for this topic?\nA) Article 14\nB) Article 21\nC) Article 32\nD) Article 368\n\nAnswer: Check your notes and try again!`,
-  summarise: `Summary\n\nKey Points:\n- Understand the core concept thoroughly\n- Know the constitutional/legal framework\n- Keep up with recent developments\n- Practice answer writing`,
-  deepdive: `Deep Dive Analysis\n\nThis topic requires comprehensive understanding across multiple dimensions. Focus on interlinkages with current affairs and other GS papers for a holistic UPSC preparation strategy.`,
+  explain: `Let's break this down step by step.\n\nCore Concept:\n- This topic sits at the intersection of multiple GS papers\n- Understanding the fundamentals is key before exploring advanced angles\n\nStructure:\n1. Start with definitions and constitutional basis\n2. Understand historical evolution\n3. Link to current affairs\n4. Practice with previous year questions`,
+  quiz: `Here's a practice question:\n\nQ: Which of the following best describes the core principle behind this topic?\nA) Constitutional mandate\nB) Executive discretion\nC) Judicial interpretation\nD) Legislative framework\n\nSelect your answer, then I'll explain the reasoning.`,
+  summarise: `Exam-Relevant Summary\n\nKey Points:\n- Core concept and constitutional basis\n- Landmark developments\n- Current affairs angle\n- Common traps in MCQs\n\nPick a topic to revise.`,
+  deepdive: `Let me understand where you are first.\n\nWhat specific aspect of this topic would you like to explore?\n- Advanced analysis and interlinkages\n- A specific dimension you're struggling with\n- Cross-topic connections for Mains`,
 }
 
 const PLACEHOLDERS = [
@@ -133,7 +133,7 @@ export default function AIChatbot() {
     setLoading(true)
 
     const profile = buildStudentProfile(topicScores, practiceDecay, revisionSchedule, questionHistory)
-    const rules = buildRules(profile, sessionRef.current, text)
+    const rules = buildRules(profile, sessionRef.current, text, mode)
     const behaviorRules = rules.join('||')
 
     let response = ''

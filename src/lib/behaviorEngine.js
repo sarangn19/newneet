@@ -58,9 +58,30 @@ function trustFilter(behaviorName) {
   return r ? (r.safety + r.agency + r.growth) >= 2 : true
 }
 
-export function buildRules(profile, session, lastMessage) {
+function getModeBehaviorFilter(modeId) {
+  const defaults = { activated: [], suppressed: [] }
+  const map = {
+    explain: {
+      suppressed: ['CALIBRATE'],
+    },
+    quiz: {
+      suppressed: ['SCAFFOLD', 'DEEPEN', 'REFRESH'],
+    },
+    summarise: {
+      activated: ['REFRESHER'],
+      suppressed: ['SCAFFOLD', 'CALIBRATE', 'ENCOURAGE', 'DEEPEN', 'STRATEGIZE', 'REFRESH'],
+    },
+    deepdive: {
+      suppressed: ['REFRESH'],
+    },
+  }
+  return map[modeId] || defaults
+}
+
+export function buildRules(profile, session, lastMessage, modeId) {
   const rules = []
   const mode = getInteractionMode(profile)
+  const modeFilter = getModeBehaviorFilter(modeId)
   if (mode === 'UNKNOWN') return rules
   if (mode === 'EMERGING') {
     const baseRules = buildEmergingRules(profile, session)
@@ -105,11 +126,12 @@ export function buildRules(profile, session, lastMessage) {
       break
     }
   }
-  // P3 — REFRESHER (stale non-weak topics that haven't been practiced in >30 days)
+  // P3 — REFRESHER (stale topics that haven't been practiced in >30 days)
   if (!session.behaviorsFired.has('refresher') && profile.topicAccs?.length) {
     const weakIds = new Set((profile.weakTopics || []).map(t => t.id))
     for (const t of profile.topicAccs) {
-      if (weakIds.has(t.id) || t.total < 5) continue
+      if (t.total < 5) continue
+      if (weakIds.has(t.id) && modeId !== 'summarise') continue
       const last = profile.topicScores?.[t.id]?.lastAttempted
       if (!last) continue
       const daysSince = Math.floor((Date.now() - new Date(last).getTime()) / DAY)
@@ -143,20 +165,28 @@ export function buildRules(profile, session, lastMessage) {
       text: 'FEEDBACK: Student is asking about their progress. Give directional feedback only: areas of strength, areas with most room to grow, and one actionable next step. No percentages, no labels, no comparisons.' })
   }
 
-  // Select: up to P1 + 1 P2 + 1 topic-P3 + 1 P4, max 3 total
+  // Mode filter: remove suppressed behaviors per mode
+  const filtered = modeFilter.suppressed.length
+    ? candidates.filter(c => !modeFilter.suppressed.includes(c.name))
+    : candidates
+
+  // Select: up to P1 + 2 P2 + rest P3+P4, max 4 total
   const selected = []
-  const p1 = candidates.find(c => c.priority === 1)
+  const p1 = filtered.find(c => c.priority === 1)
   if (p1) { selected.push(p1); session.strugglingAcknowledged = true }
-  const p2 = candidates.filter(c => c.priority === 2)
-  if (p2.length > 0) selected.push(p2[0])
-  const p3 = candidates.filter(c => c.priority === 3)
-  for (const c of p3) {
+  const p2 = filtered.filter(c => c.priority === 2)
+  for (const c of p2) {
     if (selected.length >= 3) break
     selected.push(c)
   }
-  const p4 = candidates.filter(c => c.priority === 4)
+  const p3 = filtered.filter(c => c.priority === 3)
+  for (const c of p3) {
+    if (selected.length >= 4) break
+    selected.push(c)
+  }
+  const p4 = filtered.filter(c => c.priority === 4)
   for (const c of p4) {
-    if (selected.length >= 3) break
+    if (selected.length >= 4) break
     selected.push(c)
   }
 
