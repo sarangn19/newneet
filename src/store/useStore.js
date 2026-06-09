@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { supabase, hasTopicScoresTable, hasQuestionHistoryTable, hasRevisionScheduleTable } from '../lib/supabase'
+import { supabase, hasTopicScoresTable, hasQuestionHistoryTable, hasRevisionScheduleTable, hasRevisionMasteryTable, hasRevisionSeenQuestionsTable, hasPracticeDecayHistoryTable } from '../lib/supabase'
 import { upsertTodayStats } from '../lib/useDailyStats'
 
 const MAX_HISTORY = 2000
