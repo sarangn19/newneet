@@ -281,7 +281,7 @@ function ProtectedRoutes() {
   }
 
   return (
-    <div className={examType === 'neet' ? 'neet-mode' : examType === 'upsc' ? 'upsc-mode' : ''} style={{ height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div className={examType === 'neet' ? 'neet-mode' : ''} style={{ height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
         <AnimatedRoutes />
       </div>

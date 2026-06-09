@@ -276,7 +276,7 @@ export default function AIChatbot() {
   }
 
   return (
-    <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: 100, boxSizing: 'border-box' }}>
+    <motion.div layout className="upsc-mode" style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: 100, boxSizing: 'border-box' }}>
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -431,38 +431,33 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '6px 18px calc(10px + env(safe-area-inset-bottom, 0px))', gap: 10, background: 'var(--card-bg)', borderRadius: 28, margin: '0 12px 8px', border: '1px solid var(--border)' }}>
-            {/* Input pill */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px', gap: 6, height: 42, background: 'var(--surface-alt)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 21 }}>
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                placeholder={PLACEHOLDERS[placeholderIdx]}
-                style={{
-                  flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                  fontSize: 14, fontWeight: 400, letterSpacing: '-0.15px',
-                  fontFamily: 'inherit', color: 'var(--text)', padding: 0,
-                }}
-              />
-              <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
-                width: 24, height: 24, borderRadius: 12, border: 'none', flexShrink: 0,
-                background: 'transparent', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-              }}>
-                <Mic size={16} color={listening ? '#fff' : 'var(--text-3)'} />
-              </motion.button>
-            </div>
-            {/* Send button */}
+          <div style={{ margin: '0 14px 8px', padding: '0 14px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, height: 48, background: 'var(--surface-alt)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+              placeholder={PLACEHOLDERS[placeholderIdx]}
+              style={{
+                flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                fontSize: 14, fontWeight: 400, letterSpacing: '-0.15px',
+                fontFamily: 'inherit', color: 'var(--text)', padding: 0,
+              }}
+            />
+            <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
+              width: 28, height: 28, borderRadius: 8, border: 'none', flexShrink: 0,
+              background: 'transparent', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+            }}>
+              <Mic size={14} color={listening ? '#fff' : 'var(--text-3)'} />
+            </motion.button>
             <motion.button whileTap={{scale:0.94}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
-              display: 'flex', flexDirection: 'row', alignItems: 'center',
-              padding: '4px 18px 4px 16px', gap: 6,
-              height: 34, border: 'none', borderRadius: 17, flexShrink: 0,
+              width: 28, height: 28, borderRadius: 8, border: 'none', flexShrink: 0,
               background: input.trim() && !loading ? 'var(--primary)' : 'transparent',
               cursor: input.trim() && !loading ? 'pointer' : 'default',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
             }}>
-              <Send size={15} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
+              <Send size={14} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
             </motion.button>
           </div>
         </div>
