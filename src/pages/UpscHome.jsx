@@ -6,13 +6,13 @@ import { useRecommendations } from '../lib/useRecommendations'
 import { usePerformanceAlerts } from '../lib/usePerformanceAlerts'
 import { generateRevisionContent } from '../lib/revisionAI'
 import { upscMCQs } from '../data/upsc/questions'
-import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery, advanceMastery as saveMastery } from '../lib/revisionEngine'
+import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
 import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingUp, TrendingDown, Clock, Search, FileText, SkipForward, Zap, Layers, MessageSquare, GitBranch, RefreshCw, Target } from 'lucide-react'
 import { card as cardStyle, cardHover, spring, spacing, font, colors, btn } from '../lib/designTokens'
 
 export default function UpscHome() {
   const navigate = useNavigate()
-  const { user, topicScores, saveTopicScore, recordQuestionAttempt, startSession, endSession, updateStats, revisionSchedule, markTopicReviewed } = useStore()
+  const { user, topicScores, saveTopicScore, recordQuestionAttempt, startSession, endSession, updateStats, revisionSchedule, markTopicReviewed, revisionMastery, setRevisionMastery, recordSeenQuestion } = useStore()
   const { allTopics } = useRecommendations('upsc')
   const todayStr = new Date().toISOString().slice(0, 10)
   const [dailyMix] = useState(() => getRevisionMix(allTopics, topicScores, revisionSchedule, 5))
@@ -63,9 +63,7 @@ export default function UpscHome() {
 
   const getTailoredQuestions = (topicId, count) => {
     const topicQ = upscMCQs.filter(q => q.chapter === topicId)
-    const seenRaw = localStorage.getItem('revision_seen_questions')
-    const seenData = seenRaw ? JSON.parse(seenRaw) : {}
-    const topicSeen = seenData[topicId] || {}
+    const topicSeen = revisionSeenQuestions[topicId] || {}
     const withStatus = topicQ.map(q => {
       const key = q.q.slice(0, 40)
       const s = topicSeen[key]
@@ -81,15 +79,8 @@ export default function UpscHome() {
     if (result.length < count) result.push(...pick(done, count - result.length))
     return result.slice(0, count)
   }
-  const recordSeenQuestion = (topicId, questionText, isCorrect) => {
-    const key = questionText.slice(0, 40)
-    const raw = localStorage.getItem('revision_seen_questions')
-    const data = raw ? JSON.parse(raw) : {}
-    if (!data[topicId]) data[topicId] = {}
-    if (!data[topicId][key]) data[topicId][key] = { seen: 0, correct: 0 }
-    data[topicId][key].seen++
-    if (isCorrect) data[topicId][key].correct++
-    localStorage.setItem('revision_seen_questions', JSON.stringify(data))
+  const recordSeenQuestionLocal = (topicId, questionText, isCorrect) => {
+    recordSeenQuestion(topicId, questionText.slice(0, 40), isCorrect)
   }
 
   const openRevision = async (topic) => {
@@ -109,7 +100,7 @@ export default function UpscHome() {
     const result = await generateRevisionContent({ ...topic, accuracy, total: ts?.total || 0 })
     setRevisionContent(result)
     setRevisionLoading(false)
-    const level = getMastery(topic.id)
+    const level = getMastery(topic.id, revisionMastery)
     const count = level === 1 ? 3 : level === 2 ? 5 : level === 3 ? 5 : 1
     const questions = getTailoredQuestions(topic.id, count)
     setPracticeQ(questions)
@@ -129,7 +120,7 @@ export default function UpscHome() {
     setPracticeAnswers(newAnswers)
     if (revisionPopupTopic) {
       recordQuestionAttempt(revisionPopupTopic.id, correct, timeSpent, revisionPopupTopic.subjectId || '')
-      recordSeenQuestion(revisionPopupTopic.id, practiceQ[practiceIdx].q, correct)
+      recordSeenQuestionLocal(revisionPopupTopic.id, practiceQ[practiceIdx].q, correct)
     }
   }
 
@@ -146,7 +137,8 @@ export default function UpscHome() {
         saveTopicScore(revisionPopupTopic.id, correct, total)
         updateStats(correct, total, revisionPopupTopic.subjectId || '')
         const pct = Math.round((correct / total) * 100)
-        saveMastery(revisionPopupTopic.id, pct)
+        const newLevel = Math.min((getMastery(revisionPopupTopic.id, revisionMastery) || 1) + (pct >= 70 ? 1 : 0), 4)
+        setRevisionMastery(revisionPopupTopic.id, newLevel)
         markTopicReviewed(revisionPopupTopic.id)
         setFeedDone(prev => new Set([...prev, revisionPopupTopic.id]))
       }
@@ -301,11 +293,11 @@ export default function UpscHome() {
                       )}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <Clock size={11} color="#94a3b8" />
-                        <span style={{ fontSize: 10, color: '#94a3b8' }}>{getMastery(t.id) === 1 ? '3m' : '5m'}</span>
+                        <span style={{ fontSize: 10, color: '#94a3b8' }}>{getMastery(t.id, revisionMastery) === 1 ? '3m' : '5m'}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <Zap size={11} color="#94a3b8" />
-                        <span style={{ fontSize: 10, color: '#94a3b8' }}>L{getMastery(t.id)}/4</span>
+                        <span style={{ fontSize: 10, color: '#94a3b8' }}>L{getMastery(t.id, revisionMastery)}/4</span>
                       </div>
                     </div>
 

@@ -41,7 +41,8 @@ export function calcPriority(topicId, topicScores, revisionSchedule) {
 }
 
 // ── Mastery Level ──
-export function getMasteryLevel(topicId) {
+export function getMasteryLevel(topicId, revisionMastery = null) {
+  if (revisionMastery) return revisionMastery[topicId] || 1
   const raw = localStorage.getItem('revision_mastery')
   const data = raw ? JSON.parse(raw) : {}
   return data[topicId] || 1

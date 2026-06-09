@@ -168,3 +168,66 @@ limit 100;
 
 -- Allow anyone (including anon) to read the leaderboard
 grant select on public.leaderboard to anon, authenticated;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Cross-device sync tables for revision & practice data
+-- ═══════════════════════════════════════════════════════════════════
+
+-- revision_mastery — tracks level (1-4) per topic
+create table if not exists public.revision_mastery (
+  id          uuid        primary key default uuid_generate_v4(),
+  user_id     uuid        not null references public.profiles(id) on delete cascade,
+  topic_id    text        not null,
+  level       integer     not null default 1,
+  updated_at  timestamptz not null default now(),
+  unique(user_id, topic_id)
+);
+
+-- revision_seen_questions — per-question tracking for tailored revision
+create table if not exists public.revision_seen_questions (
+  id            uuid        primary key default uuid_generate_v4(),
+  user_id       uuid        not null references public.profiles(id) on delete cascade,
+  topic_id      text        not null,
+  question_key  text        not null,
+  seen          integer     not null default 0,
+  correct       integer     not null default 0,
+  updated_at    timestamptz not null default now(),
+  unique(user_id, topic_id, question_key)
+);
+
+-- practice_decay_history — per-attempt decay/spaced-repetition data
+create table if not exists public.practice_decay_history (
+  id             uuid        primary key default uuid_generate_v4(),
+  user_id        uuid        not null references public.profiles(id) on delete cascade,
+  question_id    text        not null,
+  chapter        text        not null default '',
+  subject        text        not null default '',
+  skill          text        not null default '',
+  correct        boolean     not null,
+  confidence     integer     not null default 0,
+  time_ms        integer     not null default 0,
+  ts             bigint      not null,
+  expected_score integer     not null default 0
+);
+
+alter table public.revision_mastery         enable row level security;
+alter table public.revision_seen_questions  enable row level security;
+alter table public.practice_decay_history   enable row level security;
+
+do $$ begin
+  drop policy if exists "revision_mastery_own"          on public.revision_mastery;
+  drop policy if exists "revision_seen_questions_own"   on public.revision_seen_questions;
+  drop policy if exists "practice_decay_history_own"    on public.practice_decay_history;
+end $$;
+
+create policy "revision_mastery_own"
+  on public.revision_mastery for all
+  using (auth.uid() = user_id);
+
+create policy "revision_seen_questions_own"
+  on public.revision_seen_questions for all
+  using (auth.uid() = user_id);
+
+create policy "practice_decay_history_own"
+  on public.practice_decay_history for all
+  using (auth.uid() = user_id);

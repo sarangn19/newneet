@@ -54,3 +54,6 @@ export const hasDailyStatsTable = true
 export const hasTopicScoresTable = true
 export const hasQuestionHistoryTable = true
 export const hasRevisionScheduleTable = true
+export const hasRevisionMasteryTable = true
+export const hasRevisionSeenQuestionsTable = true
+export const hasPracticeDecayHistoryTable = true

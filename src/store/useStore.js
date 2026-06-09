@@ -147,6 +147,129 @@ const pushRevisionToSupabase = async (userId, topicId, lastReviewed, interval) =
   }
 }
 
+// ── Revision Mastery sync ──────────────────────────────────────────
+const syncRevisionMasteryFromSupabase = async (userId) => {
+  if (!supabase || !hasRevisionMasteryTable || !userId) return null
+  try {
+    const { data } = await supabase
+      .from('revision_mastery')
+      .select('*')
+      .eq('user_id', userId)
+    if (data && data.length > 0) {
+      const mastery = {}
+      data.forEach(row => { mastery[row.topic_id] = row.level })
+      return mastery
+    }
+  } catch (e) {
+    console.warn('syncRevisionMasteryFromSupabase failed:', e)
+  }
+  return null
+}
+
+const pushRevisionMasteryToSupabase = async (userId, topicId, level) => {
+  if (!supabase || !hasRevisionMasteryTable || !userId) return
+  try {
+    await supabase.from('revision_mastery').upsert({
+      user_id: userId,
+      topic_id: topicId,
+      level,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id,topic_id' })
+  } catch (e) {
+    console.warn('pushRevisionMasteryToSupabase failed:', e)
+  }
+}
+
+// ── Revision Seen Questions sync ───────────────────────────────────
+const syncRevisionSeenQuestionsFromSupabase = async (userId) => {
+  if (!supabase || !hasRevisionSeenQuestionsTable || !userId) return null
+  try {
+    const { data } = await supabase
+      .from('revision_seen_questions')
+      .select('*')
+      .eq('user_id', userId)
+    if (data && data.length > 0) {
+      const seen = {}
+      data.forEach(row => {
+        if (!seen[row.topic_id]) seen[row.topic_id] = {}
+        seen[row.topic_id][row.question_key] = { seen: row.seen, correct: row.correct }
+      })
+      return seen
+    }
+  } catch (e) {
+    console.warn('syncRevisionSeenQuestionsFromSupabase failed:', e)
+  }
+  return null
+}
+
+const pushRevisionSeenQuestionToSupabase = async (userId, topicId, questionKey, seen, correct) => {
+  if (!supabase || !hasRevisionSeenQuestionsTable || !userId) return
+  try {
+    await supabase.from('revision_seen_questions').upsert({
+      user_id: userId,
+      topic_id: topicId,
+      question_key: questionKey,
+      seen,
+      correct,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id,topic_id,question_key' })
+  } catch (e) {
+    console.warn('pushRevisionSeenQuestionToSupabase failed:', e)
+  }
+}
+
+// ── Practice Decay History sync ────────────────────────────────────
+const syncPracticeDecayFromSupabase = async (userId) => {
+  if (!supabase || !hasPracticeDecayHistoryTable || !userId) return null
+  try {
+    const { data } = await supabase
+      .from('practice_decay_history')
+      .select('*')
+      .eq('user_id', userId)
+    if (data && data.length > 0) {
+      const decay = {}
+      data.forEach(row => {
+        if (!decay[row.question_id]) decay[row.question_id] = []
+        decay[row.question_id].push({
+          qId: row.question_id,
+          chapter: row.chapter,
+          subject: row.subject,
+          skill: row.skill,
+          correct: row.correct,
+          confidence: row.confidence,
+          timeMs: row.time_ms,
+          ts: row.ts,
+          expectedScore: row.expected_score,
+        })
+      })
+      return decay
+    }
+  } catch (e) {
+    console.warn('syncPracticeDecayFromSupabase failed:', e)
+  }
+  return null
+}
+
+const pushPracticeDecayToSupabase = async (userId, questionId, entry) => {
+  if (!supabase || !hasPracticeDecayHistoryTable || !userId) return
+  try {
+    await supabase.from('practice_decay_history').insert({
+      user_id: userId,
+      question_id: questionId,
+      chapter: entry.chapter || '',
+      subject: entry.subject || '',
+      skill: entry.skill || '',
+      correct: entry.correct,
+      confidence: entry.confidence || 0,
+      time_ms: entry.timeMs || 0,
+      ts: entry.ts || Date.now(),
+      expected_score: entry.expectedScore || 0,
+    })
+  } catch (e) {
+    console.warn('pushPracticeDecayToSupabase failed:', e)
+  }
+}
+
 // ── store ─────────────────────────────────────────────────────────
 const useStore = create(
   persist(
@@ -205,6 +328,10 @@ const useStore = create(
 
       revisionSchedule: {}, // { [topicId]: { lastReviewed: '2026-06-07', interval: 1 } }
 
+      revisionMastery: {}, // { [topicId]: 1-4 }
+      revisionSeenQuestions: {}, // { [topicId]: { [questionKey]: { seen, correct } } }
+      practiceDecay: {}, // { [questionId]: [{ qId, chapter, subject, skill, correct, confidence, timeMs, ts, expectedScore }] }
+
       markTopicReviewed: (topicId) => {
         const { revisionSchedule, topicScores, userId } = get()
         const score = topicScores[topicId]
@@ -221,6 +348,51 @@ const useStore = create(
           }
         })
         if (userId) pushRevisionToSupabase(userId, topicId, lastReviewed, interval)
+      },
+
+      // ── Revision Mastery ──────────────────────────────────────────
+      setRevisionMastery: (topicId, level) => {
+        set(state => ({
+          revisionMastery: { ...state.revisionMastery, [topicId]: level }
+        }))
+        const { userId } = get()
+        if (userId) pushRevisionMasteryToSupabase(userId, topicId, level)
+      },
+
+      // ── Revision Seen Questions ───────────────────────────────────
+      recordSeenQuestion: (topicId, questionKey, isCorrect) => {
+        set(state => {
+          const topic = state.revisionSeenQuestions[topicId] || {}
+          const prev = topic[questionKey] || { seen: 0, correct: 0 }
+          const updated = { seen: prev.seen + 1, correct: prev.correct + (isCorrect ? 1 : 0) }
+          return {
+            revisionSeenQuestions: {
+              ...state.revisionSeenQuestions,
+              [topicId]: { ...topic, [questionKey]: updated }
+            }
+          }
+        })
+        const { userId } = get()
+        if (userId) {
+          const state = get()
+          const entry = state.revisionSeenQuestions[topicId]?.[questionKey] || { seen: 0, correct: 0 }
+          pushRevisionSeenQuestionToSupabase(userId, topicId, questionKey, entry.seen, entry.correct)
+        }
+      },
+
+      // ── Practice Decay History ────────────────────────────────────
+      savePracticeDecay: (questionId, entry) => {
+        set(state => {
+          const existing = state.practiceDecay[questionId] || []
+          return {
+            practiceDecay: {
+              ...state.practiceDecay,
+              [questionId]: [...existing, entry]
+            }
+          }
+        })
+        const { userId } = get()
+        if (userId) pushPracticeDecayToSupabase(userId, questionId, entry)
       },
 
       // ── Second Brain tracking ────────────────────────────────────
@@ -284,6 +456,30 @@ const useStore = create(
         const remoteRevision = await syncRevisionScheduleFromSupabase(userId)
         if (remoteRevision) {
           set({ revisionSchedule: remoteRevision })
+        }
+
+        // Sync revision mastery from Supabase
+        const remoteMastery = await syncRevisionMasteryFromSupabase(userId)
+        if (remoteMastery) {
+          set(state => ({
+            revisionMastery: { ...state.revisionMastery, ...remoteMastery }
+          }))
+        }
+
+        // Sync revision seen questions from Supabase
+        const remoteSeen = await syncRevisionSeenQuestionsFromSupabase(userId)
+        if (remoteSeen) {
+          set(state => ({
+            revisionSeenQuestions: { ...state.revisionSeenQuestions, ...remoteSeen }
+          }))
+        }
+
+        // Sync practice decay from Supabase
+        const remoteDecay = await syncPracticeDecayFromSupabase(userId)
+        if (remoteDecay) {
+          set(state => ({
+            practiceDecay: { ...state.practiceDecay, ...remoteDecay }
+          }))
         }
 
         // Sync streak protection from user_stats
@@ -638,6 +834,9 @@ const useStore = create(
         moduleProgress:   s.moduleProgress,
         topicScores:      s.topicScores,
         revisionSchedule: s.revisionSchedule,
+        revisionMastery:  s.revisionMastery,
+        revisionSeenQuestions: s.revisionSeenQuestions,
+        practiceDecay:    s.practiceDecay,
         questionHistory:  s.questionHistory,
         dailyBreakdown:   s.dailyBreakdown,
         userId:           s.userId,

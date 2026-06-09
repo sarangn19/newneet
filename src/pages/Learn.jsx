@@ -302,9 +302,8 @@ function tagSkill(q) {
 const SKILL_LABELS = { recall: 'Recall', elimination: 'Elimination', analysis: 'Analysis', pattern: 'Pattern', application: 'Application' }
 const SKILL_COLORS = { recall: '#3B82F6', elimination: '#8B5CF6', analysis: '#F59E0B', pattern: '#10B981', application: '#EF4444' }
 
-function saveSession(subject, topic, questions, answers, confidence, qTimes, expectedScore) {
+function saveSession(subject, topic, questions, answers, confidence, qTimes, expectedScore, savePracticeDecay) {
   try {
-    const existing = JSON.parse(localStorage.getItem(DECAY_KEY) || '{}')
     const now = Date.now()
     questions.forEach((q, i) => {
       const ans = answers[i]
@@ -312,17 +311,22 @@ function saveSession(subject, topic, questions, answers, confidence, qTimes, exp
       const t = qTimes[i]
       if (ans === undefined) return
       const entry = { qId: q.id || q.q, chapter: q.chapter || topic || '', subject, skill: tagSkill(q), correct: ans === q.ans, confidence: conf || 0, timeMs: t?.answered && t?.shown ? t.answered - t.shown : 0, ts: now, expectedScore }
-      const history = existing[q.id || q.q] || []
-      history.push(entry)
-      existing[q.id || q.q] = history
+      if (savePracticeDecay) {
+        savePracticeDecay(q.id || q.q, entry)
+      } else {
+        const existing = JSON.parse(localStorage.getItem(DECAY_KEY) || '{}')
+        const history = existing[q.id || q.q] || []
+        history.push(entry)
+        existing[q.id || q.q] = history
+        localStorage.setItem(DECAY_KEY, JSON.stringify(existing))
+      }
     })
-    localStorage.setItem(DECAY_KEY, JSON.stringify(existing))
   } catch {}
 }
 
-function getChapterRetention(chapterId) {
+function getChapterRetention(chapterId, decayData) {
   try {
-    const existing = JSON.parse(localStorage.getItem(DECAY_KEY) || '{}')
+    const existing = decayData || (JSON.parse(localStorage.getItem(DECAY_KEY) || '{}'))
     const now = Date.now()
     const DAY = 86400000
     let lastTs = 0; let total = 0; let correct = 0
@@ -337,9 +341,9 @@ function getChapterRetention(chapterId) {
   } catch { return { daysSince: null, status: 'never', total: 0, accuracy: 0 } }
 }
 
-function getLearnerProfile() {
+function getLearnerProfile(decayData) {
   try {
-    const existing = JSON.parse(localStorage.getItem(DECAY_KEY) || '{}')
+    const existing = decayData || (JSON.parse(localStorage.getItem(DECAY_KEY) || '{}'))
     const entries = Object.values(existing).flat()
     if (entries.length === 0) return null
     const total = entries.length
@@ -403,6 +407,8 @@ function getLearnerProfile() {
 function PracticeMCQTab() {
   const navigate = useNavigate()
   const saveTopicScore = useStore(s => s.saveTopicScore)
+  const practiceDecay = useStore(s => s.practiceDecay)
+  const savePracticeDecay = useStore(s => s.savePracticeDecay)
   const [selectedSubjects, setSelectedSubjects] = useState(['gs1'])
   const [selectedChapters, setSelectedChapters] = useState([])
   const [numQ, setNumQ] = useState(10)
@@ -505,7 +511,7 @@ function PracticeMCQTab() {
         saveTopicScore(ch, correct, chQ.length)
       })
       const allTopics = [...new Set(questions.map(q => q.chapter).filter(Boolean))]
-      saveSession(allTopics.join(','), '', questions, answers, confidence, qTimes, expectedScore)
+      saveSession(allTopics.join(','), '', questions, answers, confidence, qTimes, expectedScore, savePracticeDecay)
       setShowResult(true)
     }
   }
@@ -809,7 +815,7 @@ function PracticeMCQTab() {
 
             {/* Cognitive Twin Profile */}
             {(() => {
-              const profile = getLearnerProfile()
+              const profile = getLearnerProfile(practiceDecay)
               if (!profile || profile.total < 3) return null
               return (
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ ...cardStyle, padding: 14, marginBottom: 10 }} whileHover={cardHover}>
@@ -934,7 +940,7 @@ function PracticeMCQTab() {
 
             {/* Retention warning banner */}
             {(() => {
-              const decaying = subjectsWithChapters.flatMap(s => s.chapters).filter(ch => getChapterRetention(ch.id).status === 'decaying')
+              const decaying = subjectsWithChapters.flatMap(s => s.chapters).filter(ch => getChapterRetention(ch.id, practiceDecay).status === 'decaying')
               if (decaying.length === 0) return null
               return (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
@@ -962,7 +968,7 @@ function PracticeMCQTab() {
                 </div>
                 {sub.chapters.map(ch => {
                   const sel = selectedChapters.includes(ch.id)
-                  const ret = getChapterRetention(ch.id)
+                  const ret = getChapterRetention(ch.id, practiceDecay)
                   const retColor = ret.status === 'fresh' ? '#10B981' : ret.status === 'aging' ? '#F59E0B' : ret.status === 'decaying' ? '#EF4444' : '#D1D5DB'
                   return (
                     <motion.div key={ch.id} onClick={() => toggleChapter(ch.id)}
