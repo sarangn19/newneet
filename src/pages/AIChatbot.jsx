@@ -306,7 +306,7 @@ export default function AIChatbot() {
         {/* Chat area */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '10px 14px', minHeight: 0 }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '10px 14px 100px', minHeight: 0 }}>
             <AnimatePresence>
             {messages.map((msg, i) => (
               <motion.div
@@ -419,7 +419,7 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ padding: '8px 14px 14px', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
+          <div style={{ padding: '8px 14px calc(14px + env(safe-area-inset-bottom, 0px))', background: 'var(--card-bg)', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 101 }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
               <div style={{ flex: 1, position: 'relative' }}>
                 <input
