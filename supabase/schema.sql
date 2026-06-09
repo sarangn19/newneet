@@ -176,7 +176,7 @@ grant select on public.leaderboard to anon, authenticated;
 -- revision_mastery — tracks level (1-4) per topic
 create table if not exists public.revision_mastery (
   id          uuid        primary key default uuid_generate_v4(),
-  user_id     uuid        not null references public.profiles(id) on delete cascade,
+  user_id     uuid        not null references public.users(id) on delete cascade,
   topic_id    text        not null,
   level       integer     not null default 1,
   updated_at  timestamptz not null default now(),

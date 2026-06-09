@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { useRecommendations } from '../lib/useRecommendations'
@@ -7,8 +7,7 @@ import { usePerformanceAlerts } from '../lib/usePerformanceAlerts'
 import { generateRevisionContent } from '../lib/revisionAI'
 import { upscMCQs } from '../data/upsc/questions'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
-import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingUp, TrendingDown, Clock, Search, FileText, SkipForward, Zap, Layers, MessageSquare, GitBranch, RefreshCw, Target } from 'lucide-react'
-import { card as cardStyle, cardHover, spring, spacing, font, colors, btn } from '../lib/designTokens'
+import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, Clock, Search, FileText, SkipForward, Zap, Target } from 'lucide-react'
 
 export default function UpscHome() {
   const navigate = useNavigate()
@@ -35,8 +34,6 @@ export default function UpscHome() {
   // Day of week format
   const dayOfWeek = new Date().getDay()
   const dayLabels = { 0: 'Weekly Review', 1: 'Flashcards', 2: 'MCQ Revision', 3: 'Mind Maps', 4: 'Summary', 5: 'AI Q&A', 6: 'Mixed Test' }
-  const dayIcons = { 0: RefreshCw, 1: Layers, 2: Zap, 3: GitBranch, 4: FileText, 5: MessageSquare, 6: BarChart3 }
-  const TodayIcon = dayIcons[dayOfWeek] || Layers
 
   const skipTopic = () => { if (feedIdx < remainingFeed.length - 1) setFeedIdx(i => i + 1) }
   const touchStartX = useRef(0)
@@ -148,186 +145,107 @@ export default function UpscHome() {
   }
 
   return (
-    <div style={{ background: '#f4f6f8', minHeight: '100%', paddingBottom: 100, position: 'relative' }}>
-      {/* Dot grid background */}
-      <div className="bg-pattern" style={{ position: 'fixed', inset: 0, opacity: 0.4, pointerEvents: 'none', zIndex: 0 }} />
-
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
+    <div style={{ background: '#f4f6f8', minHeight: '100%', paddingBottom: 100 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {/* ══ TOP BAR ══ */}
-        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '40px 20px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            <h1 style={{ fontSize: 28, fontWeight: 900, color: '#1e293b', letterSpacing: '-0.03em' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '48px 20px 8px' }}>
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1e293b', letterSpacing: '-0.03em', margin: 0 }}>
               UPSC<span style={{ color: '#6366f1' }}>.</span>
             </h1>
+            <p style={{ fontSize: 12, color: '#94a3b8', margin: '2px 0 0', fontWeight: 500 }}>
+              {remainingCount > 0 ? `${remainingCount} topics today` : 'All done!'} · {dayLabels[dayOfWeek]}
+            </p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button className="pill-3d" style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', cursor: 'pointer', background: '#fff', borderRadius: 9999, border: '2px solid #e2e8f0' }}>
-              <Flame size={16} color="#f97316" />
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#1e293b' }}>{streak}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button className="pill-3d" onClick={() => navigate('/pyq-search')} style={{ padding: '6px 10px', cursor: 'pointer', background: '#fff', borderRadius: 9999, border: '2px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Search size={14} color="#6366f1" />
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#475569' }}>PYQs</span>
             </button>
-            <button className="pill-3d" onClick={() => navigate('/profile')} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: '#fff', borderRadius: 9999, border: '2px solid #e2e8f0', overflow: 'hidden' }}>
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#6366f1', background: '#e0e7ff' }}>
-                {user?.name?.[0] || 'U'}
-              </div>
+            <button className="pill-3d" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', cursor: 'pointer', background: '#fff', borderRadius: 9999, border: '2px solid #e2e8f0' }}>
+              <Flame size={14} color="#f97316" />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>{streak}</span>
+            </button>
+            <button className="pill-3d" onClick={() => navigate('/profile')} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: '#e0e7ff', borderRadius: 9999, border: '2px solid #e2e8f0', overflow: 'hidden', fontSize: 12, fontWeight: 700, color: '#6366f1' }}>
+              {user?.name?.[0] || 'U'}
             </button>
           </div>
-        </header>
-
-        {/* ══ GREETING ══ */}
-        <div style={{ padding: '0 20px 24px' }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b' }}>
-            Ready to conquer, {user?.name?.split(' ')[0] || 'Alex'}?
-          </h2>
-          <p style={{ fontSize: 13, fontWeight: 500, color: '#64748b', marginTop: 4 }}>
-            {remainingCount > 0
-              ? `${remainingCount} topics remaining today`
-              : 'All done for today!'}
-          </p>
         </div>
 
-        {/* ══ QUICK LINKS ══ */}
-        <section style={{ padding: '0 20px 28px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 14 }}>
-            <div className="card-3d interactive" onClick={() => navigate('/pyq-search')} style={{ padding: 16, cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 14, height: 70 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#eef2ff', border: '1px solid #e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Search size={20} color="#6366f1" />
-              </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: '#1e293b', lineHeight: 1.2 }}>PYQ Search</div>
-                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 500, marginTop: 2 }}>Search previous year questions & create custom tests</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ══ PERFORMANCE ALERTS ══ */}
-        <section style={{ padding: '0 20px 12px' }}>
-          <AnimatePresence>
-            {alerts.length > 0 && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {alerts.slice(0, 2).map((alert, i) => {
+        {/* ══ ALERTS ══ */}
+        {alerts.length > 0 && (
+          <div style={{ padding: '12px 20px 0' }}>
+            <AnimatePresence>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {alerts.slice(0, 1).map((alert, i) => {
                   const iconMap = { critical: TrendingDown, weak: AlertTriangle, declining: TrendingDown, streak: Flame, inactive: Clock, consistency: BarChart3 }
-                  const bgMap = { critical: '#FEF2F2', weak: '#FFF7ED', declining: '#FEF2F2', streak: '#FFF7ED', inactive: '#F3F4F6', consistency: '#EFF6FF' }
-                  const borderMap = { critical: '#FCA5A5', weak: '#FDBA74', declining: '#FCA5A5', streak: '#FCD34D', inactive: '#D1D5DB', consistency: '#93C5FD' }
                   const colorMap = { critical: '#DC2626', weak: '#D97706', declining: '#DC2626', streak: '#B45309', inactive: '#6B7280', consistency: '#2563EB' }
+                  const bgMap = { critical: '#FEF2F2', weak: '#FFF7ED', declining: '#FEF2F2', streak: '#FFF7ED', inactive: '#F3F4F6', consistency: '#EFF6FF' }
                   const Icon = iconMap[alert.type] || AlertTriangle
                   return (
-                    <div key={i} style={{
-                      padding: '8px 12px', borderRadius: 10,
-                      background: bgMap[alert.type],
-                      borderLeft: `3px solid ${borderMap[alert.type]}`,
-                      display: 'flex', alignItems: 'flex-start', gap: 8,
-                    }}>
-                      <Icon size={14} color={colorMap[alert.type]} style={{ marginTop: 1, flexShrink: 0 }} />
-                      <div style={{ fontSize: 11, color: '#4B5563', lineHeight: 1.4 }}>{alert.message}</div>
+                    <div key={i} style={{ padding: '6px 10px', borderRadius: 8, background: bgMap[alert.type], display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#4B5563', lineHeight: 1.4 }}>
+                      <Icon size={13} color={colorMap[alert.type]} style={{ flexShrink: 0 }} />
+                      {alert.message}
                     </div>
                   )
                 })}
               </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
+            </AnimatePresence>
+          </div>
+        )}
 
         {/* ══ TODAY'S REVISION CAROUSEL ══ */}
         {remainingFeed.length > 0 && (
-          <div
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', touchAction: 'none', userSelect: 'none' }}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0', touchAction: 'none', userSelect: 'none' }}
+            onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
           >
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 4 }}>
-              <div style={{ width: 24, height: 24, borderRadius: 6, background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <TodayIcon size={13} color="#6366f1" />
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>Today's Revision</div>
-              <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{remainingCount} left · {dayLabels[dayOfWeek]}</div>
-            </div>
-
-            {/* Cards */}
-            <div style={{ position: 'relative', width: '100%', minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: '100%', minHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {[-1, 0, 1].map((offset) => {
                 const idx = feedIdx + offset
                 if (idx < 0 || idx >= remainingFeed.length) return null
                 const t = remainingFeed[idx]
                 const isCenter = offset === 0
                 const pi = isCenter ? priorityInfo : calculatePriorityScore(t.id, topicScores, revisionSchedule)
+                const reason = pi?.weakness >= 0.6 ? `Weak — ${t.accuracy || 0}% accuracy` : pi?.forgetting >= 0.8 ? 'Over 2 weeks since review' : pi?.forgetting >= 0.5 ? 'Due for review' : pi?.importance >= 0.6 ? 'High-yield topic' : 'Keep fresh'
                 return (
-                  <motion.div
-                    key={t.id}
-                    animate={{
-                      x: offset * 200,
-                      scale: isCenter ? 1 : 0.85,
-                      zIndex: isCenter ? 10 : 5,
-                      opacity: isCenter ? 1 : 0.6,
-                    }}
+                  <motion.div key={t.id}
+                    animate={{ x: offset * 180, scale: isCenter ? 1 : 0.88, opacity: isCenter ? 1 : 0.5, zIndex: isCenter ? 10 : 5 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     onClick={() => { if (isCenter) openRevision(t); else setFeedIdx(idx) }}
-                    className="card-3d"
-                    style={{
-                      position: 'absolute', width: 280, cursor: 'pointer', overflow: 'hidden', borderBottomWidth: 6, padding: 0,
-                    }}
+                    style={{ position: 'absolute', width: 290, cursor: 'pointer', overflow: 'hidden', background: '#fff', borderRadius: 16, boxShadow: isCenter ? '0 8px 32px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.06)' }}
                   >
-                    {/* Subject badge */}
-                    <div style={{ padding: '16px 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    {/* Top accent bar */}
+                    <div style={{ height: 4, background: pi?.weakness >= 0.6 ? '#ef4444' : pi?.forgetting >= 0.5 ? '#f59e0b' : '#6366f1' }} />
+
+                    {/* Subject + badge */}
+                    <div style={{ padding: '14px 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t.subjectName}</div>
-                        <div style={{ fontSize: isCenter ? 17 : 14, fontWeight: 900, color: '#1e293b', lineHeight: 1.2, marginTop: 2 }}>{t.name}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.subjectName}</div>
+                        <div style={{ fontSize: isCenter ? 16 : 14, fontWeight: 800, color: '#1e293b', lineHeight: 1.2, marginTop: 2 }}>{t.name}</div>
                       </div>
-                      <div style={{
-                        padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: 800, whiteSpace: 'nowrap',
-                        background: pi?.weakness >= 0.6 ? '#fef2f2' : pi?.forgetting >= 0.5 ? '#fff7ed' : '#f0fdf4',
-                        color: pi?.weakness >= 0.6 ? '#dc2626' : pi?.forgetting >= 0.5 ? '#d97706' : '#059669',
-                      }}>
+                      <div style={{ padding: '2px 7px', borderRadius: 5, fontSize: 9, fontWeight: 700, whiteSpace: 'nowrap', background: pi?.weakness >= 0.6 ? '#fef2f2' : pi?.forgetting >= 0.5 ? '#fff7ed' : '#eef2ff', color: pi?.weakness >= 0.6 ? '#dc2626' : pi?.forgetting >= 0.5 ? '#d97706' : '#6366f1' }}>
                         {pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'}
                       </div>
                     </div>
 
-                    {/* Stats */}
-                    <div style={{ padding: '10px 16px', display: 'flex', gap: 10 }}>
-                      {t.total > 0 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <Target size={11} color="#6366f1" />
-                          <span style={{ fontSize: 10, fontWeight: 700, color: '#475569' }}>{t.accuracy}%</span>
-                        </div>
-                      )}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <Clock size={11} color="#94a3b8" />
-                        <span style={{ fontSize: 10, color: '#94a3b8' }}>{getMastery(t.id, revisionMastery) === 1 ? '3m' : '5m'}</span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <Zap size={11} color="#94a3b8" />
-                        <span style={{ fontSize: 10, color: '#94a3b8' }}>L{getMastery(t.id, revisionMastery)}/4</span>
-                      </div>
+                    {/* Reason */}
+                    <div style={{ padding: '4px 16px 0', fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>{reason}</div>
+
+                    {/* Stats row */}
+                    <div style={{ padding: '8px 16px 0', display: 'flex', gap: 14 }}>
+                      {t.total > 0 && <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Target size={10} color="#6366f1" /><span style={{ fontSize: 10, fontWeight: 600, color: '#475569' }}>{t.accuracy}%</span></div>}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Clock size={10} color="#94a3b8" /><span style={{ fontSize: 10, color: '#94a3b8' }}>{getMastery(t.id, revisionMastery) === 1 ? '3m' : '5m'}</span></div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Zap size={10} color="#94a3b8" /><span style={{ fontSize: 10, color: '#94a3b8' }}>L{getMastery(t.id, revisionMastery)}/4</span></div>
                     </div>
 
-                    {/* Description */}
-                    <div style={{ padding: '0 16px', flex: 1 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: '#64748b', marginBottom: 3 }}>Why?</div>
-                      <div style={{ fontSize: 10, color: '#475569', lineHeight: 1.5 }}>
-                        {pi?.weakness >= 0.6
-                          ? `Accuracy ${t.accuracy || 0}% — needs improvement.`
-                          : pi?.forgetting >= 0.8
-                          ? `Over 2 weeks since review.`
-                          : pi?.forgetting >= 0.5
-                          ? `Due for reinforcement.`
-                          : pi?.importance >= 0.6
-                          ? `High-yield UPSC topic.`
-                          : `Keep knowledge fresh.`}
-                      </div>
-                    </div>
-
-                    {/* Action button */}
+                    {/* Action */}
                     <div style={{ padding: '12px 16px' }}>
                       {isCenter ? (
-                        <motion.button
-                          whileTap={{ scale: 0.97 }}
-                          onClick={(e) => { e.stopPropagation(); openRevision(t) }}
-                          className="btn-primary-3d"
-                          style={{ width: '100%', padding: '10px 0', fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', border: 'none', letterSpacing: '0.02em' }}
+                        <motion.button whileTap={{ scale: 0.97 }} onClick={(e) => { e.stopPropagation(); openRevision(t) }}
+                          style={{ width: '100%', padding: '9px 0', fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', border: 'none', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', borderRadius: 10, letterSpacing: '0.02em' }}
                         >Start Practice</motion.button>
                       ) : (
-                        <div style={{ textAlign: 'center', fontSize: 10, color: '#94a3b8' }}>Tap to view</div>
+                        <div style={{ textAlign: 'center', fontSize: 10, color: '#cbd5e1' }}>Tap to view</div>
                       )}
                     </div>
                   </motion.div>
@@ -335,40 +253,31 @@ export default function UpscHome() {
               })}
             </div>
 
-            {/* Dot indicators */}
-            <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
-              {remainingFeed.slice(0, Math.min(remainingFeed.length, 20)).map((_, i) => (
-                <div key={i} onClick={() => setFeedIdx(i)}
-                  style={{
-                    width: i === feedIdx ? 16 : 5, height: 5, borderRadius: 3,
-                    background: i === feedIdx ? '#6366f1' : '#d1d5db',
-                    transition: 'all 0.25s', cursor: 'pointer',
-                  }}
-                />
-              ))}
+            {/* Dot indicators + Skip */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {remainingFeed.slice(0, 10).map((_, i) => (
+                  <div key={i} onClick={() => setFeedIdx(i)} style={{ width: i === feedIdx ? 18 : 5, height: 5, borderRadius: 3, background: i === feedIdx ? '#6366f1' : '#d1d5db', transition: 'all 0.2s', cursor: 'pointer' }} />
+                ))}
+              </div>
+              {feedIdx < remainingFeed.length - 1 && (
+                <motion.button whileTap={{ scale: 0.95 }} onClick={skipTopic}
+                  style={{ padding: '4px 10px', fontSize: 10, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', background: '#fff', border: '1px solid #e2e8f0', borderRadius: 6, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 3 }}
+                >Skip <SkipForward size={11} /></motion.button>
+              )}
             </div>
-
-            {/* Skip button */}
-            {feedIdx < remainingFeed.length - 1 && (
-              <motion.button whileTap={{ scale: 0.97 }} onClick={skipTopic}
-                style={{ marginTop: 12, padding: '8px 20px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', background: '#fff', border: '2px solid #e2e8f0', borderRadius: 10, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}
-              >Skip <SkipForward size={12} /></motion.button>
-            )}
           </div>
         )}
 
         {/* Empty — all done */}
         {dailyMix.length > 0 && remainingCount === 0 && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 20px' }}>
-            <div className="card-3d" style={{ textAlign: 'center', padding: '40px 20px', borderBottomWidth: 6, maxWidth: 300 }}>
-              <CheckCircle size={40} color="#10B981" style={{ marginBottom: 12 }} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <CheckCircle size={32} color="#10B981" style={{ marginBottom: 10 }} />
               <div style={{ fontSize: 16, fontWeight: 800, color: '#1e293b' }}>All caught up!</div>
-              <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-                You've completed today's revision. Check back tomorrow for your personalized feed.
-              </div>
-              <motion.button whileTap={{ scale: 0.97 }}
-                onClick={() => navigate('/learn')}
-                style={{ marginTop: 16, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#6366f1', color: '#fff', fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer' }}>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3, lineHeight: 1.5 }}>Check back tomorrow for fresh topics.</div>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/learn')}
+                style={{ marginTop: 14, padding: '8px 20px', borderRadius: 10, border: 'none', background: '#6366f1', color: '#fff', fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
                 Practice More
               </motion.button>
             </div>
@@ -377,16 +286,13 @@ export default function UpscHome() {
 
         {/* Empty — no mix */}
         {dailyMix.length === 0 && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 20px' }}>
-            <div className="card-3d" style={{ textAlign: 'center', padding: '40px 20px', borderBottomWidth: 6, maxWidth: 300 }}>
-              <FileText size={40} color="#94a3b8" style={{ marginBottom: 12 }} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <FileText size={32} color="#94a3b8" style={{ marginBottom: 10 }} />
               <div style={{ fontSize: 16, fontWeight: 800, color: '#1e293b' }}>No topics yet</div>
-              <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-                Start practicing to build your revision feed.
-              </div>
-              <motion.button whileTap={{ scale: 0.97 }}
-                onClick={() => navigate('/learn')}
-                style={{ marginTop: 16, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#6366f1', color: '#fff', fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer' }}>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3, lineHeight: 1.5 }}>Practice some questions to get started.</div>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/learn')}
+                style={{ marginTop: 14, padding: '8px 20px', borderRadius: 10, border: 'none', background: '#6366f1', color: '#fff', fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
                 Get Started
               </motion.button>
             </div>
