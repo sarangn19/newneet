@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
-import { Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
+import { Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2, VolumeX } from 'lucide-react'
 
 const MODES = [
   { id: 'explain', label: 'Explain', icon: BookOpen, color: '#3B82F6' },
@@ -53,7 +53,7 @@ export default function AIChatbot() {
   const [showHistory, setShowHistory] = useState(false)
   const [savedNotes, setSavedNotes] = useState(new Set())
   const [quizState, setQuizState] = useState(null)
-  const [muted, setMuted] = useState(true)
+  const [muted, setMuted] = useState(false)
   const inputRef = useRef(null)
   const endRef = useRef(null)
 
@@ -236,7 +236,7 @@ export default function AIChatbot() {
   const [genFlashcards, setGenFlashcards] = useState(false)
 
   const generateFlashcards = async (content) => {
-    if (!GROQ_API_KEY) return
+    if (!GROQ_API_KEY) { setMessages(prev => [...prev, { role: 'bot', text: '⚠️ Flashcard generation requires a Groq API key (VITE_GROQ_API_KEY).' }]); return }
     setGenFlashcards(true)
     try {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -263,9 +263,9 @@ export default function AIChatbot() {
           setFlashcards(json)
           setFlashcardIdx(0)
           setFlashcardFlipped(false)
-        }
-      }
-    } catch (e) { console.warn('Flashcard gen error:', e) }
+        } else { setMessages(prev => [...prev, { role: 'bot', text: '⚠️ Failed to parse flashcards. Try again with a shorter topic.' }]) }
+      } else { setMessages(prev => [...prev, { role: 'bot', text: `⚠️ Flashcard API error: ${res.status}` }]) }
+    } catch (e) { setMessages(prev => [...prev, { role: 'bot', text: '⚠️ Flashcard generation failed. Check console for details.' }]) }
     setGenFlashcards(false)
   }
 
@@ -287,11 +287,11 @@ export default function AIChatbot() {
             <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Chatbot</div>
             <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your UPSC study assistant</div>
           </div>
-          <button onClick={() => setMuted(!muted)} style={{
+          <button onClick={() => { setMuted(!muted); if (!muted) speechSynthesis.cancel() }} style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex',
             color: muted ? 'var(--text-3)' : 'var(--primary)',
           }}>
-            <Volume2 size={18} />
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
           </button>
           <motion.button whileTap={{scale:0.96}} onClick={() => setShowHistory(!showHistory)} style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', position: 'relative',
