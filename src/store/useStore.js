@@ -276,6 +276,7 @@ const useStore = create(
     (set, get) => ({
       userId: null,
       examType: null, // 'neet' | 'upsc'
+      isDemo: false,
 
       user: {
         name: 'Student',
@@ -817,6 +818,23 @@ const useStore = create(
 
       // ── setExamType ──────────────────────────────────────────────
       setExamType: (examType) => set({ examType }),
+
+      // ── setDemoMode ──────────────────────────────────────────────
+      setDemoMode: (examType) => set({
+        isDemo: true,
+        examType,
+        userId: 'demo-user',
+        user: {
+          name: 'Demo User',
+          avatar: '',
+          level: 1,
+          xp: 0,
+          xpToNext: 500,
+          streak: 0,
+          coins: 0,
+          rank: 'Bronze',
+        },
+      }),
 
       // ── language ─────────────────────────────────────────────────
       language: 'en',

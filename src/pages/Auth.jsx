@@ -75,6 +75,47 @@ function InputField({ icon: Icon, type, placeholder, value, onChange, rightIcon,
   )
 }
 
+function DemoExamPicker({ onSelect, onCancel }) {
+  const [demoExam, setDemoExam] = useState('neet')
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+      onClick={onCancel}
+      style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }}>
+      <motion.div initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        onClick={e => e.stopPropagation()}
+        style={{ background: '#fff', borderRadius: 24, padding: 28, margin: '0 20px', maxWidth: 320, width: '100%', boxShadow: '0 16px 48px rgba(0,0,0,0.2)' }}>
+        <div style={{ fontSize: 20, fontWeight: 900, color: '#1A1410', textAlign: 'center', marginBottom: 4 }}>Try Demo</div>
+        <div style={{ fontSize: 13, color: '#9C9185', fontWeight: 600, textAlign: 'center', marginBottom: 20 }}>Which exam are you preparing for?</div>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+          {[
+            { id: 'neet', label: 'NEET', emoji: '🩺', color: '#22C55E' },
+            { id: 'upsc', label: 'UPSC', emoji: '📜', color: '#8B5CF6' },
+          ].map(et => (
+            <button key={et.id} type="button" onClick={() => setDemoExam(et.id)} style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+              padding: '16px 12px', borderRadius: 16, cursor: 'pointer', fontFamily: 'inherit',
+              border: demoExam === et.id ? '2px solid ' + et.color : '2px solid #E5E0D5',
+              background: demoExam === et.id ? et.color + '12' : '#F7F6F3',
+              transition: 'all 0.15s',
+            }}>
+              <span style={{ fontSize: 28 }}>{et.emoji}</span>
+              <span style={{ fontSize: 15, fontWeight: demoExam === et.id ? 800 : 600, color: demoExam === et.id ? et.color : '#B0ABA0' }}>{et.label}</span>
+            </button>
+          ))}
+        </div>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={() => onSelect(demoExam)} style={{
+          width: '100%', padding: '14px', borderRadius: 14, border: 'none',
+          background: demoExam === 'upsc' ? '#8B5CF6' : '#22C55E',
+          color: '#fff', fontSize: 16, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit',
+          letterSpacing: '0.02em',
+        }}>
+          Start {demoExam === 'upsc' ? 'UPSC' : 'NEET'} Demo
+        </motion.button>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 export default function Auth() {
   const [tab, setTab]           = useState('login')
   const [name, setName]         = useState('')
@@ -85,6 +126,7 @@ export default function Auth() {
   const [error, setError]       = useState('')
   const [success, setSuccess]   = useState('')
   const [examType, setExamType] = useState('neet')
+  const [showDemo, setShowDemo] = useState(false)
   const { signIn, signUp, signInWithGoogle } = useAuth()
   const navigate = useNavigate()
 
@@ -283,7 +325,37 @@ export default function Auth() {
           </svg>
           {tab === 'signup' ? 'Sign Up with Google' : 'Sign In with Google'}
         </motion.button>
+
+        {/* Demo login */}
+        <motion.button
+          type="button"
+          onClick={() => setShowDemo(true)}
+          whileTap={{ scale: 0.97 }}
+          style={{
+            width: '100%', padding: '13px', borderRadius: 14,
+            border: '2px dashed #D0CBC0', background: '#FBFAF8',
+            fontFamily: 'inherit', fontSize: 14, fontWeight: 700,
+            cursor: 'pointer', color: '#8B7D70',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            transition: 'all 0.15s',
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B7D70" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+          </svg>
+          Try Demo
+        </motion.button>
       </motion.div>
+
+      {showDemo && (
+        <DemoExamPicker
+          onSelect={(exam) => {
+            useStore.getState().setDemoMode(exam)
+            navigate('/', { replace: true })
+          }}
+          onCancel={() => setShowDemo(false)}
+        />
+      )}
     </div>
   )
 }

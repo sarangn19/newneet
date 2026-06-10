@@ -125,6 +125,7 @@ function ProtectedRoutes() {
   const { session, loading } = useAuth()
   const examType = useStore(s => s.examType)
   const userId = useStore(s => s.userId)
+  const isDemo = useStore(s => s.isDemo)
   const [newUserDecision, setNewUserDecision] = useState(null)
   const googleAuthRef = useRef(null)
   const navigate = useNavigate()
@@ -196,8 +197,8 @@ function ProtectedRoutes() {
   }
 
   if (loading) return <Loader />
-  if (!session) return <Navigate to="/auth" replace />
-  if (examType === null && !userId) return <Loader />
+  if (!session && !isDemo) return <Navigate to="/auth" replace />
+  if (!isDemo && examType === null && !userId) return <Loader />
 
   if (newUserDecision === 'already_registered') {
     return (
