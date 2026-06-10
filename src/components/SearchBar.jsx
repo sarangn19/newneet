@@ -94,11 +94,20 @@ export default function SearchBar({
         }}
         onMouseUp={e => {
           e.currentTarget.style.transform = ''
-          e.currentTarget.style.boxShadow = '0 5px 0 var(--accent-secondary-dark)'
-
-          e.currentTarget.style.boxShadow = disabled ? 'none' : '0 5px 0 var(--accent-secondary-dark)'
-
-          e.currentTarget.style.boxShadow = '0 5px 0 var(--accent-secondary-dark)'
+          e.currentTarget.style.boxShadow = '0 5px 0 var(--accent-secondary-dark), 0 6px 16px rgba(59,130,246,0.25)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = ''
+          e.currentTarget.style.boxShadow = disabled ? 'none' : '0 5px 0 var(--accent-secondary-dark), 0 6px 16px rgba(59,130,246,0.25)'
+        }}
+        onTouchStart={e => {
+          if (disabled) return
+          e.currentTarget.style.transform = 'translateY(4px)'
+          e.currentTarget.style.boxShadow = '0 1px 0 var(--accent-secondary-dark)'
+        }}
+        onTouchEnd={e => {
+          e.currentTarget.style.transform = ''
+          e.currentTarget.style.boxShadow = '0 5px 0 var(--accent-secondary-dark), 0 6px 16px rgba(59,130,246,0.25)'
         }}
       >
         {buttonLabel}

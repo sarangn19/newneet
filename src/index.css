@@ -32,10 +32,10 @@
   --shadow-float:  0 2px 4px rgba(60,40,20,0.06), 0 8px 24px rgba(60,40,20,0.06);
   --shadow-strong: 0 4px 8px rgba(60,40,20,0.08), 0 12px 32px rgba(60,40,20,0.08);
   --shadow-hover:  0 4px 12px rgba(60,40,20,0.08), 0 12px 32px rgba(60,40,20,0.06);
-  --shadow-active: 0 0 0 2px var(--accent);
-  --shadow-button: 0 2px 8px rgba(0,0,0,0.08);
-  --shadow-button-hover: 0 4px 16px rgba(0,0,0,0.1);
-  --shadow-button-3d: 0 5px 0 #2563EB;
+  --shadow-active: 0 0 0 2px var(--accent), 0 4px 16px rgba(59,130,246,0.2);
+  --shadow-button: 0 2px 8px rgba(37,99,235,0.2);
+  --shadow-button-hover: 0 4px 16px rgba(37,99,235,0.3);
+  --shadow-button-3d: 0 5px 0 #2563EB, 0 6px 12px rgba(59,130,246,0.3);
   --glass-bg: rgba(255,255,255,0.72);
   --glass-border: rgba(255,255,255,0.3);
   --glass-shadow: 0 0 0 1px rgba(255,255,255,0.5), 0 4px 20px rgba(0,0,0,0.04);
@@ -90,10 +90,10 @@
   --shadow-float:       0 2px 4px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05);
   --shadow-strong:      0 4px 8px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.08);
   --shadow-hover:       0 4px 12px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.05);
-  --shadow-active:      0 0 0 2px var(--accent);
-  --shadow-button:      0 2px 8px rgba(0,0,0,0.08);
-  --shadow-button-hover: 0 4px 16px rgba(0,0,0,0.1);
-  --shadow-button-3d:   0 5px 0 #EA580C;
+  --shadow-active:      0 0 0 2px var(--accent), 0 4px 16px rgba(249,115,22,0.15);
+  --shadow-button:      0 2px 8px rgba(234,88,12,0.15);
+  --shadow-button-hover: 0 4px 16px rgba(234,88,12,0.2);
+  --shadow-button-3d:   0 5px 0 #EA580C, 0 6px 12px rgba(249,115,22,0.2);
   --icon-active-filter: brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(745%) hue-rotate(359deg) brightness(101%);
   --icon-inactive-filter: brightness(0) saturate(0%) invert(35%);
   --accent-secondary: #7C3AED;
@@ -407,16 +407,16 @@ html {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
-  background: #0a0a0f;
+  background: var(--page-bg);
 }
 body {
   min-height: 100vh;
   min-height: 100dvh;
-  background: #0a0a0f;
+  background: var(--page-bg);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
-#root { background: #0a0a0f; }
+#root { background: var(--page-bg); }
 
 a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--primary);

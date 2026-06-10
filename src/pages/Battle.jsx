@@ -245,7 +245,7 @@ function Podium({ top3 }) {
                   borderRadius: '50%',
                   background: getAvatarColor(player.name),
                   overflow: 'hidden',
-                  boxShadow: 'none',
+                  boxShadow: pos.rank === 1 ? '0 0 16px rgba(255,215,0,0.5)' : 'none',
                 }}
               >
                 <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(14px, 4vw, 22px)', fontWeight: 700, color: '#fff' }}>
@@ -835,7 +835,7 @@ export default function Battle() {
               flex: 1, height: 8, borderRadius: 4, position: 'relative', overflow: 'hidden',
               background: i < filledBars ? '#E58A24' : '#E5E7EB',
               opacity: i < filledBars || i === filledBars ? 1 : 0.4,
-              boxShadow: 'none',
+              boxShadow: i < filledBars ? '0 0 6px rgba(229,138,36,0.5)' : 'none',
             }}>
               {i === filledBars && (
                 <div style={{

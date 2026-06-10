@@ -1,17 +1,24 @@
 # Session Summary
 
 ## Goal
-Fix MCQ/Flashcard topic selection UX: enable multi-chapter selection across subjects, replace bottom-of-page Start button with fixed bottom bar, move question count + prediction to a modal.
+Pre-release UPSC app enhancements (chatbot modes, behavior engine) + NEET regression restoration.
 
 ## Progress
 
 ### Completed
-- **Learn.jsx PracticeMCQTab**: Replaced single `subject`/`topic` state with `selectedSubjects` (array) + `selectedChapters` (array) for multi-chapter cross-subject selection
-- **Learn.jsx PracticeMCQTab**: Added fixed bottom bar showing chapter/question count + Start Practice button (no scrolling needed)
-- **Learn.jsx PracticeMCQTab**: Added modal with question count picker (5/10/20/50) + expected score selector + Begin button
-- **Learn.jsx FlashcardsTab**: Replaced bottom-of-page Start button with fixed bottom bar showing chapter/card count + Start button
-- **Learn.jsx FlashcardsTab**: Changed chapter selection indicator from radio-style circle to checkbox-style rounded square (Check icon)
-- **Learn.jsx**: Added `Check` icon import from lucide-react
+- **Chatbot Modes**: Evaluated and implemented Learn/Practice/Revise/Master labels and updated MODE_PROMPTS in `AIChatbot.jsx`
+- **Behavior Engine**: Built `buildStudentProfile()` analyzing topic scores, calibration, decay trends, and weak/strong topics. Integrated via `behaviorRules` into API calls
+- **Pre-release Audit**: Simulated UPSC sessions; applied Fixes 1-3 (locked prompt, fading memory, trend awareness)
+- **NEET Regression Fix — index.css**:
+  - Changed `html/body/#root background: #0a0a0f` → `var(--page-bg)` so NEET gets light background
+  - Restored NEET shadow orange glow (`rgba(249,115,22,0.15-0.2)`)
+  - Restored default (`:root`) shadow blue glow (`rgba(59,130,246,0.2-0.3)`)
+- **NEET Regression Fix — shared files restored to initial commit**:
+  - `AIChatbot.jsx` — back button, old MODES, original prompts/fallbacks
+  - `SearchBar.jsx` — 3D button press effect (onMouseLeave/onTouchStart/onTouchEnd)
+  - `Gastro.jsx` — cat avatar drop-shadow filter
+  - `Battle.jsx` — gold glows on winner podium and exp bars
+  - `Onboarding.jsx` — orange glow shadows, avatar grid layout, original text
 
 ### In Progress
 - (none)
@@ -26,3 +33,4 @@ Fix MCQ/Flashcard topic selection UX: enable multi-chapter selection across subj
 - `--text-2`: `rgba(255,255,255,0.65)` in NEET mode, `#6B6258` in default mode
 - `--text-3`: `rgba(255,255,255,0.4)` in NEET mode, `#9C9185` in default mode
 - `--surface-alt`: `rgba(255,255,255,0.08)` in NEET mode, `#F3EFE9` in default mode
+- `--page-bg`: `#F8F9FA` in default, `#ffffff` in NEET mode, `#0a0a0f` in UPSC mode

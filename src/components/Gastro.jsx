@@ -196,7 +196,7 @@ export default function Gastro({ mood = 'idle', message, show = true, moduleId }
         onClick={handleTap}
         style={{
           cursor: 'pointer', position: 'relative',
-          filter: 'none',
+          filter: currentMood === 'streak' ? 'drop-shadow(0 0 8px rgba(239,68,68,0.6))' : 'drop-shadow(0 3px 8px rgba(99,102,241,0.3))',
         }}
       >
         <RiveCat />

@@ -1,98 +1,37 @@
+import { useNavigate } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
-import { buildRules, createSession, formatPrompt } from '../lib/behaviorEngine'
-import { Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
+import { ChevronLeft, Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
 
 const MODES = [
-  { id: 'explain', label: 'Learn', icon: BookOpen, color: '#3B82F6' },
-  { id: 'quiz', label: 'Practice', icon: ClipboardList, color: '#8B5CF6' },
-  { id: 'summarise', label: 'Revise', icon: Search, color: '#10B981' },
-  { id: 'deepdive', label: 'Master', icon: Sparkles, color: '#8B5CF6' },
+  { id: 'explain', label: 'Explain', icon: BookOpen, color: '#3B82F6' },
+  { id: 'quiz', label: 'Quiz Me', icon: ClipboardList, color: '#8B5CF6' },
+  { id: 'summarise', label: 'Summarise', icon: Search, color: '#10B981' },
+  { id: 'deepdive', label: 'Deep Dive', icon: Sparkles, color: '#3B82F6' },
 ]
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || ''
 
 const MODE_PROMPTS = {
-  explain: `You are a UPSC CSE mentor. Use plain text only - no stars, no hashes, no markdown. Use numbered sections and dashes for lists.`,
-  quiz: `You are a UPSC CSE mentor. Generate one multiple-choice question at a time. Wait for the student's answer. Provide feedback on correctness and reasoning. If the answer is incorrect, explain why. Adapt question difficulty to the student's demonstrated level. Use plain text only - no stars, no hashes, no markdown.`,
-  summarise: `You are a UPSC CSE mentor. Assume prior knowledge. Provide a concise, exam-relevant summary using bullet points. Focus on the UPSC angle and common traps. Use plain text only - no stars, no hashes, no markdown.`,
-  deepdive: `You are a UPSC CSE mentor. If the student shows strong understanding, provide advanced analysis, interlinkages, and critical framing. If they struggle, ask diagnostic questions to identify the gap. Use plain text only - no stars, no hashes, no markdown.`,
+  explain: `You are a UPSC CSE mentor. Explain the given topic in detail with a structured breakdown including definition, key features, historical background, contemporary relevance, and exam perspective. Use plain text only - no stars, no hashes, no markdown. Use numbered sections and dashes for lists.`,
+  quiz: `You are a UPSC CSE mentor. Generate a multiple-choice quiz question on the given topic. Include 4 options (A, B, C, D) and indicate the correct answer after the question. Use plain text only - no stars, no hashes, no markdown.`,
+  summarise: `You are a UPSC CSE mentor. Provide a concise summary of the given topic covering key points, must-know facts, and UPSC angle. Use dashes for bullet points, no stars, no hashes, no markdown.`,
+  deepdive: `You are a UPSC CSE mentor. Provide a comprehensive deep dive analysis of the given topic covering multiple dimensions (historical, constitutional, administrative, social, economic), case studies, critical analysis, and interlinkages with other GS papers. Use plain text only - no stars, no hashes, no markdown.`,
 }
 
 const FALLBACK_RESPONSES = {
-  explain: `Let's break this down step by step.\n\nCore Concept:\n- This topic sits at the intersection of multiple GS papers\n- Understanding the fundamentals is key before exploring advanced angles\n\nStructure:\n1. Start with definitions and constitutional basis\n2. Understand historical evolution\n3. Link to current affairs\n4. Practice with previous year questions`,
-  quiz: `Here's a practice question:\n\nQ: Which of the following best describes the core principle behind this topic?\nA) Constitutional mandate\nB) Executive discretion\nC) Judicial interpretation\nD) Legislative framework\n\nSelect your answer, then I'll explain the reasoning.`,
-  summarise: `Exam-Relevant Summary\n\nKey Points:\n- Core concept and constitutional basis\n- Landmark developments\n- Current affairs angle\n- Common traps in MCQs\n\nPick a topic to revise.`,
-  deepdive: `Let me understand where you are first.\n\nWhat specific aspect of this topic would you like to explore?\n- Advanced analysis and interlinkages\n- A specific dimension you're struggling with\n- Cross-topic connections for Mains`,
-}
-
-const PLACEHOLDERS = [
-  'Explain Directive Principles of State Policy...',
-  'Generate 5 MCQs from today\'s news...',
-  'Summarise this editorial for Mains...',
-  'Create flashcards from my Polity notes...',
-  'Evaluate my answer on Fundamental Rights...',
-  'Compare federal vs unitary features...',
-  'Paste a newspaper article to simplify...',
-  'Quiz me on Environment & Ecology...',
-]
-
-function buildStudentProfile(topicScores, practiceDecay, revisionSchedule, questionHistory) {
-  try {
-    const scoredTopics = Object.entries(topicScores || {}).filter(([, s]) => s.total > 0)
-    const totalQ = scoredTopics.reduce((sum, [, s]) => sum + s.total, 0)
-    const correctQ = scoredTopics.reduce((sum, [, s]) => sum + s.correct, 0)
-    if (totalQ < 5) return null
-    const overallAccuracy = Math.round(correctQ / totalQ * 100)
-    const topicAccs = scoredTopics.map(([id, s]) => ({ id, accuracy: Math.round(s.correct / s.total * 100), total: s.total }))
-    const weakTopics = topicAccs.filter(t => t.total >= 3).sort((a, b) => a.accuracy - b.accuracy).slice(0, 5)
-    const strongTopics = topicAccs.filter(t => t.total >= 5).sort((a, b) => b.accuracy - a.accuracy).slice(0, 3)
-    const allEntries = Object.values(practiceDecay || {}).flat()
-    let calibration = null
-    if (allEntries.length >= 10) {
-      const avgConf = Math.round(allEntries.reduce((s, e) => s + e.confidence, 0) / allEntries.length * 20)
-      const overcnt = allEntries.filter(e => !e.correct && e.confidence >= 4).length
-      const undercnt = allEntries.filter(e => e.correct && e.confidence <= 2).length
-      const guessed = allEntries.filter(e => e.correct && e.confidence <= 2).length
-      const guessingTendency = correctQ > 0 ? Math.round(guessed / correctQ * 100) : 0
-      const bias = overcnt > undercnt ? 'overconfident' : undercnt > overcnt ? 'underconfident' : 'calibrated'
-      calibration = { bias, avgConfidence: avgConf, guessingTendency }
-    }
-    const DAY = 86400000; const now = Date.now()
-    const chapterLast = {}
-    allEntries.forEach(e => { if (!e.chapter) return; if (!chapterLast[e.chapter] || e.ts > chapterLast[e.chapter]) chapterLast[e.chapter] = e.ts })
-    const decayingCount = Object.values(chapterLast).filter(ts => now - ts > 7 * DAY).length
-    const recent7 = questionHistory.filter(e => e.timestamp && now - new Date(e.timestamp).getTime() < 7 * DAY)
-    const prev7 = questionHistory.filter(e => { if (!e.timestamp) return false; const diff = now - new Date(e.timestamp).getTime(); return diff >= 7 * DAY && diff < 14 * DAY })
-    const calcAcc = arr => arr.length >= 5 ? Math.round(arr.filter(e => e.correct).length / arr.length * 100) : null
-    const recentAcc = calcAcc(recent7); const prevAcc = calcAcc(prev7)
-    let trend = 'stable'
-    if (recentAcc !== null && prevAcc !== null) { if (recentAcc < prevAcc - 5) trend = 'declining'; else if (recentAcc > prevAcc + 5) trend = 'improving' }
-    const overdue = Object.entries(revisionSchedule || {}).filter(([, s]) => { if (!s.lastReviewed) return false; return Math.floor((now - new Date(s.lastReviewed).getTime()) / DAY) > (s.interval || 7) }).length
-    const skillStats = {}
-    allEntries.forEach(e => { if (!e.skill) return; if (!skillStats[e.skill]) skillStats[e.skill] = { total: 0, correct: 0 }; skillStats[e.skill].total++; if (e.correct) skillStats[e.skill].correct++ })
-    const skills = Object.entries(skillStats).map(([s, v]) => ({ skill: s, accuracy: Math.round(v.correct / v.total * 100), total: v.total })).filter(s => s.total >= 3).sort((a, b) => a.accuracy - b.accuracy).slice(0, 5)
-    return {
-      overall: { totalQuestions: totalQ, accuracy: overallAccuracy },
-      topicAccs,
-      topicScores,
-      weakTopics: weakTopics.length > 0 ? weakTopics : undefined,
-      strongTopics: strongTopics.length > 0 ? strongTopics : undefined,
-      calibration,
-      decayingChapters: decayingCount > 0 ? decayingCount : undefined,
-      trend: trend !== 'stable' ? trend : undefined,
-      overdueRevisions: overdue > 0 ? overdue : undefined,
-      skills: skills.length > 0 ? skills : undefined,
-    }
-  } catch { return null }
+  explain: `Topic Overview\n\nThis is an important UPSC topic that requires understanding from multiple angles.\n\nKey Aspects:\n- Focus on definitions and basic concepts first\n- Understand the historical context and evolution\n- Link with current affairs for Mains answers\n- Practice previous year questions on this topic`,
+  quiz: `Quiz Time!\n\nQ: What is the primary constitutional basis for this topic?\nA) Article 14\nB) Article 21\nC) Article 32\nD) Article 368\n\nAnswer: Check your notes and try again!`,
+  summarise: `Summary\n\nKey Points:\n- Understand the core concept thoroughly\n- Know the constitutional/legal framework\n- Keep up with recent developments\n- Practice answer writing`,
+  deepdive: `Deep Dive Analysis\n\nThis topic requires comprehensive understanding across multiple dimensions. Focus on interlinkages with current affairs and other GS papers for a holistic UPSC preparation strategy.`,
 }
 
 export default function AIChatbot() {
-  const { userId, topicScores, questionHistory, practiceDecay, revisionSchedule } = useStore()
-  const sessionRef = useRef(createSession())
+  const navigate = useNavigate()
+  const { userId } = useStore()
   const [messages, setMessages] = useState([
     { role: 'bot', text: 'Hello! I\'m your AI study assistant. Ask me anything about UPSC topics, or pick a mode below.' },
   ])
@@ -100,19 +39,12 @@ export default function AIChatbot() {
   const [mode, setMode] = useState('explain')
   const [loading, setLoading] = useState(false)
   const [listening, setListening] = useState(false)
-  const [placeholderIdx, setPlaceholderIdx] = useState(0)
   const [history, setHistory] = useState([])
   const [showHistory, setShowHistory] = useState(false)
   const [savedNotes, setSavedNotes] = useState(new Set())
   const [quizState, setQuizState] = useState(null)
-  const [speakingIdx, setSpeakingIdx] = useState(null)
   const inputRef = useRef(null)
   const endRef = useRef(null)
-
-  useEffect(() => {
-    const t = setInterval(() => setPlaceholderIdx(i => (i + 1) % PLACEHOLDERS.length), 3200)
-    return () => clearInterval(t)
-  }, [])
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -132,10 +64,6 @@ export default function AIChatbot() {
     setMessages(prev => [...prev, { role: 'user', text }])
     setLoading(true)
 
-    const profile = buildStudentProfile(topicScores, practiceDecay, revisionSchedule, questionHistory)
-    const rules = buildRules(profile, sessionRef.current, text, mode)
-    const behaviorRules = rules.join('||')
-
     let response = ''
 
     // Try server API route first (works on Vercel — has Gemini + Groq fallback)
@@ -143,7 +71,7 @@ export default function AIChatbot() {
       const apiRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, mode, behaviorRules }),
+        body: JSON.stringify({ message: text, mode }),
       })
       if (apiRes.ok) {
         const data = await apiRes.json()
@@ -154,7 +82,7 @@ export default function AIChatbot() {
     // Fallback: direct Groq from browser
     if (!response && GROQ_API_KEY) {
       try {
-        const systemPrompt = formatPrompt(MODE_PROMPTS[mode] || MODE_PROMPTS.explain, rules)
+        const systemPrompt = MODE_PROMPTS[mode] || MODE_PROMPTS.explain
         const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -168,7 +96,7 @@ export default function AIChatbot() {
               { role: 'user', content: `Topic: ${text}` },
             ],
             temperature: 0.7,
-            max_tokens: 1280,
+            max_tokens: 1024,
           }),
         })
         if (groqRes.ok) {
@@ -183,7 +111,7 @@ export default function AIChatbot() {
     // Fallback: direct Gemini from browser
     if (!response && GEMINI_API_KEY) {
       try {
-        const systemPrompt = formatPrompt(MODE_PROMPTS[mode] || MODE_PROMPTS.explain, rules)
+        const systemPrompt = MODE_PROMPTS[mode] || MODE_PROMPTS.explain
         const prompt = `${systemPrompt}\n\nTopic: ${text}`
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`
         const res = await fetch(url, {
@@ -191,7 +119,7 @@ export default function AIChatbot() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.7, maxOutputTokens: 1280 },
+            generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
           }),
         })
         if (res.ok) {
@@ -208,6 +136,8 @@ export default function AIChatbot() {
     }
 
     setMessages(prev => [...prev, { role: 'bot', text: response }])
+    const u = new SpeechSynthesisUtterance(response.replace(/[A-D]\)/g, '').replace(/Answer.*/i, ''))
+    u.rate = 0.9; speechSynthesis.speak(u)
     setLoading(false)
 
     if (mode === 'quiz') {
@@ -288,7 +218,7 @@ export default function AIChatbot() {
   const [genFlashcards, setGenFlashcards] = useState(false)
 
   const generateFlashcards = async (content) => {
-    if (!GROQ_API_KEY) { setMessages(prev => [...prev, { role: 'bot', text: '⚠️ Flashcard generation requires a Groq API key (VITE_GROQ_API_KEY).' }]); return }
+    if (!GROQ_API_KEY) return
     setGenFlashcards(true)
     try {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -315,9 +245,9 @@ export default function AIChatbot() {
           setFlashcards(json)
           setFlashcardIdx(0)
           setFlashcardFlipped(false)
-        } else { setMessages(prev => [...prev, { role: 'bot', text: '⚠️ Failed to parse flashcards. Try again with a shorter topic.' }]) }
-      } else { setMessages(prev => [...prev, { role: 'bot', text: `⚠️ Flashcard API error: ${res.status}` }]) }
-    } catch (e) { setMessages(prev => [...prev, { role: 'bot', text: '⚠️ Flashcard generation failed. Check console for details.' }]) }
+        }
+      }
+    } catch (e) { console.warn('Flashcard gen error:', e) }
     setGenFlashcards(false)
   }
 
@@ -331,27 +261,30 @@ export default function AIChatbot() {
   }
 
   return (
-    <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: 100, boxSizing: 'border-box' }}>
+    <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ background: '#fff', padding: '48px 16px 10px', borderBottom: '1px solid #F3F4F6' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <motion.button whileTap={{scale:0.96}} onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+            <ChevronLeft size={18} color="#111827" />
+          </motion.button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Chatbot</div>
-            <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your UPSC study assistant</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#111827' }}>AI Chatbot</div>
+            <div style={{ fontSize: 11, color: '#6B7280' }}>Your UPSC study assistant</div>
           </div>
           <motion.button whileTap={{scale:0.96}} onClick={() => setShowHistory(!showHistory)} style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', position: 'relative',
           }}>
-            <MessageSquare size={18} color="var(--text-2)" />
+            <MessageSquare size={18} color="#6B7280" />
             {history.length > 0 && (
-              <div style={{ position: 'absolute', top: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: 'var(--primary)' }} />
+              <div style={{ position: 'absolute', top: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: '#3B82F6' }} />
             )}
           </motion.button>
         </div>
       </div>
 
       {/* Mode chips */}
-      <div style={{ display: 'flex', gap: 4, padding: '8px 14px', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)', overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <div style={{ display: 'flex', gap: 4, padding: '8px 14px', background: '#fff', borderBottom: '1px solid #F3F4F6', overflowX: 'auto', scrollbarWidth: 'none' }}>
         {MODES.map(m => {
           const Icon = m.icon
           const active = mode === m.id
@@ -359,8 +292,8 @@ export default function AIChatbot() {
               <motion.button whileTap={{scale:0.96}} key={m.id} onClick={() => setMode(m.id)} style={{
                 display: 'flex', alignItems: 'center', gap: 4, padding: '7px 14px', borderRadius: 12, border: 'none',
                 cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit',
-                background: active ? m.color + '25' : 'var(--surface-alt)',
-                color: active ? m.color : 'var(--text-3)', fontSize: 12, fontWeight: 600,
+                background: active ? m.color + '15' : '#F3F4F6',
+                color: active ? m.color : '#6B7280', fontSize: 12, fontWeight: 600,
               }}>
                 <Icon size={15} />
                 {m.label}
@@ -373,7 +306,7 @@ export default function AIChatbot() {
         {/* Chat area */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '10px 14px 100px', minHeight: 0 }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '10px 14px', minHeight: 0 }}>
             <AnimatePresence>
             {messages.map((msg, i) => (
               <motion.div
@@ -387,45 +320,34 @@ export default function AIChatbot() {
               >
                 <div style={{
                   maxWidth: '85%', padding: '10px 14px', borderRadius: 14, fontSize: 12, lineHeight: 1.6,
-                  background: msg.role === 'user' ? 'var(--primary)' : 'var(--card-bg)',
-                  color: msg.role === 'user' ? '#fff' : 'var(--text)',
-                  border: msg.role === 'user' ? 'none' : '1px solid var(--border)',
+                  background: msg.role === 'user' ? '#3B82F6' : '#fff',
+                  color: msg.role === 'user' ? '#fff' : '#111827',
+                  border: msg.role === 'user' ? 'none' : '1px solid #E5E7EB',
                   whiteSpace: 'pre-wrap',
                 }}>
                   {msg.text}
                   {msg.role === 'bot' && (
                     <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                      <motion.button whileTap={{scale:0.96}} onClick={() => {
-                        if (speakingIdx === i) { speechSynthesis.cancel(); setSpeakingIdx(null) }
-                        else {
-                          speechSynthesis.cancel()
-                          const u = new SpeechSynthesisUtterance(msg.text)
-                          u.rate = 0.9
-                          u.onend = () => setSpeakingIdx(null)
-                          u.onerror = () => setSpeakingIdx(null)
-                          speechSynthesis.speak(u)
-                          setSpeakingIdx(i)
-                        }
-                      }} title={speakingIdx === i ? 'Stop' : 'Read aloud'} style={{
+                      <motion.button whileTap={{scale:0.96}} onClick={() => { const u = new SpeechSynthesisUtterance(msg.text); u.rate = 0.9; speechSynthesis.speak(u) }} title="Read aloud" style={{
                         background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 10, color: speakingIdx === i ? 'var(--primary)' : 'var(--text-3)', fontWeight: 600, padding: 0, fontFamily: 'inherit',
+                        fontSize: 10, color: '#6B7280', fontWeight: 600, padding: 0, fontFamily: 'inherit',
                         display: 'flex', alignItems: 'center', gap: 3,
                       }}>
-                        <Volume2 size={12} /> {speakingIdx === i ? 'Stop' : 'Speak'}
+                        <Volume2 size={12} /> Speak
                       </motion.button>
                       <motion.button whileTap={{scale:0.96}} onClick={() => saveAsNote(msg.text, messages[i-1]?.text)} style={{
                         background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 10, color: savedNotes.has(msg.text.slice(0, 50)) ? 'var(--success)' : 'var(--primary)',
+                        fontSize: 10, color: savedNotes.has(msg.text.slice(0, 50)) ? '#10B981' : '#3B82F6',
                         fontWeight: 600, padding: 0, fontFamily: 'inherit',
                       }}>
                         {savedNotes.has(msg.text.slice(0, 50)) ? 'Saved' : 'Save as note'}
                       </motion.button>
-                      <button onClick={() => generateFlashcards(msg.text)} style={{
+                      <motion.button whileTap={{scale:0.96}} onClick={() => generateFlashcards(msg.text)} style={{
                         background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 10, color: 'var(--phys)', fontWeight: 600, padding: 0, fontFamily: 'inherit',
+                        fontSize: 10, color: '#8B5CF6', fontWeight: 600, padding: 0, fontFamily: 'inherit',
                       }}>
                         Flashcards
-                      </button>
+                      </motion.button>
                     </div>
                   )}
                 </div>
@@ -435,7 +357,7 @@ export default function AIChatbot() {
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 10 }}>
                 <div style={{
-                  background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 14,
+                  background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14,
                   padding: '10px 16px', display: 'flex', gap: 4,
                 }}>
                   {[0, 1, 2].map(i => (
@@ -497,34 +419,37 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ margin: '0 14px 8px', padding: '0 14px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, height: 48, background: 'var(--surface-alt)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow-card)' }}>
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-              placeholder={PLACEHOLDERS[placeholderIdx]}
-              style={{
-                flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                fontSize: 14, fontWeight: 400, letterSpacing: '-0.15px',
-                fontFamily: 'inherit', color: 'var(--text)', padding: 0,
-              }}
-            />
-            <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
-              width: 28, height: 28, borderRadius: 8, border: 'none', flexShrink: 0,
-              background: 'transparent', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-            }}>
-              <Mic size={14} color={listening ? '#fff' : 'var(--text-3)'} />
-            </motion.button>
-            <motion.button whileTap={input.trim() && !loading ? {scale:0.94} : {}} onClick={() => { if (input.trim() && !loading) sendMessage() }} style={{
-              width: 28, height: 28, borderRadius: 8, border: 'none', flexShrink: 0,
-              background: input.trim() && !loading ? 'var(--primary)' : 'transparent',
-              cursor: input.trim() && !loading ? 'pointer' : 'default',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-            }}>
-              <Send size={14} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
-            </motion.button>
+          <div style={{ padding: '8px 14px 14px', background: '#fff', borderTop: '1px solid #F3F4F6' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+              <div style={{ flex: 1, position: 'relative' }}>
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+                  placeholder="Ask a question..."
+                  style={{
+                    width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid #E5E7EB',
+                    fontSize: 12, outline: 'none', fontFamily: 'inherit', background: '#F9FAFB', boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} whileHover={{ scale: 1.05 }} style={{
+                width: 36, height: 36, borderRadius: 12, border: 'none', flexShrink: 0,
+                background: listening ? '#EF4444' : '#F3F4F6', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Mic size={15} color={listening ? '#fff' : '#6B7280'} />
+              </motion.button>
+              <motion.button whileTap={{scale:0.96}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
+                width: 36, height: 36, borderRadius: 12, border: 'none',
+                background: input.trim() && !loading ? '#3B82F6' : '#E5E7EB',
+                cursor: input.trim() && !loading ? 'pointer' : 'default',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <Send size={16} color={input.trim() && !loading ? '#fff' : '#9CA3AF'} />
+              </motion.button>
+            </div>
           </div>
         </div>
 
@@ -613,7 +538,7 @@ export default function AIChatbot() {
                   </div>
                 </motion.div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => {
+                  <motion.button whileTap={{scale:0.96}} onClick={() => {
                     if (flashcardIdx < flashcards.length - 1) { setFlashcardIdx(p => p + 1); setFlashcardFlipped(false) }
                     else setFlashcards(null)
                   }} style={{
@@ -621,16 +546,16 @@ export default function AIChatbot() {
                     background: '#8B5CF6', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                   }}>
                     {flashcardIdx < flashcards.length - 1 ? 'Next' : 'Done'}
-                  </button>
+                  </motion.button>
                 </div>
               </>
             ) : (
               <div style={{ textAlign: 'center', padding: 20 }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 6 }}>All done!</div>
-                <button onClick={() => setFlashcards(null)} style={{
+                <motion.button whileTap={{scale:0.96}} onClick={() => setFlashcards(null)} style={{
                   marginTop: 12, padding: '10px 24px', borderRadius: 12, border: 'none',
                   background: '#8B5CF6', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-                }}>Close</button>
+                }}>Close</motion.button>
               </div>
             )}
           </motion.div>
