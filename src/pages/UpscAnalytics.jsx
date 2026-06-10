@@ -114,7 +114,7 @@ export default function UpscAnalytics() {
           </div>
 
           {/* Weekly Summary */}
-          <div className="card-3d" style={{ padding: 16, borderBottomWidth: 4 }}>
+          <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>This Week</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               <div style={{ textAlign: 'center' }}>
@@ -133,7 +133,7 @@ export default function UpscAnalytics() {
           </div>
 
           {/* Activity Overview */}
-          <div className="card-3d" style={{ padding: 16, borderBottomWidth: 4 }}>
+          <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Activity Overview</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <ActivityItem icon={BookOpen} label="Notes Created" value={notesCount} color="#6366f1" />
@@ -144,23 +144,23 @@ export default function UpscAnalytics() {
           </div>
 
           {/* Subject Accuracy */}
-          <div className="card-3d" style={{ padding: 16, borderBottomWidth: 4 }}>
+          <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>Subject Accuracy</div>
             <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500, marginBottom: 10 }}>Percentages shown after {MIN_Q}+ questions per subject</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-              <div className="card-3d" style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderBottomWidth: 3, background: 'var(--success-light)' }}>
+              <div style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderRadius: 14, background: 'var(--success-light)', border: '1px solid rgba(52,211,153,0.15)' }}>
                 <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--success)' }}>{topicStatus.mastered}</div>
                 <div style={{ fontSize: 9, color: 'var(--success)', fontWeight: 600 }}>Mastered</div>
               </div>
-              <div className="card-3d" style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderBottomWidth: 3, background: 'var(--warning-light)' }}>
+              <div style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderRadius: 14, background: 'var(--warning-light)', border: '1px solid rgba(251,191,36,0.15)' }}>
                 <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--warning)' }}>{topicStatus.attempted}</div>
                 <div style={{ fontSize: 9, color: 'var(--warning)', fontWeight: 600 }}>Attempted</div>
               </div>
-              <div className="card-3d" style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderBottomWidth: 3, background: 'var(--error-light)' }}>
+              <div style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderRadius: 14, background: 'var(--error-light)', border: '1px solid rgba(239,68,68,0.15)' }}>
                 <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--error)' }}>{topicStatus.weak}</div>
                 <div style={{ fontSize: 9, color: 'var(--error)', fontWeight: 600 }}>Weak</div>
               </div>
-              <div className="card-3d" style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderBottomWidth: 3 }}>
+              <div style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderRadius: 14, background: 'var(--surface-alt)', border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-2)' }}>{topicStatus.total - topicStatus.attempted}</div>
                 <div style={{ fontSize: 9, color: 'var(--text-2)', fontWeight: 600 }}>New</div>
               </div>
@@ -188,7 +188,7 @@ export default function UpscAnalytics() {
 
           {/* Topic Breakdown */}
           {topicBreakdown.length > 0 && (
-            <div className="card-3d" style={{ padding: 16, borderBottomWidth: 4 }}>
+            <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Second Brain — Topic Scores</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {topicBreakdown.sort((a, b) => (a.accuracy || 0) - (b.accuracy || 0)).slice(0, 15).map(t => (
@@ -217,7 +217,7 @@ export default function UpscAnalytics() {
 
           {/* Recent Activity */}
           {recentActivity.length > 0 && (
-            <div className="card-3d" style={{ padding: 16, borderBottomWidth: 4 }}>
+            <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Recent Activity</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {recentActivity.map((e, i) => (
@@ -246,10 +246,12 @@ export default function UpscAnalytics() {
 
 function KpiBox({ icon: Icon, value, label, color }) {
   return (
-    <div className="card-3d" style={{ padding: '12px 6px', textAlign: 'center', borderBottomWidth: 3 }}>
-      <Icon size={16} color={color} style={{ marginBottom: 4 }} />
-      <div style={{ fontSize: 16, fontWeight: 800, color, lineHeight: 1.2 }}>{value}</div>
-      <div style={{ fontSize: 9, color: 'var(--text-3)', fontWeight: 600, marginTop: 2 }}>{label}</div>
+    <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: '14px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <div style={{ width: 32, height: 32, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon size={16} color={color} />
+      </div>
+      <div style={{ fontSize: 18, fontWeight: 900, color, lineHeight: 1.2 }}>{value}</div>
+      <div style={{ fontSize: 9, color: 'var(--text-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{label}</div>
     </div>
   )
 }
