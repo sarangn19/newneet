@@ -296,6 +296,27 @@ export default function Auth() {
           </motion.button>
         </form>
 
+        {/* Demo login */}
+        <motion.button
+          type="button"
+          onClick={() => setShowDemo(true)}
+          whileTap={{ scale: 0.97 }}
+          style={{
+            width: '100%', padding: '15px', borderRadius: 14,
+            border: 'none', background: 'linear-gradient(135deg, #6366f1, #8B5CF6)',
+            fontFamily: 'inherit', fontSize: 15, fontWeight: 800,
+            cursor: 'pointer', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
+            letterSpacing: '0.01em',
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+          </svg>
+          Try Demo — No Sign Up Needed
+        </motion.button>
+
         {/* Divider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0' }}>
           <div style={{ flex: 1, height: 1, background: '#E5E0D5' }} />
@@ -324,26 +345,6 @@ export default function Auth() {
             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/>
           </svg>
           {tab === 'signup' ? 'Sign Up with Google' : 'Sign In with Google'}
-        </motion.button>
-
-        {/* Demo login */}
-        <motion.button
-          type="button"
-          onClick={() => setShowDemo(true)}
-          whileTap={{ scale: 0.97 }}
-          style={{
-            width: '100%', padding: '13px', borderRadius: 14,
-            border: '2px dashed #D0CBC0', background: '#FBFAF8',
-            fontFamily: 'inherit', fontSize: 14, fontWeight: 700,
-            cursor: 'pointer', color: '#8B7D70',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            transition: 'all 0.15s',
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B7D70" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-          </svg>
-          Try Demo
         </motion.button>
       </motion.div>
 
