@@ -200,6 +200,7 @@ export default function AIChatbot() {
 
   return (
     <motion.div layout style={{ background: 'var(--page-bg)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <style>{`.chat-input::placeholder { color: var(--text-3) }`}</style>
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -378,10 +379,11 @@ export default function AIChatbot() {
           </div>
 
           {/* Input */}
-          <div style={{ padding: '8px 14px 14px', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
+          <div style={{ padding: '8px 14px calc(14px + 56px)', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
               <div style={{ flex: 1, position: 'relative' }}>
                 <input
+                  className="chat-input"
                   ref={inputRef}
                   value={input}
                   onChange={e => setInput(e.target.value)}
@@ -389,7 +391,7 @@ export default function AIChatbot() {
                   placeholder="Ask a question..."
                   style={{
                     width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid var(--border)',
-                    fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', boxSizing: 'border-box',
+                    fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', boxSizing: 'border-box',
                   }}
                 />
               </div>
