@@ -16,6 +16,7 @@ const upscAllChapterIds = upscSubjects.flatMap(s => s.chapters.map(c => c.id))
 const ENABLED_CHAPTERS = new Set([...neetAllChapterIds, ...upscAllChapterIds])
 const neetAllChapters = neetSubjects.flatMap(s => s.chapters.map(c => ({ ...c, subject: s.id })))
 const upscAllChapters = upscSubjects.flatMap(s => s.chapters.map(c => ({ ...c, subject: s.id })))
+const chapterIdToName = Object.fromEntries(neetAllChapters.map(c => [c.id, c.name]))
 
 const chapterNameToIdMap = {
   'Physical World': 'p1', 'Units and Measurements': 'p2',
@@ -75,7 +76,10 @@ const chapterNameToIdMap = {
   'Reproduction': ['b21', 'b22', 'b23', 'b24'],
 }
 
-const getQCount = (chapterId, questions) => questions.filter(q => q.chapter === chapterId).length
+const getQCount = (chapterId, questions) => {
+  const name = chapterIdToName[chapterId]
+  return questions.filter(q => q.chapter === (name || chapterId)).length
+}
 
 export default function MCQPractice() {
   const navigate = useNavigate()
