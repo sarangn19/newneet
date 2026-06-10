@@ -80,6 +80,12 @@ const getQCount = (chapterId, questions) => {
   const name = chapterIdToName[chapterId]
   return questions.filter(q => q.chapter === (name || chapterId)).length
 }
+const getLastScore = (chapterId) => {
+  const ts = useStore.getState().topicScores[chapterId]
+  if (!ts || ts.total === 0) return null
+  return Math.round(ts.correct / ts.total * 100)
+}
+const getProgress = (chapterId) => getLastScore(chapterId) || 0
 
 export default function MCQPractice() {
   const navigate = useNavigate()
