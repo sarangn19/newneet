@@ -402,7 +402,7 @@ export default function AIChatbot() {
               }}>
                 <Mic size={15} color={listening ? '#fff' : 'var(--text-2)'} />
               </motion.button>
-              <motion.button whileTap={{scale:0.96}} onClick={sendMessage} disabled={!input.trim() || loading} style={{
+              <motion.button whileTap={{scale:0.96}} onClick={() => sendMessage()} disabled={!input.trim() || loading} style={{
                 width: 36, height: 36, borderRadius: 12, border: 'none',
                 background: input.trim() && !loading ? 'var(--primary)' : 'var(--border)',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
