@@ -302,7 +302,7 @@ export default function Auth() {
           onClick={() => setShowDemo(true)}
           whileTap={{ scale: 0.97 }}
           style={{
-            width: '100%', padding: '15px', borderRadius: 14,
+            width: '100%', padding: '15px', borderRadius: 14, marginTop: 8,
             border: 'none', background: 'linear-gradient(135deg, #6366f1, #8B5CF6)',
             fontFamily: 'inherit', fontSize: 15, fontWeight: 800,
             cursor: 'pointer', color: '#fff',
