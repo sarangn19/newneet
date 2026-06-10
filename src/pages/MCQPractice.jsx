@@ -360,13 +360,13 @@ export default function MCQPractice() {
         <div style={{ width: '100%', maxWidth: '100%' }}>
           <div style={{
             width: '100%', height: 52,
-            background: '#fff',
-            border: '2px solid #e5e5e5',
+            background: 'var(--card-bg)',
+            border: '2px solid var(--border)',
             borderRadius: 12,
             display: 'flex', alignItems: 'center', padding: '0 16px', gap: 10,
             boxSizing: 'border-box',
           }}>
-            <Search size={17} color="#afafaf" style={{ flexShrink: 0 }} />
+            <Search size={17} color="var(--text-3)" style={{ flexShrink: 0 }} />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -374,7 +374,7 @@ export default function MCQPractice() {
               style={{
                 border: 'none', outline: 'none', flex: 1,
                 fontSize: 15, fontFamily: 'Satoshi, sans-serif',
-                color: '#333', background: 'transparent',
+                color: 'var(--text)', background: 'transparent',
               }}
             />
           </div>
@@ -392,23 +392,23 @@ export default function MCQPractice() {
                 }}
                 onMouseDown={e => {
                   e.currentTarget.style.transform = 'translateY(3px)'
-                  e.currentTarget.style.boxShadow = isActive ? '0 1px 0 #b35c00' : '0 1px 0 rgba(0,0,0,0.2)'
+                  e.currentTarget.style.boxShadow = isActive ? '0 1px 0 var(--primary-dark)' : '0 1px 0 rgba(0,0,0,0.2)'
                 }}
                 onMouseUp={e => {
                   e.currentTarget.style.transform = ''
-                  e.currentTarget.style.boxShadow = isActive ? '0 4px 0 #b35c00' : '0 4px 0 rgba(0,0,0,0.2)'
+                  e.currentTarget.style.boxShadow = isActive ? '0 4px 0 var(--primary-dark)' : '0 4px 0 rgba(0,0,0,0.2)'
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.transform = ''
-                  e.currentTarget.style.boxShadow = isActive ? '0 4px 0 #b35c00' : '0 4px 0 rgba(0,0,0,0.2)'
+                  e.currentTarget.style.boxShadow = isActive ? '0 4px 0 var(--primary-dark)' : '0 4px 0 rgba(0,0,0,0.2)'
                 }}
                 onTouchStart={e => {
                   e.currentTarget.style.transform = 'translateY(3px)'
-                  e.currentTarget.style.boxShadow = isActive ? '0 1px 0 #b35c00' : '0 1px 0 rgba(0,0,0,0.2)'
+                  e.currentTarget.style.boxShadow = isActive ? '0 1px 0 var(--primary-dark)' : '0 1px 0 rgba(0,0,0,0.2)'
                 }}
                 onTouchEnd={e => {
                   e.currentTarget.style.transform = ''
-                  e.currentTarget.style.boxShadow = isActive ? '0 4px 0 #b35c00' : '0 4px 0 rgba(0,0,0,0.2)'
+                  e.currentTarget.style.boxShadow = isActive ? '0 4px 0 var(--primary-dark)' : '0 4px 0 rgba(0,0,0,0.2)'
                 }}
                 style={{
                   flex: 1,
@@ -424,10 +424,10 @@ export default function MCQPractice() {
                   userSelect: 'none',
                   WebkitTapHighlightColor: 'transparent',
                   ...(isActive ? {
-                    background: '#FF9944',
+                    background: 'var(--primary)',
                     color: '#fff',
-                    border: '2px solid #FF9944',
-                    boxShadow: '0 4px 0 #b35c00',
+                    border: '2px solid var(--primary)',
+                    boxShadow: '0 4px 0 var(--primary-dark)',
                   } : {
                     background: 'transparent',
                     color: 'var(--text-2)',
@@ -496,28 +496,28 @@ export default function MCQPractice() {
                       onClick={() => toggle(ch.id)}
                       whileTap={{ scale: 0.98 }}
                       style={{
-                        background: '#fff',
+                        background: 'var(--card-bg)',
                         borderRadius: 14,
                         padding: '12px 14px',
                         cursor: 'pointer',
-                        border: sel ? '2px solid #FF9944' : '2px solid transparent',
+                        border: sel ? '2px solid var(--accent)' : '2px solid transparent',
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
                         marginBottom: 6,
                         transition: 'all 0.2s',
                         boxShadow: sel 
-                          ? '0 2px 8px rgba(255,153,68,0.2)' 
+                          ? '0 2px 8px rgba(var(--accent-rgb),0.2)' 
                           : '0 1px 4px rgba(0,0,0,0.06)',
                       }}
                     >
                       {/* Chapter number badge */}
                       <div style={{
                         width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                        background: sel ? '#FF9944' : '#F3F4F6',
+                        background: sel ? 'var(--accent)' : 'var(--surface-alt)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 13, fontWeight: 800,
-                        color: sel ? '#fff' : '#6B7280',
+                        color: sel ? '#fff' : 'var(--text-2)',
                         fontFamily: 'Satoshi, sans-serif',
                         transition: 'all 0.2s',
                       }}>
@@ -527,7 +527,7 @@ export default function MCQPractice() {
                       {/* Text */}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{
-                          fontSize: 14, fontWeight: 700, color: '#1a1a1a',
+                          fontSize: 14, fontWeight: 700, color: 'var(--text)',
                           fontFamily: 'Satoshi, sans-serif', lineHeight: 1.3,
                           marginBottom: 4,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -536,21 +536,21 @@ export default function MCQPractice() {
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           {progress > 0 && (
-                            <div style={{ flex: 1, height: 3, background: 'rgba(0,0,0,0.06)', borderRadius: 99, overflow: 'hidden', maxWidth: 80 }}>
+                            <div style={{ flex: 1, height: 3, background: 'var(--border)', borderRadius: 99, overflow: 'hidden', maxWidth: 80 }}>
                               <div style={{ height: '100%', width: `${progress}%`, background: sub.color, borderRadius: 99 }} />
                             </div>
                           )}
                           {isWeak && (
-                            <span style={{ fontSize: 10, fontWeight: 700, color: '#f87171', background: 'rgba(248,113,113,0.15)', padding: '2px 7px', borderRadius: 99 }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--error)', background: 'var(--error-light)', padding: '2px 7px', borderRadius: 99 }}>
                               Weak
                             </span>
                           )}
                           {lastScore && !isWeak && (
-                            <span style={{ fontSize: 10, fontWeight: 700, color: '#34d399', background: 'rgba(52,211,153,0.12)', padding: '2px 7px', borderRadius: 99 }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--success)', background: 'var(--success-light)', padding: '2px 7px', borderRadius: 99 }}>
                               {lastScore}%
                             </span>
                           )}
-                          <span style={{ fontSize: 10, color: '#9CA3AF' }}>{ch.qCount}Q</span>
+                          <span style={{ fontSize: 10, color: 'var(--text-3)' }}>{ch.qCount}Q</span>
                         </div>
                       </div>
 
@@ -748,20 +748,20 @@ export default function MCQPractice() {
       }}
         onClick={() => { setPhase('setup'); setAnswers([]); setSelectedChapters([]) }}>
         <div onClick={e => e.stopPropagation()} style={{
-          background: '#fff', borderRadius: 24, width: '100%', maxWidth: 360,
+          background: 'var(--card-bg)', borderRadius: 24, width: '100%', maxWidth: 360,
           maxHeight: '90vh', overflowY: 'auto', padding: '32px 24px 24px',
         }}>
           {/* Score */}
           <div style={{ textAlign: 'center' }}>
             {perfect && (
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#FF9600', marginBottom: 4 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--accent)', marginBottom: 4 }}>
                 🎉 PERFECT SCORE
               </div>
             )}
-            <div style={{ fontSize: 56, fontWeight: 900, color: '#1A1A1A', letterSpacing: -3, lineHeight: 1 }}>
+            <div style={{ fontSize: 56, fontWeight: 900, color: 'var(--text)', letterSpacing: -3, lineHeight: 1 }}>
               {pct}%
             </div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: '#777', marginTop: 4 }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-2)', marginTop: 4 }}>
               {correct}/{answers.length} Correct
             </div>
           </div>
@@ -773,13 +773,13 @@ export default function MCQPractice() {
 
           {/* Insight: mastery */}
           <div style={{
-            background: '#F7F7F7', borderRadius: 14, padding: '12px 16px',
+            background: 'var(--surface-alt)', borderRadius: 14, padding: '12px 16px',
             textAlign: 'center',
           }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
               🧠 {subjects.find(s => s.id === selectedSubjects[0])?.name || selectedSubjects[0]} Mastery +{correct * 2}%
             </div>
-            {chapterName && <div style={{ fontSize: 11, color: '#999', marginTop: 2 }}>{chapterName}</div>}
+            {chapterName && <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>{chapterName}</div>}
           </div>
 
           {/* Review mistakes */}
@@ -787,9 +787,9 @@ export default function MCQPractice() {
             <button onClick={() => setReviewOpen(true)}
               style={{
                 width: '100%', padding: '13px', borderRadius: 14, marginTop: 12,
-                border: '1.5px solid #E8E8E8', background: '#fff',
+                border: '1.5px solid var(--border)', background: 'var(--card-bg)',
                 cursor: 'pointer', fontFamily: 'Satoshi, sans-serif',
-                fontSize: 13, fontWeight: 700, color: '#FF4B4B',
+                fontSize: 13, fontWeight: 700, color: 'var(--error)',
               }}>
               Review {wrong.length} {wrong.length === 1 ? 'Mistake' : 'Mistakes'}
             </button>
@@ -799,15 +799,15 @@ export default function MCQPractice() {
           <button onClick={() => { setPhase('setup'); setAnswers([]); setSelectedChapters([]) }}
             style={{
               width: '100%', padding: '15px', borderRadius: 14, border: 'none', marginTop: 10,
-              background: good || perfect ? '#FF9600' : '#CCC',
+              background: good || perfect ? 'var(--accent)' : 'var(--border)',
               color: '#fff', fontSize: 15, fontWeight: 800,
               cursor: 'pointer', fontFamily: 'Satoshi, sans-serif',
-              boxShadow: good || perfect ? '0 4px 0 #CC7A00' : 'none',
+              boxShadow: good || perfect ? '0 4px 0 var(--primary-dark)' : 'none',
               transition: 'transform 0.08s, box-shadow 0.08s',
             }}
-            onMouseDown={e => { if (good || perfect) { e.currentTarget.style.transform = 'translateY(3px)'; e.currentTarget.style.boxShadow = '0 1px 0 #CC7A00' } }}
-            onMouseUp={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = good || perfect ? '0 4px 0 #CC7A00' : 'none' }}
-            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = good || perfect ? '0 4px 0 #CC7A00' : 'none' }}>
+            onMouseDown={e => { if (good || perfect) { e.currentTarget.style.transform = 'translateY(3px)'; e.currentTarget.style.boxShadow = '0 1px 0 var(--primary-dark)' } }}
+            onMouseUp={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = good || perfect ? '0 4px 0 var(--primary-dark)' : 'none' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = good || perfect ? '0 4px 0 var(--primary-dark)' : 'none' }}>
             {perfect ? 'Next Challenge →' : good ? 'Continue →' : 'Try Again'}
           </button>
 
@@ -818,18 +818,18 @@ export default function MCQPractice() {
                 const selLetter = String.fromCharCode(65 + a.selected)
                 const ansLetter = String.fromCharCode(65 + a.q.ans)
                 return (
-                  <div key={i} style={{ padding: '12px 14px', background: '#FFF0F0', borderRadius: 14, marginBottom: 8 }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: '#333', lineHeight: 1.5, margin: '0 0 6px' }}>{a.q.q}</p>
+                  <div key={i} style={{ padding: '12px 14px', background: 'var(--error-light)', borderRadius: 14, marginBottom: 8 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', lineHeight: 1.5, margin: '0 0 6px' }}>{a.q.q}</p>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 6, background: 'rgba(255,75,75,0.1)', color: '#FF4B4B' }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 6, background: 'rgba(255,75,75,0.1)', color: 'var(--error)' }}>
                         ✗ {selLetter}
                       </span>
-                      <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 6, background: 'rgba(255,150,0,0.1)', color: '#FF9600' }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 6, background: 'rgba(255,150,0,0.1)', color: 'var(--accent)' }}>
                         ✓ {ansLetter}
                       </span>
                     </div>
                     {a.q.explanation && (
-                      <div style={{ marginTop: 8, padding: '10px 12px', background: '#fff', borderRadius: 10, fontSize: 11, color: '#666', lineHeight: 1.6 }}>
+                      <div style={{ marginTop: 8, padding: '10px 12px', background: 'var(--card-bg)', borderRadius: 10, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.6 }}>
                         {a.q.explanation}
                       </div>
                     )}
@@ -840,7 +840,7 @@ export default function MCQPractice() {
                 style={{
                   width: '100%', padding: '10px', borderRadius: 12, border: 'none',
                   background: 'transparent', cursor: 'pointer', fontFamily: 'Satoshi, sans-serif',
-                  fontSize: 12, fontWeight: 600, color: '#999', marginBottom: 8,
+                  fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginBottom: 8,
                 }}>
                 Hide Review ▲
               </button>
@@ -873,11 +873,11 @@ export default function MCQPractice() {
             {streakRef.current >= 2 && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 3,
-                background: 'rgba(255,150,0,0.15)', borderRadius: 99,
+                background: 'var(--primary-light)', borderRadius: 99,
                 padding: '4px 8px',
               }}>
                 <span style={{ fontSize: 13 }}>🔥</span>
-                <span style={{ fontSize: 11, fontWeight: 800, color: '#FF9600' }}>{streakRef.current}</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent)' }}>{streakRef.current}</span>
               </div>
             )}
             <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-3)', flexShrink: 0 }}>{current + 1}/{questions.length}</span>
@@ -892,18 +892,18 @@ export default function MCQPractice() {
         <motion.div key={current} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
           style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 0' }}>
           <div style={{
-            background: '#fff', borderRadius: 20, padding: '18px 16px',
-            border: '2px solid #e5e5e5', boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            background: 'var(--card-bg)', borderRadius: 20, padding: '18px 16px',
+            border: '2px solid var(--border)', boxShadow: 'var(--shadow-card)',
           }}>
-            <p style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.65, color: '#1a1a1a', margin: 0 }}>{q.q}</p>
+            <p style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.65, color: 'var(--text)', margin: 0 }}>{q.q}</p>
           </div>
           {submitted && q.explanation && (
             <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
               style={{
-                background: selected === q.ans ? '#d1fae5' : '#fee2e2',
-                border: `1.5px solid ${selected === q.ans ? '#10b981' : '#ef4444'}`,
+                background: selected === q.ans ? 'var(--success-light)' : 'var(--error-light)',
+                border: `1.5px solid ${selected === q.ans ? 'var(--success)' : 'var(--error)'}`,
                 borderRadius: 14, padding: '12px 14px', marginTop: 10,
-                fontSize: 13, color: '#374151', lineHeight: 1.6,
+                fontSize: 13, color: 'var(--text)', lineHeight: 1.6,
               }}>
               {q.explanation}
             </motion.div>
@@ -929,22 +929,22 @@ export default function MCQPractice() {
                 padding: '0 14px', borderRadius: 14, border: 'none',
                 cursor: submitted ? 'default' : 'pointer',
                 fontFamily: 'inherit', textAlign: 'left', width: '100%',
-                background: isRight ? '#d1fae5' : isWrong ? '#fee2e2' : isSel ? '#fff7ed' : '#fff',
-                boxShadow: isSel ? '0 0 0 2px #FF9944' : isRight ? '0 0 0 2px #10b981' : isWrong ? '0 0 0 2px #ef4444' : '0 2px 8px rgba(0,0,0,0.08)',
+                background: isRight ? 'var(--success-light)' : isWrong ? 'var(--error-light)' : isSel ? 'var(--primary-light)' : 'var(--card-bg)',
+                boxShadow: isSel ? '0 0 0 2px var(--accent)' : isRight ? '0 0 0 2px var(--success)' : isWrong ? '0 0 0 2px var(--error)' : 'var(--shadow-card)',
                 transition: 'all 0.15s', overflow: 'hidden',
               }}>
               <div style={{
                 width: 30, height: 30, borderRadius: 9, flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: isRight ? '#10b981' : isWrong ? '#ef4444' : isSel ? '#FF9944' : '#F3F4F6',
-                color: (isRight || isWrong || isSel) ? '#fff' : '#6B7280',
+                background: isRight ? 'var(--success)' : isWrong ? 'var(--error)' : isSel ? 'var(--accent)' : 'var(--surface-alt)',
+                color: (isRight || isWrong || isSel) ? '#fff' : 'var(--text-2)',
                 fontSize: 12, fontWeight: 800,
               }}>
                 {String.fromCharCode(65 + i)}
               </div>
               <span style={{
                 fontSize: 13, fontWeight: 500,
-                color: isRight ? '#065f46' : isWrong ? '#7f1d1d' : '#1a1a1a',
+                color: isRight ? 'var(--success-dark)' : isWrong ? 'var(--error-dark)' : 'var(--text)',
                 lineHeight: 1.3,
                 overflow: 'hidden', display: '-webkit-box',
                 WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
@@ -970,7 +970,7 @@ export default function MCQPractice() {
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
               <button onClick={handleOneMore} style={{
                 padding: '8px 20px', borderRadius: 12, border: 'none',
-                background: '#fff', color: 'var(--accent)',
+                background: 'var(--card-bg)', color: 'var(--accent)',
                 fontSize: 13, fontWeight: 800, cursor: 'pointer',
                 fontFamily: 'Satoshi, sans-serif',
               }}>

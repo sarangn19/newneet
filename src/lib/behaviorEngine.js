@@ -223,4 +223,47 @@ function detectProgressQuery(msg) {
   return /(?:how am i doing|am i on track|my progress|how is my|am i ready|how am i performing|tell me about my|what are my weak|what are my strong)/.test(words)
 }
 
+export function buildStudentProfile(store) {
+  const { topicScores, questionHistory, stats } = store || {}
+  const totalQuestions = stats?.totalQuestions || 0
+
+  const topicAccs = Object.entries(topicScores || {}).map(([id, s]) => ({
+    id,
+    accuracy: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0,
+    total: s.total || 0,
+  }))
+
+  const weakTopics = topicAccs.filter(t => t.total >= 3 && t.accuracy < 60)
+  const strongTopics = topicAccs.filter(t => t.total >= 5 && t.accuracy >= 80)
+
+  let trend = 'stable'
+  if (questionHistory && questionHistory.length >= 10) {
+    const recent = questionHistory.slice(-10).filter(q => q.correct).length
+    const older = questionHistory.slice(-20, -10).filter(q => q.correct).length
+    if (recent < older - 2) trend = 'declining'
+    else if (recent > older + 2) trend = 'improving'
+  }
+
+  const calibration = { bias: 'balanced' }
+
+  const decayingChapters = topicAccs.filter(t => {
+    const last = topicScores?.[t.id]?.lastAttempted
+    if (!last) return false
+    return Math.floor((Date.now() - new Date(last).getTime()) / 86400000) > 30
+  }).length
+
+  return {
+    overall: { totalQuestions },
+    weakTopics,
+    strongTopics,
+    topicAccs,
+    topicScores: topicScores || {},
+    trend,
+    calibration,
+    decayingChapters,
+    overdueRevisions: 0,
+    skills: [],
+  }
+}
+
 

@@ -35,6 +35,12 @@ export default function UpscHome() {
   // Day of week format
   const dayOfWeek = new Date().getDay()
   const dayLabels = { 0: 'Weekly Review', 1: 'Flashcards', 2: 'MCQ Revision', 3: 'Mind Maps', 4: 'Summary', 5: 'AI Q&A', 6: 'Mixed Test' }
+  const greeting = () => {
+    const h = new Date().getHours()
+    if (h < 12) return 'Good morning'
+    if (h < 17) return 'Good afternoon'
+    return 'Good evening'
+  }
 
   const skipTopic = () => { if (feedIdx < remainingFeed.length - 1) setFeedIdx(i => i + 1) }
   const touchStartX = useRef(0)
@@ -155,7 +161,7 @@ export default function UpscHome() {
               UPSC<span style={{ color: 'var(--primary)' }}>.</span>
             </h1>
             <p style={{ fontSize: 12, color: 'var(--text-3)', margin: '2px 0 0', fontWeight: 500 }}>
-              {dayLabels[dayOfWeek]}
+              {greeting()}, {user?.name?.split(' ')[0] || 'Student'} · {dayLabels[dayOfWeek]}
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
