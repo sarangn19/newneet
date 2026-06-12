@@ -31,10 +31,7 @@ export function AuthProvider({ children }) {
 
     let oauthResolved = false
 
-    console.debug('[Auth] URL hash:', window.location.hash.substring(0, 60))
-
     const sub = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      console.debug('[Auth] onAuthStateChange event:', _event, 'user:', nextSession?.user?.email)
       oauthResolved = true
       setSession(nextSession)
       if (nextSession) {
@@ -53,7 +50,6 @@ export function AuthProvider({ children }) {
     })
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.debug('[Auth] getSession resolved. session:', session?.user?.email, 'oauthResolved:', oauthResolved, 'hash present:', !!window.location.hash)
       if (oauthResolved) return
       setSession(session)
       if (session) {

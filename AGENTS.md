@@ -20,6 +20,13 @@ Pre-release UPSC app enhancements (chatbot modes, behavior engine) + NEET regres
   - `Battle.jsx` — gold glows on winner podium and exp bars
   - `Onboarding.jsx` — orange glow shadows, avatar grid layout, original text
 
+### Completed
+- **Google OAuth fixed**:
+  - Root cause: Client Secret in Supabase Google provider didn't match Google Cloud Console
+  - Race condition (secondary): `getSession()` returned null before `onAuthStateChange`'s `INITIAL_SESSION` processed the URL hash, causing ProtectedRoutes to redirect to `/auth`. Fixed with `oauthResolved` flag set inside the callback itself (not via `subscription` variable assigned after)
+  - Added hash-guard in ProtectedRoutes: if `window.location.hash` contains `access_token`, show Loader instead of redirecting
+  - Debug logs added/removed during diagnosis
+
 ### In Progress
 - (none)
 
