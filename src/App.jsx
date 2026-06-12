@@ -196,6 +196,8 @@ function ProtectedRoutes() {
     }).catch(() => navigate('/onboarding', { replace: true }))
   }
 
+  // If URL hash contains access_token, OAuth redirect just landed — wait for session recovery
+  if (!loading && !session && !isDemo && window.location.hash?.includes('access_token')) return <Loader />
   if (loading) return <Loader />
   if (!session && !isDemo) return <Navigate to="/auth" replace />
   if (!isDemo && examType === null && !userId) return <Loader />
