@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { fetchCurrentAffairs } from '../lib/currentAffairs'
-import { ChevronLeft, Search, RefreshCw, Bookmark, ExternalLink, ChevronRight, BookOpen, X, XCircle, CheckCircle, Sparkles } from 'lucide-react'
+import { ChevronLeft, Search, RefreshCw, Bookmark, ExternalLink, ChevronRight, BookOpen, X, XCircle, CheckCircle, Sparkles, AlertTriangle, RotateCcw } from 'lucide-react'
 
 const CATEGORIES = [
   'All', 'Polity', 'Economy', 'International', 'Environment', 'Science & Tech', 'History & Culture', 'Geography',
@@ -22,7 +22,7 @@ const categoryColors = {
 
 export default function CurrentAffairs() {
   const navigate = useNavigate()
-  const { userId } = useStore()
+  const { userId, caHistory, recordArticleOpened, recordArticleClosed, recordArticleBookmarked, recordNotesGenerated, recordMCQsGenerated, incrementCaFallback, incrementCaRetryAttempt, incrementCaRetrySuccess, incrementCaMcqTimeout, incrementCaMcqFail } = useStore()
   const [articles, setArticles] = useState([])
   const [activeCategory, setActiveCategory] = useState('All')
   const [search, setSearch] = useState('')
@@ -36,6 +36,24 @@ export default function CurrentAffairs() {
   const [mcqResult, setMcqResult] = useState(null)
   const [mcqCurrent, setMcqCurrent] = useState(0)
   const [mcqLoading, setMcqLoading] = useState(false)
+  const [mcqProgress, setMcqProgress] = useState('')
+  const [isFallback, setIsFallback] = useState(false)
+  const [retrying, setRetrying] = useState(false)
+  const articleOpenTime = useRef(null)
+  const mcqProgressTimer = useRef(null)
+  const mcqSafetyTimer = useRef(null)
+
+  const MCQ_PROGRESS_STEPS = [
+    'Analyzing article relevance...',
+    'Generating UPSC-style questions...',
+    'Creating explanations...',
+    'Finalizing practice set...',
+  ]
+
+  const clearMcqTimers = () => {
+    if (mcqProgressTimer.current) { clearInterval(mcqProgressTimer.current); mcqProgressTimer.current = null }
+    if (mcqSafetyTimer.current) { clearTimeout(mcqSafetyTimer.current); mcqSafetyTimer.current = null }
+  }
 
   const showToast = (msg) => {
     setToast(msg)
@@ -44,11 +62,31 @@ export default function CurrentAffairs() {
 
   const loadNews = async () => {
     setLoading(true)
+    setIsFallback(false)
     try {
-      const data = await fetchCurrentAffairs()
-      setArticles(data || [])
-    } catch { /* use mock fallback */ }
+      const result = await fetchCurrentAffairs()
+      setArticles(result.articles || [])
+      if (result.source === 'mock') { setIsFallback(true); incrementCaFallback() }
+    } catch {
+      setIsFallback(true); incrementCaFallback()
+    }
     setLoading(false)
+  }
+
+  const retry = async () => {
+    if (retrying) return
+    setRetrying(true)
+    setIsFallback(false)
+    incrementCaRetryAttempt()
+    try {
+      const result = await fetchCurrentAffairs()
+      setArticles(result.articles || [])
+      if (result.source === 'mock') { setIsFallback(true); incrementCaFallback() }
+      else incrementCaRetrySuccess()
+    } catch {
+      setIsFallback(true); incrementCaFallback()
+    }
+    setRetrying(false)
   }
 
   useEffect(() => { loadNews() }, [])
@@ -72,6 +110,12 @@ export default function CurrentAffairs() {
     return list.slice(0, 30)
   }, [articles, activeCategory, search])
 
+  const readArticles = useMemo(() => {
+    const read = new Set()
+    caHistory.forEach(e => { if (e.timeSpentSeconds > 0) read.add(e.articleId) })
+    return read
+  }, [caHistory])
+
   const toggleBookmark = async (article) => {
     if (!userId) return
     if (bookmarked.has(article.title)) {
@@ -87,6 +131,8 @@ export default function CurrentAffairs() {
         user_id: userId, title: article.title, content,
       })
       setBookmarked(prev => new Set([...prev, article.title]))
+      recordArticleBookmarked(article.title)
+      recordNotesGenerated(article.title)
       showToast('Note saved!')
     }
   }
@@ -96,6 +142,26 @@ export default function CurrentAffairs() {
     setMcqAnswers({})
     setMcqResult(null)
     setMcqCurrent(0)
+    setMcqProgress(MCQ_PROGRESS_STEPS[0])
+    setMcqPractice(article)
+    setMcqQuestions([])
+
+    clearMcqTimers()
+    let stepIdx = 0
+    mcqProgressTimer.current = setInterval(() => {
+      stepIdx = (stepIdx + 1) % MCQ_PROGRESS_STEPS.length
+      setMcqProgress(MCQ_PROGRESS_STEPS[stepIdx])
+    }, 4000)
+
+    mcqSafetyTimer.current = setTimeout(() => {
+      clearMcqTimers()
+      setMcqLoading(false)
+      setMcqProgress('')
+      setMcqPractice(null)
+      incrementCaMcqTimeout()
+      showToast('MCQ generation timed out. Try again.')
+    }, 25000)
+
     try {
       const res = await fetch('/api/ai-doubt', {
         method: 'POST',
@@ -115,15 +181,22 @@ export default function CurrentAffairs() {
           questions = match ? JSON.parse(match[0]) : null
         }
         if (questions && questions.length > 0) {
+          clearMcqTimers()
           setMcqQuestions(questions)
           setMcqPractice(article)
+          setMcqProgress('')
+          recordMCQsGenerated(article.title)
           setMcqLoading(false)
           return
         }
       }
     } catch {}
+    clearMcqTimers()
+    incrementCaMcqFail()
     showToast('Could not generate MCQs. Try again.')
     setMcqLoading(false)
+    setMcqProgress('')
+    setMcqPractice(null)
   }
 
   const answerMcq = (idx) => {
@@ -148,7 +221,7 @@ export default function CurrentAffairs() {
             exit={{ opacity: 0, y: -20 }}
             style={{
               position: 'fixed', top: 60, left: '50%', transform: 'translateX(-50%)', zIndex: 999,
-              background: '#1F2937', color: '#fff', padding: '8px 20px', borderRadius: 12,
+              background: 'var(--surface-alt)', color: 'var(--text)', padding: '8px 20px', borderRadius: 12,
               fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
             }}
           >
@@ -180,6 +253,40 @@ export default function CurrentAffairs() {
           }} />
         </div>
       </div>
+
+      {/* Fallback warning banner */}
+      <AnimatePresence>
+        {isFallback && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            style={{
+              background: 'var(--warning-light)', borderBottom: '1px solid var(--border)',
+              padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
+            }}
+          >
+            <AlertTriangle size={14} color="var(--warning)" style={{ flexShrink: 0 }} />
+            <div style={{ flex: 1, fontSize: 11, color: 'var(--text)', lineHeight: 1.4 }}>
+              Unable to fetch the latest current affairs. Showing archived articles.
+            </div>
+            <motion.button
+              whileTap={{scale:0.96}}
+              onClick={retry}
+              disabled={retrying}
+              style={{
+                padding: '5px 12px', borderRadius: 8, border: '1px solid var(--warning)',
+                background: 'transparent', color: 'var(--warning)', fontSize: 11, fontWeight: 600,
+                cursor: retrying ? 'default' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
+                display: 'flex', alignItems: 'center', gap: 4, opacity: retrying ? 0.6 : 1,
+              }}
+            >
+              <RotateCcw size={12} className={retrying ? 'spin' : ''} />
+              Retry
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Category tabs */}
       <div style={{
@@ -217,16 +324,17 @@ export default function CurrentAffairs() {
               {filtered.map((a, i) => {
                 const catColor = categoryColors[a.category] || '#6B7280'
                 const gradient = `linear-gradient(135deg, ${catColor}22, ${catColor}08)`
+                const isRead = readArticles.has(a.title)
                 return (
                   <motion.div key={i}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.02 }}
                     whileHover={{ y: -3 }}
-                    onClick={() => setSelectedArticle(a)}
+                    onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
                     style={{
                       background: 'var(--card-bg)', borderRadius: 14, border: selectedArticle?.title === a.title ? '2px solid var(--primary)' : '1px solid var(--border)',
-                      cursor: 'pointer', overflow: 'hidden', transition: '0.15s',
+                      cursor: 'pointer', overflow: 'hidden', transition: '0.15s', opacity: isRead ? 0.85 : 1,
                     }}
                   >
                     {/* Colored placeholder */}
@@ -238,13 +346,13 @@ export default function CurrentAffairs() {
                       <span style={{ opacity: 0.3 }}>📰</span>
                       <span style={{
                         position: 'absolute', top: 6, right: 6, fontSize: 9, fontWeight: 700,
-                        padding: '2px 8px', borderRadius: 99, background: '#fff', color: catColor,
+                          padding: '2px 8px', borderRadius: 99, background: 'var(--card-bg)', color: catColor,
                       }}>
                         {a.category}
                       </span>
                     </div>
                     <div style={{ padding: '10px 12px 12px' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: isRead ? 'var(--text-2)' : 'var(--text)', lineHeight: 1.4, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {a.title}
                       </div>
                       {a.summary && (
@@ -253,7 +361,10 @@ export default function CurrentAffairs() {
                         </div>
                       )}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ fontSize: 10, color: 'var(--text-3)' }}>{a.date}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          {isRead && <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />}
+                          <div style={{ fontSize: 10, color: 'var(--text-3)' }}>{a.date}</div>
+                        </div>
                         <motion.button whileTap={{scale:0.9}} onClick={e => { e.stopPropagation(); toggleBookmark(a) }} style={{
                           background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex',
                         }}>
@@ -278,15 +389,15 @@ export default function CurrentAffairs() {
             transition={{ type: 'tween', duration: 0.25 }}
             style={{
               position: 'fixed', right: 0, top: 0, bottom: 0, width: '100%', maxWidth: 400,
-              background: '#fff', zIndex: 200, boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
+              background: 'var(--card-bg)', zIndex: 200, boxShadow: 'var(--shadow-strong)',
               display: 'flex', flexDirection: 'column', overflow: 'hidden',
             }}
           >
-            <div style={{ padding: '50px 14px 10px', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <motion.button whileTap={{scale:0.96}} onClick={() => setSelectedArticle(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-                <ChevronLeft size={18} color="#111827" />
+            <div style={{ padding: '50px 14px 10px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <motion.button whileTap={{scale:0.96}} onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; if (selectedArticle) recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                <ChevronLeft size={18} color="var(--text)" />
               </motion.button>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>Article</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>Article</div>
             </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '14px 14px 100px' }}>
               {/* Category-colored header */}
@@ -306,35 +417,35 @@ export default function CurrentAffairs() {
                   {selectedArticle.category}
                 </span>
               )}
-              <div style={{ fontSize: 17, fontWeight: 700, color: '#111827', lineHeight: 1.4, marginBottom: 6 }}>{selectedArticle.title}</div>
-              <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 12 }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 6 }}>{selectedArticle.title}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 12 }}>
                 {selectedArticle.date} · {selectedArticle.source}
               </div>
               {/* Detailed analysis sections */}
-              <div style={{ fontSize: 12, color: '#4B5563', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
                 {selectedArticle.summary || 'Full article content would appear here. Fetch the complete story from the source link below.'}
               </div>
               {selectedArticle.tags?.length > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#111827', marginBottom: 6 }}>Tags</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Tags</div>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {selectedArticle.tags.map((t, i) => (
-                      <span key={i} style={{ fontSize: 10, color: '#6B7280', background: '#F3F4F6', padding: '3px 10px', borderRadius: 99 }}>{t}</span>
+                      <span key={i} style={{ fontSize: 10, color: 'var(--text-3)', background: 'var(--surface-alt)', padding: '3px 10px', borderRadius: 99 }}>{t}</span>
                     ))}
                   </div>
                 </div>
               )}
               {/* UPSC Relevance */}
-              <div style={{ background: '#F0FDF4', borderRadius: 10, padding: 10, marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#059669', marginBottom: 4 }}>UPSC Relevance</div>
-                <div style={{ fontSize: 11, color: '#065F46', lineHeight: 1.5 }}>
+              <div style={{ background: 'var(--success-light)', borderRadius: 10, padding: 10, marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--success)', marginBottom: 4 }}>UPSC Relevance</div>
+                <div style={{ fontSize: 11, color: 'var(--success-dark)', lineHeight: 1.5 }}>
                   This article is relevant for {selectedArticle.category || 'General Studies'} preparation. Analyze the key facts, government initiatives, and constitutional aspects mentioned. Link with static syllabus topics for Mains answers.
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <motion.button whileTap={{scale:0.96}} onClick={() => toggleBookmark(selectedArticle)} style={{
                   width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
-                  background: bookmarked.has(selectedArticle.title) ? '#EF4444' : '#3B82F6',
+                  background: bookmarked.has(selectedArticle.title) ? 'var(--error)' : 'var(--primary)',
                   color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 }}>
@@ -342,7 +453,7 @@ export default function CurrentAffairs() {
                 </motion.button>
                 <motion.button whileTap={{scale:0.96}} onClick={() => generateMCQs(selectedArticle)} disabled={mcqLoading} style={{
                   width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
-                  background: mcqLoading ? '#D1D5DB' : '#059669', color: '#fff',
+                  background: mcqLoading ? 'var(--surface-alt)' : 'var(--success)', color: '#fff',
                   fontSize: 12, fontWeight: 700, cursor: mcqLoading ? 'default' : 'pointer', fontFamily: 'inherit',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 }}>
@@ -350,8 +461,8 @@ export default function CurrentAffairs() {
                 </motion.button>
                 {selectedArticle.url && (
                   <a href={selectedArticle.url} target="_blank" rel="noopener noreferrer" style={{
-                    width: '100%', padding: '10px 0', borderRadius: 8, border: '1.5px solid #E5E7EB',
-                    background: '#fff', color: '#6B7280', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                    width: '100%', padding: '10px 0', borderRadius: 8, border: '1.5px solid var(--border)',
+                    background: 'var(--card-bg)', color: 'var(--text-3)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, textDecoration: 'none',
                   }}>
                     <ExternalLink size={14} /> Read Full Article
@@ -366,7 +477,7 @@ export default function CurrentAffairs() {
 
       {/* MCQ Practice Modal */}
       <AnimatePresence>
-        {mcqPractice && mcqQuestions.length > 0 && (
+        {mcqPractice && (mcqLoading || mcqQuestions.length > 0) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -375,7 +486,7 @@ export default function CurrentAffairs() {
               position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.4)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
             }}
-            onClick={() => { setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }}
+            onClick={() => { clearMcqTimers(); setMcqLoading(false); setMcqProgress(''); setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -383,53 +494,59 @@ export default function CurrentAffairs() {
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
               style={{
-                background: '#fff', borderRadius: 16, width: '100%', maxWidth: 420, maxHeight: '80vh',
+                background: 'var(--card-bg)', borderRadius: 16, width: '100%', maxWidth: 420, maxHeight: '80vh',
                 overflow: 'hidden', display: 'flex', flexDirection: 'column',
               }}
             >
-              <div style={{ padding: '16px 16px 10px', borderBottom: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Sparkles size={16} color="#059669" />
-                <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: '#111827' }}>
-                  {mcqResult ? 'Results' : `MCQ ${mcqCurrent + 1}/${mcqQuestions.length}`}
+              <div style={{ padding: '16px 16px 10px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Sparkles size={16} color="var(--success)" />
+                <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>
+                  {mcqLoading ? 'Generating Practice Set' : mcqResult ? 'Results' : `MCQ ${mcqCurrent + 1}/${mcqQuestions.length}`}
                 </div>
-                <motion.button whileTap={{scale:0.9}} onClick={() => { setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }} style={{
+                <motion.button whileTap={{scale:0.9}} onClick={() => { clearMcqTimers(); setMcqLoading(false); setMcqProgress(''); setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }} style={{
                   background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex',
                 }}>
-                  <X size={16} color="#9CA3AF" />
+                  <X size={16} color="var(--text-3)" />
                 </motion.button>
               </div>
               <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
-                {mcqResult ? (
+                {mcqLoading ? (
+                  <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--primary)', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+                    <div style={{ fontSize: 13, color: 'var(--text-2)', fontWeight: 500, marginBottom: 8 }}>{mcqProgress}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-3)' }}>This may take up to 25 seconds</div>
+                  </div>
+                ) : mcqResult ? (
                   <div style={{ textAlign: 'center', padding: '20px 0' }}>
                     <div style={{ fontSize: 36, marginBottom: 8 }}>
                       {mcqResult.correct === mcqResult.total ? '🎉' : mcqResult.correct >= mcqResult.total / 2 ? '👍' : '💪'}
                     </div>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#111827', marginBottom: 4 }}>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>
                       {mcqResult.correct}/{mcqResult.total}
                     </div>
-                    <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 16 }}>Questions correct</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>Questions correct</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {mcqQuestions.map((q, i) => (
-                        <div key={i} style={{ fontSize: 11, color: '#4B5563', textAlign: 'left', background: '#F9FAFB', borderRadius: 10, padding: 10 }}>
-                          <div style={{ fontWeight: 600, marginBottom: 4, color: mcqAnswers[i] === q.ans ? '#059669' : '#EF4444' }}>
+                        <div key={i} style={{ fontSize: 11, color: 'var(--text-2)', textAlign: 'left', background: 'var(--surface-alt)', borderRadius: 10, padding: 10 }}>
+                          <div style={{ fontWeight: 600, marginBottom: 4, color: mcqAnswers[i] === q.ans ? 'var(--success)' : 'var(--error)' }}>
                             {mcqAnswers[i] === q.ans ? '✓ Correct' : '✗ Incorrect'} — {q.q}
                           </div>
                           {mcqAnswers[i] !== q.ans && (
-                            <div style={{ color: '#059669' }}>Answer: {q.options[q.ans]}</div>
+                            <div style={{ color: 'var(--success)' }}>Answer: {q.options[q.ans]}</div>
                           )}
                         </div>
                       ))}
                     </div>
-                    <motion.button onClick={() => { setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }} whileTap={{scale:0.97}} style={{
+                    <motion.button onClick={() => { clearMcqTimers(); setMcqLoading(false); setMcqProgress(''); setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }} whileTap={{scale:0.97}} style={{
                       marginTop: 16, width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
-                      background: '#3B82F6', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                      background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                     }}>
                       Close
                     </motion.button>
                   </div>
                 ) : (
                   <>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', marginBottom: 12 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>
                       {mcqQuestions[mcqCurrent]?.q}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -440,14 +557,14 @@ export default function CurrentAffairs() {
                         return (
                           <motion.button key={oi} onClick={() => answerMcq(oi)} whileTap={{ scale: 0.97 }} disabled={answered} style={{
                             width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid',
-                            borderColor: answered ? (isCorrect ? '#10B981' : selected ? '#EF4444' : '#E5E7EB') : '#E5E7EB',
-                            background: answered ? (isCorrect ? '#F0FDF4' : selected ? '#FEF2F2' : '#fff') : '#fff',
-                            color: '#111827', fontSize: 12, fontWeight: 500, cursor: answered ? 'default' : 'pointer',
+                            borderColor: answered ? (isCorrect ? 'var(--success)' : selected ? 'var(--error)' : 'var(--border)') : 'var(--border)',
+                            background: answered ? (isCorrect ? 'var(--success-light)' : selected ? 'var(--error-light)' : 'var(--card-bg)') : 'var(--card-bg)',
+                            color: 'var(--text)', fontSize: 12, fontWeight: 500, cursor: answered ? 'default' : 'pointer',
                             textAlign: 'left', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 8,
                           }}>
-                            {answered && isCorrect && <CheckCircle size={14} color="#10B981" />}
-                            {answered && selected && !isCorrect && <XCircle size={14} color="#EF4444" />}
-                            {!answered && <span style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid #D1D5DB', display: 'inline-block' }} />}
+                            {answered && isCorrect && <CheckCircle size={14} color="var(--success)" />}
+                            {answered && selected && !isCorrect && <XCircle size={14} color="var(--error)" />}
+                            {!answered && <span style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--text-3)', display: 'inline-block' }} />}
                             {opt}
                           </motion.button>
                         )

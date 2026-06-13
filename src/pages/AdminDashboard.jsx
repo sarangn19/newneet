@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/useAuth'
 import { subjects, getMcqBank } from '../data/subjects'
-import { ChevronLeft, ChevronRight, Users, BookOpen, Trophy, AlertCircle, Plus, Trash2, Search, CheckCircle, Edit3, Download, ArrowLeft, BarChart3, Target, Book, Clock, Zap } from 'lucide-react'
+import useStore from '../store/useStore'
+import { ChevronLeft, ChevronRight, Users, BookOpen, Trophy, AlertCircle, Plus, Trash2, Search, CheckCircle, Edit3, Download, ArrowLeft, BarChart3, Target, Book, Clock, Zap, Newspaper, Repeat, Activity, Timer, PieChart, Layers, Info } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const inputStyle = {
@@ -31,6 +32,12 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ totalUsers: 0, activeToday: 0, totalLessons: 0, totalQuestions: 0, localQuestions: 0 })
   const [loading, setLoading] = useState(true)
   const [reports, setReports] = useState([])
+  const caHistory = useStore(s => s.caHistory)
+  const caFallbackCount = useStore(s => s.caFallbackCount)
+  const caRetryAttempts = useStore(s => s.caRetryAttempts)
+  const caRetrySuccess = useStore(s => s.caRetrySuccess)
+  const caMcqTimeoutCount = useStore(s => s.caMcqTimeoutCount)
+  const caMcqFailCount = useStore(s => s.caMcqFailCount)
 
   // Content tab state
   const [contentView, setContentView] = useState('list')
@@ -313,6 +320,7 @@ export default function AdminDashboard() {
             { key: 'users', label: 'Users', icon: Users },
             { key: 'content', label: 'Questions', icon: BookOpen },
             { key: 'reports', label: 'Reports', icon: Trophy },
+            { key: 'ca-insights', label: 'CA Insights', icon: Newspaper },
           ].map(({ key, label, icon: Icon }) => (
             <button key={key} onClick={() => setTab(key)} style={{
               flex: 1, padding: '10px 0', borderRadius: 12,
@@ -747,7 +755,381 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* ═══════ CA INSIGHTS TAB ═══════ */}
+        {!loading && tab === 'ca-insights' && <CaInsights caHistory={caHistory} caFallbackCount={caFallbackCount} caRetryAttempts={caRetryAttempts} caRetrySuccess={caRetrySuccess} caMcqTimeoutCount={caMcqTimeoutCount} caMcqFailCount={caMcqFailCount} />}
       </div>
+    </div>
+  )
+}
+
+// ── CA Insights Sub-Component ──────────────────────────────────────
+function CaInsights({ caHistory, caFallbackCount, caRetryAttempts, caRetrySuccess, caMcqTimeoutCount, caMcqFailCount }) {
+  const reading = useMemo(() => {
+    const total = caHistory.length
+    const unique = new Set(caHistory.map(h => h.articleId))
+    const uniqueCount = unique.size
+    const reads = caHistory.filter(h => h.timeSpentSeconds > 0)
+    const totalReadTime = reads.reduce((s, h) => s + h.timeSpentSeconds, 0)
+    const avgTime = reads.length > 0 ? Math.round(totalReadTime / reads.length) : 0
+    const times = reads.map(h => h.timeSpentSeconds).sort((a, b) => a - b)
+    const median = times.length > 0
+      ? times.length % 2 === 0
+        ? Math.round((times[times.length/2 - 1] + times[times.length/2]) / 2)
+        : times[Math.floor(times.length/2)]
+      : 0
+    const under5 = caHistory.filter(h => h.timeSpentSeconds < 5).length
+    const mid = caHistory.filter(h => h.timeSpentSeconds >= 5 && h.timeSpentSeconds <= 30).length
+    const over30 = caHistory.filter(h => h.timeSpentSeconds > 30).length
+    return { total, uniqueCount, avgTime, median, under5, mid, over30 }
+  }, [caHistory])
+
+  const categoryEng = useMemo(() => {
+    const map = {}
+    caHistory.forEach(h => {
+      const cat = h.category || 'General'
+      if (!map[cat]) map[cat] = { opens: 0, reads: 0, bookmarks: 0, mcqs: 0 }
+      map[cat].opens++
+      if (h.timeSpentSeconds > 0) map[cat].reads++
+      if (h.bookmarked) map[cat].bookmarks++
+      if (h.generatedMCQs) map[cat].mcqs++
+    })
+    return Object.entries(map).map(([cat, d]) => ({
+      category: cat, opens: d.opens, reads: d.reads,
+      bookmarks: d.bookmarks, mcqs: d.mcqs,
+      bookmarkRate: d.opens > 0 ? Math.round((d.bookmarks / d.opens) * 100) : 0,
+      mcqRate: d.opens > 0 ? Math.round((d.mcqs / d.opens) * 100) : 0,
+    })).sort((a, b) => b.opens - a.opens)
+  }, [caHistory])
+
+  const funnel = useMemo(() => {
+    const opened = new Set(caHistory.map(h => h.articleId))
+    const read = new Set(caHistory.filter(h => h.timeSpentSeconds > 0).map(h => h.articleId))
+    const bookmarked = new Set(caHistory.filter(h => h.bookmarked).map(h => h.articleId))
+    const mcq = new Set(caHistory.filter(h => h.generatedMCQs).map(h => h.articleId))
+    const o = opened.size, r = read.size, b = bookmarked.size, m = mcq.size
+    return {
+      opened: o, read: r, bookmarked: b, mcq: m,
+      openToRead: o > 0 ? Math.round((r / o) * 100) : 0,
+      readToBookmark: r > 0 ? Math.round((b / r) * 100) : 0,
+      bookmarkToMcq: b > 0 ? Math.round((m / b) * 100) : 0,
+      overall: o > 0 ? Math.round((m / o) * 100) : 0,
+    }
+  }, [caHistory])
+
+  const repeat = useMemo(() => {
+    const countMap = {}
+    caHistory.forEach(h => {
+      if (!countMap[h.articleId]) countMap[h.articleId] = { count: 0, title: h.articleTitle }
+      countMap[h.articleId].count++
+    })
+    const entries = Object.values(countMap)
+    const repeatArticles = entries.filter(e => e.count > 1).length
+    const mostRevisited = entries.sort((a, b) => b.count - a.count).slice(0, 5)
+    const sessionMap = {}
+    caHistory.forEach(h => {
+      const date = h.openedAt?.split('T')[0] || 'unknown'
+      if (!sessionMap[date]) sessionMap[date] = new Set()
+      sessionMap[date].add(h.articleId)
+    })
+    const sessionCounts = Object.values(sessionMap).map(s => s.size)
+    const avgPerSession = sessionCounts.length > 0
+      ? Math.round(sessionCounts.reduce((s, c) => s + c, 0) / sessionCounts.length)
+      : 0
+    return { repeatArticles, avgPerSession, mostRevisited }
+  }, [caHistory])
+
+  const infra = useMemo(() => {
+    const retryRate = caRetryAttempts > 0 ? Math.round((caRetrySuccess / caRetryAttempts) * 100) : null
+    const mcqTotalGen = caMcqTimeoutCount + caMcqFailCount
+    const mcqTimeoutRate = mcqTotalGen > 0 ? Math.round((caMcqTimeoutCount / mcqTotalGen) * 100) : null
+    const mcqFailRate = mcqTotalGen > 0 ? Math.round((caMcqFailCount / mcqTotalGen) * 100) : null
+    return { retryRate, mcqTimeoutRate, mcqFailRate }
+  }, [caFallbackCount, caRetryAttempts, caRetrySuccess, caMcqTimeoutCount, caMcqFailCount])
+
+  const decisions = useMemo(() => {
+    const recs = []
+    const bookmarkRate = funnel.read > 0 ? Math.round((funnel.bookmarked / funnel.read) * 100) : 0
+    const mcqGenRate = funnel.bookmarked > 0 ? Math.round((funnel.mcq / funnel.bookmarked) * 100) : 0
+
+    if (bookmarkRate > 25 && mcqGenRate > 20) {
+      recs.push({
+        action: 'Evaluate CA → Revision integration',
+        why: `Bookmark rate ${bookmarkRate}% (>25%) and MCQ gen rate ${mcqGenRate}% (>20%) indicate active learning behaviour. Integration would create a seamless study loop.`,
+        metrics: `Bookmark rate: ${bookmarkRate}% | MCQ gen rate: ${mcqGenRate}%`,
+        confidence: 'High',
+      })
+    }
+
+    if (infra.mcqTimeoutRate !== null && infra.mcqTimeoutRate > 15) {
+      recs.push({
+        action: 'Improve AI infrastructure before expanding MCQ workflows',
+        why: `MCQ timeout rate is ${infra.mcqTimeoutRate}% (>15%). Users are experiencing generation failures at scale, eroding trust.`,
+        metrics: `Timeout rate: ${infra.mcqTimeoutRate}% | Total failures: ${caMcqTimeoutCount + caMcqFailCount}`,
+        confidence: 'High',
+      })
+    }
+
+    if (reading.median < 10 && reading.total > 5) {
+      recs.push({
+        action: 'Review article summaries and relevance quality',
+        why: `Median read time is ${reading.median}s (<10s). Users are skimming, suggesting content may not match UPSC needs.`,
+        metrics: `Median read time: ${reading.median}s | <5s skim rate: ${reading.total > 0 ? Math.round((reading.under5 / reading.total) * 100) : 0}%`,
+        confidence: reading.total > 20 ? 'High' : 'Medium',
+      })
+    }
+
+    const totalOpens = categoryEng.reduce((s, c) => s + c.opens, 0)
+    categoryEng.forEach(c => {
+      const share = totalOpens > 0 ? Math.round((c.opens / totalOpens) * 100) : 0
+      if (share > 40) {
+        recs.push({
+          action: `Consider prioritizing "${c.category}" in article selection`,
+          why: `"${c.category}" accounts for ${share}% of all opens (>40%). This category drives disproportionate engagement.`,
+          metrics: `${c.category} opens: ${c.opens} / ${totalOpens} total (${share}%)`,
+          confidence: 'High',
+        })
+      }
+    })
+
+    if (recs.length === 0) {
+      recs.push({
+        action: 'Collect more data before making roadmap decisions',
+        why: 'No threshold-triggering patterns detected yet. Continue beta data collection.',
+        metrics: `Total interactions: ${reading.total}`,
+        confidence: 'Low',
+      })
+    }
+
+    return recs
+  }, [categoryEng, funnel, reading, infra])
+
+  if (caHistory.length === 0) {
+    return (
+      <div className="card" style={{ padding: 40, textAlign: 'center' }}>
+        <Newspaper size={40} color="var(--text-3)" style={{ marginBottom: 12 }} />
+        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-2)', marginBottom: 4 }}>No Current Affairs data yet</div>
+        <div style={{ fontSize: 12, color: 'var(--text-3)' }}>Data appears once students start using the Current Affairs feature.</div>
+      </div>
+    )
+  }
+
+  const skimRate = reading.total > 0 ? Math.round((reading.under5 / reading.total) * 100) : 0
+  const repeatRate = reading.uniqueCount > 0 ? Math.round((repeat.repeatArticles / reading.uniqueCount) * 100) : 0
+  const topCat = categoryEng[0]
+  const bottomCat = categoryEng[categoryEng.length - 1]
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+      {/* ─── 1. Reading Behavior ─── */}
+      <div className="card" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <Timer size={16} color="var(--primary)" />
+          <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)' }}>Reading Behavior</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+          <InsightBox label="Total Opens" value={reading.total} />
+          <InsightBox label="Unique Articles" value={reading.uniqueCount} />
+          <InsightBox label="Avg Read Time" value={`${reading.avgTime}s`} />
+          <InsightBox label="Median Read Time" value={`${reading.median}s`} />
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-2)', marginBottom: 8 }}>Time Spent Distribution</div>
+        <BarSegment label="< 5s (skim)" count={reading.under5} total={reading.total} color="#EF4444" />
+        <BarSegment label="5-30s" count={reading.mid} total={reading.total} color="#F59E0B" />
+        <BarSegment label="> 30s (deep read)" count={reading.over30} total={reading.total} color="#10B981" />
+      </div>
+
+      {/* ─── 2. Category Engagement ─── */}
+      <div className="card" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <PieChart size={16} color="var(--primary)" />
+          <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)' }}>Category Engagement</div>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', fontSize: 11, borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ color: 'var(--text-3)', fontWeight: 700 }}>
+                <th style={{ textAlign: 'left', padding: '6px 4px' }}>Category</th>
+                <th style={{ textAlign: 'center', padding: '6px 4px' }}>Opens</th>
+                <th style={{ textAlign: 'center', padding: '6px 4px' }}>Reads</th>
+                <th style={{ textAlign: 'center', padding: '6px 4px' }}>Bookmark%</th>
+                <th style={{ textAlign: 'center', padding: '6px 4px' }}>MCQ%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categoryEng.map(c => (
+                <tr key={c.category} style={{ borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '8px 4px', fontWeight: 600, color: 'var(--text)' }}>{c.category}</td>
+                  <td style={{ textAlign: 'center', color: 'var(--text-2)' }}>{c.opens}</td>
+                  <td style={{ textAlign: 'center', color: 'var(--text-2)' }}>{c.reads}</td>
+                  <td style={{ textAlign: 'center', color: c.bookmarkRate > 20 ? 'var(--success)' : 'var(--text-3)' }}>{c.bookmarkRate}%</td>
+                  <td style={{ textAlign: 'center', color: c.mcqRate > 10 ? 'var(--success)' : 'var(--text-3)' }}>{c.mcqRate}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ─── 3. Conversion Funnel ─── */}
+      <div className="card" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <Layers size={16} color="var(--primary)" />
+          <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)' }}>Conversion Funnel</div>
+        </div>
+        <FunnelRow label="Articles Opened" count={funnel.opened} />
+        <FunnelRow label="Articles Read" count={funnel.read} parentCount={funnel.opened} pct={funnel.openToRead} />
+        <FunnelRow label="Articles Bookmarked" count={funnel.bookmarked} parentCount={funnel.read} pct={funnel.readToBookmark} />
+        <FunnelRow label="MCQs Generated" count={funnel.mcq} parentCount={funnel.bookmarked} pct={funnel.bookmarkToMcq} />
+        <div style={{ marginTop: 8, padding: '10px 12px', background: 'var(--surface-alt)', borderRadius: 10, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
+          Overall conversion (open → MCQ): <strong style={{ color: 'var(--text)' }}>{funnel.overall}%</strong>
+        </div>
+      </div>
+
+      {/* ─── 4. Repeat Behavior ─── */}
+      <div className="card" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <Repeat size={16} color="var(--primary)" />
+          <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)' }}>Repeat Behavior</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+          <InsightBox label="Repeat Article Opens" value={repeat.repeatArticles} />
+          <InsightBox label="Avg Articles / Session" value={repeat.avgPerSession} />
+        </div>
+        {repeat.mostRevisited.length > 0 && (
+          <>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-2)', marginBottom: 8 }}>Most Revisited</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {repeat.mostRevisited.map((art, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--text-2)' }}>
+                  <span style={{ width: 16, height: 16, borderRadius: 4, background: 'var(--surface-alt)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: 'var(--text-3)', flexShrink: 0 }}>{art.count}</span>
+                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{art.title}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* ─── 5. Infrastructure Health ─── */}
+      <div className="card" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <Activity size={16} color="var(--primary)" />
+          <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)' }}>Infrastructure Health</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
+          <InsightBox label="RSS Fallback Count" value={caFallbackCount} />
+          <InsightBox label="Retry Attempts" value={caRetryAttempts} />
+          <InsightBox label="Retry Success Rate" value={infra.retryRate !== null ? `${infra.retryRate}%` : '—'} />
+          <InsightBox label="MCQ Timeout Rate" value={infra.mcqTimeoutRate !== null ? `${infra.mcqTimeoutRate}%` : '—'} />
+          <InsightBox label="MCQ Failure Rate" value={infra.mcqFailRate !== null ? `${infra.mcqFailRate}%` : '—'} />
+          <InsightBox label="MCQ Total Failures" value={caMcqTimeoutCount + caMcqFailCount} />
+        </div>
+        {caRetryAttempts > 0 && caRetrySuccess > 0 && (
+          <BarSegment label="Retry Success" count={caRetrySuccess} total={caRetryAttempts} color="#10B981" />
+        )}
+      </div>
+
+      {/* ─── 6. Weekly Beta Report ─── */}
+      <div className="card" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <BookOpen size={16} color="var(--primary)" />
+          <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)' }}>Weekly Beta Report</div>
+        </div>
+        <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Usage</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
+          <InsightBox label="Unique Articles Opened" value={funnel.opened} />
+          <InsightBox label="Articles Read (>0s)" value={funnel.read} />
+          <InsightBox label="Bookmarked" value={funnel.bookmarked} />
+          <InsightBox label="MCQs Generated" value={funnel.mcq} />
+          <InsightBox label="Total Interactions" value={reading.total} />
+          <InsightBox label="Repeat Rate" value={`${repeatRate}%`} />
+        </div>
+        <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Learning</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+          <InsightBox label="Most Engaged" value={topCat?.category || '—'} sub={`${topCat?.opens || 0} opens`} />
+          <InsightBox label="Least Engaged" value={bottomCat?.category || '—'} sub={`${bottomCat?.opens || 0} opens`} />
+          <InsightBox label="Median Read Time" value={`${reading.median}s`} />
+          <InsightBox label="Skim Rate (<5s)" value={`${skimRate}%`} />
+        </div>
+        <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Reliability</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <InsightBox label="RSS Fallbacks" value={caFallbackCount} />
+          <InsightBox label="Retry Success" value={infra.retryRate !== null ? `${infra.retryRate}%` : '—'} />
+          <InsightBox label="MCQ Timeouts" value={infra.mcqTimeoutRate !== null ? `${infra.mcqTimeoutRate}%` : '—'} />
+          <InsightBox label="MCQ Failures" value={infra.mcqFailRate !== null ? `${infra.mcqFailRate}%` : '—'} />
+        </div>
+      </div>
+
+      {/* ─── 7. Decision Engine ─── */}
+      <div className="card" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <Info size={16} color="var(--primary)" />
+          <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)' }}>Product Decisions</div>
+        </div>
+        {decisions.map((d, i) => (
+          <div key={i} style={{
+            padding: 12, marginBottom: 8, borderRadius: 10,
+            background: d.confidence === 'High' ? 'var(--success-light)' : 'var(--surface-alt)',
+            border: d.confidence === 'High' ? '1px solid rgba(16,185,129,0.2)' : '1px solid var(--border)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>{d.action}</div>
+              <span style={{
+                padding: '2px 8px', borderRadius: 99, fontSize: 9, fontWeight: 700,
+                background: d.confidence === 'High' ? '#dcfce7' : d.confidence === 'Medium' ? '#fef3c7' : '#f3f4f6',
+                color: d.confidence === 'High' ? '#16a34a' : d.confidence === 'Medium' ? '#d97706' : '#6b7280',
+              }}>{d.confidence} confidence</span>
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5, marginBottom: 4 }}>{d.why}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'monospace' }}>{d.metrics}</div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  )
+}
+
+function InsightBox({ label, value, sub }) {
+  return (
+    <div style={{ background: 'var(--surface-alt)', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
+      <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--text)' }}>{value}</div>
+      <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600, marginTop: 1 }}>{label}</div>
+      {sub && <div style={{ fontSize: 9, color: 'var(--text-3)', marginTop: 2, fontStyle: 'italic' }}>{sub}</div>}
+    </div>
+  )
+}
+
+function BarSegment({ label, count, total, color }) {
+  const pct = total > 0 ? (count / total) * 100 : 0
+  return (
+    <div style={{ marginBottom: 6 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-2)', marginBottom: 3 }}>
+        <span>{label}</span>
+        <span style={{ fontWeight: 700 }}>{count} ({Math.round(pct)}%)</span>
+      </div>
+      <div style={{ height: 6, background: 'var(--surface-alt)', borderRadius: 99, overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 99, transition: 'width 0.3s' }} />
+      </div>
+    </div>
+  )
+}
+
+function FunnelRow({ label, count, parentCount, pct }) {
+  const barPct = parentCount > 0 ? (count / parentCount) * 100 : 0
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, color: 'var(--text-2)', marginBottom: 3 }}>
+        <span style={{ fontWeight: 600, color: 'var(--text)' }}>{label}</span>
+        <span><strong style={{ color: 'var(--text)' }}>{count}</strong>{pct !== undefined ? ` (${pct}%)` : ''}</span>
+      </div>
+      {parentCount !== undefined && (
+        <div style={{ height: 8, background: 'var(--surface-alt)', borderRadius: 99, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${barPct}%`, background: count === 0 ? 'var(--text-3)' : 'var(--primary)', borderRadius: 99, opacity: 0.6, transition: 'width 0.3s' }} />
+        </div>
+      )}
     </div>
   )
 }

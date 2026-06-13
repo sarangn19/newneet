@@ -63,6 +63,8 @@
   --error:         #EF4444;
   --error-light:   #FEF2F2;
   --error-dark:    #BE123C;
+
+  --warning:       #f59e0b;
 }
 
 .neet-mode {
@@ -111,6 +113,9 @@
   --error:              #EF4444;
   --error-light:        #FEF2F2;
   --error-dark:         #BE123C;
+
+  --warning:            #f59e0b;
+  --warning-light:      #FEF3C7;
 }
 
 /* ── UPSC dark mode ────────────────────────────────────────── */

@@ -401,6 +401,91 @@ const useStore = create(
       dailyBreakdown: {},  // { [date]: { attempted, correct, timeSpent, topics: { [topicId]: { attempted, correct, timeSpent } } } }
       sessionStart: null,  // timestamp when current session started
 
+      // ── Current Affairs reading history ──────────────────────────
+      caHistory: [], // [{ articleId, articleTitle, category, openedAt, timeSpentSeconds, bookmarked, generatedNotes, generatedFlashcards, generatedMCQs, addedToRevision }]
+
+      recordArticleOpened: (article) => {
+        const { caHistory } = get()
+        set({
+          caHistory: [...caHistory, {
+            articleId: article.title,
+            articleTitle: article.title,
+            category: article.category || 'General',
+            openedAt: new Date().toISOString(),
+            timeSpentSeconds: 0,
+            bookmarked: false,
+            generatedNotes: false,
+            generatedFlashcards: false,
+            generatedMCQs: false,
+            addedToRevision: false,
+          }]
+        })
+      },
+
+      recordArticleClosed: (articleTitle, timeSpent) => {
+        const { caHistory } = get()
+        set({
+          caHistory: caHistory.map(e =>
+            e.articleId === articleTitle && e.timeSpentSeconds === 0
+              ? { ...e, timeSpentSeconds: timeSpent }
+              : e
+          )
+        })
+      },
+
+      recordArticleBookmarked: (articleTitle) => {
+        set(state => ({
+          caHistory: state.caHistory.map(e =>
+            e.articleId === articleTitle ? { ...e, bookmarked: true } : e
+          )
+        }))
+      },
+
+      recordNotesGenerated: (articleTitle) => {
+        set(state => ({
+          caHistory: state.caHistory.map(e =>
+            e.articleId === articleTitle ? { ...e, generatedNotes: true } : e
+          )
+        }))
+      },
+
+      recordFlashcardsGenerated: (articleTitle) => {
+        set(state => ({
+          caHistory: state.caHistory.map(e =>
+            e.articleId === articleTitle ? { ...e, generatedFlashcards: true } : e
+          )
+        }))
+      },
+
+      recordMCQsGenerated: (articleTitle) => {
+        set(state => ({
+          caHistory: state.caHistory.map(e =>
+            e.articleId === articleTitle ? { ...e, generatedMCQs: true } : e
+          )
+        }))
+      },
+
+      recordAddedToRevision: (articleTitle) => {
+        set(state => ({
+          caHistory: state.caHistory.map(e =>
+            e.articleId === articleTitle ? { ...e, addedToRevision: true } : e
+          )
+        }))
+      },
+
+      // ── Current Affairs infrastructure telemetry ──────────────────
+      caFallbackCount: 0,
+      caRetryAttempts: 0,
+      caRetrySuccess: 0,
+      caMcqTimeoutCount: 0,
+      caMcqFailCount: 0,
+
+      incrementCaFallback: () => set(state => ({ caFallbackCount: state.caFallbackCount + 1 })),
+      incrementCaRetryAttempt: () => set(state => ({ caRetryAttempts: state.caRetryAttempts + 1 })),
+      incrementCaRetrySuccess: () => set(state => ({ caRetrySuccess: state.caRetrySuccess + 1 })),
+      incrementCaMcqTimeout: () => set(state => ({ caMcqTimeoutCount: state.caMcqTimeoutCount + 1 })),
+      incrementCaMcqFail: () => set(state => ({ caMcqFailCount: state.caMcqFailCount + 1 })),
+
       // ── sync from Supabase on login ──────────────────────────────
       syncFromSupabase: async (userId) => {
         if (!supabase) return
@@ -857,6 +942,12 @@ const useStore = create(
         practiceDecay:    s.practiceDecay,
         questionHistory:  s.questionHistory,
         dailyBreakdown:   s.dailyBreakdown,
+        caHistory:        s.caHistory,
+        caFallbackCount:  s.caFallbackCount,
+        caRetryAttempts:  s.caRetryAttempts,
+        caRetrySuccess:   s.caRetrySuccess,
+        caMcqTimeoutCount:s.caMcqTimeoutCount,
+        caMcqFailCount:   s.caMcqFailCount,
         userId:           s.userId,
         language:         s.language,
         streakProtection: s.streakProtection,

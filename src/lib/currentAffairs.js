@@ -39,20 +39,23 @@ export async function fetchCurrentAffairs() {
     const res = await fetch('/api/currentAffairs')
     if (!res.ok) throw new Error('API error')
     const data = await res.json()
-    if (data.source === 'mock') {
-      return data.articles.map(a => ({ ...a, category: guessCategory(a.title, a.summary), tags: extractTags(a.title + ' ' + a.summary) }))
+    return {
+      source: data.source || 'unknown',
+      articles: data.articles.map(a => ({
+        date: a.pubDate ? new Date(a.pubDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        category: guessCategory(a.title, a.summary),
+        title: a.title,
+        summary: a.summary,
+        tags: extractTags(a.title + ' ' + a.summary),
+        source: a.source,
+        link: a.link,
+      })),
     }
-    return data.articles.map(a => ({
-      date: a.pubDate ? new Date(a.pubDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-      category: guessCategory(a.title, a.summary),
-      title: a.title,
-      summary: a.summary,
-      tags: extractTags(a.title + ' ' + a.summary),
-      source: a.source,
-      link: a.link,
-    }))
   } catch (e) {
     console.warn('Failed to fetch current affairs, using fallback:', e)
-    return getMockArticles().map(a => ({ ...a, category: guessCategory(a.title, a.summary), tags: extractTags(a.title + ' ' + a.summary) }))
+    return {
+      source: 'mock',
+      articles: getMockArticles().map(a => ({ ...a, category: guessCategory(a.title, a.summary), tags: extractTags(a.title + ' ' + a.summary) })),
+    }
   }
 }
