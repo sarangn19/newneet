@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import useStore from '../store/useStore'
 import { Brain, TrendingUp, Clock, CheckCircle, BookOpen, MessageSquare, Globe, BarChart3, Flame, Target, Rotate3D } from 'lucide-react'
 import { upscSubjects } from '../data/upsc/subjects'
@@ -10,17 +10,32 @@ export default function UpscAnalytics() {
   const [notesCount, setNotesCount] = useState(0)
   const [chatCount, setChatCount] = useState(0)
   const [dailyRows, setDailyRows] = useState([])
+  const refreshInterval = useRef(null)
 
   const userId = useStore(s => s.userId)
   const syncFromSupabase = useStore(s => s.syncFromSupabase)
+
+  const refreshDailyStats = useCallback(() => {
+    if (!userId) return
+    supabase.from('daily_stats').select('*').eq('user_id', userId).eq('exam_type', 'upsc').order('date', { ascending: true }).then(({ data }) => { if (data) setDailyRows(data) })
+  }, [userId])
 
   useEffect(() => {
     if (!userId) return
     syncFromSupabase(userId)
     supabase.from('notes').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(({ count }) => { if (count !== null) setNotesCount(count) })
     supabase.from('chat_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).then(({ count }) => { if (count !== null) setChatCount(count) })
-    supabase.from('daily_stats').select('*').eq('user_id', userId).eq('exam_type', 'upsc').order('date', { ascending: true }).then(({ data }) => { if (data) setDailyRows(data) })
-  }, [userId])
+    refreshDailyStats()
+
+    const onVisibility = () => { if (document.visibilityState === 'visible') refreshDailyStats() }
+    document.addEventListener('visibilitychange', onVisibility)
+    refreshInterval.current = setInterval(refreshDailyStats, 30000)
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      if (refreshInterval.current) clearInterval(refreshInterval.current)
+    }
+  }, [userId, refreshDailyStats])
 
   const totalQ = stats.upscTotal || 0
   const correct = stats.upscCorrect || 0
