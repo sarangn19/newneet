@@ -334,7 +334,7 @@ function NotesTab() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '0 0 40px' }}>
           {[1,2,3].map(i => (
             <div key={i} style={{
-              background: 'var(--card-bg)', borderRadius: 24,
+              background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)',
               padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
               ...(i > 1 ? { marginTop: -(100 - i * 12), transform: `scale(${1 - (i * 0.03)})`, opacity: 1 - (i * 0.15) } : {}),
             }}>
@@ -401,7 +401,7 @@ function NotesTab() {
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}
                 whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}
                 style={{
-                  background: 'var(--card-bg)', borderRadius: 24, padding: 20,
+                  background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', padding: 20,
                   cursor: 'pointer', display: 'flex', flexDirection: 'column',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
                 }}>
@@ -458,7 +458,7 @@ function NotesTab() {
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 onClick={e => e.stopPropagation()}
                 style={{
-                  background: 'var(--card-bg)', borderRadius: 24,
+                  background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)',
                   width: '100%', maxWidth: 400, maxHeight: '85vh',
                   display: 'flex', flexDirection: 'column', overflow: 'hidden',
                   boxShadow: '0 20px 60px rgba(0,0,0,0.3)',

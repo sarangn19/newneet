@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { fetchCurrentAffairs } from '../lib/currentAffairs'
-import { ChevronLeft, Search, RefreshCw, Bookmark, ExternalLink, ChevronRight, BookOpen, X, XCircle, CheckCircle, Sparkles, AlertTriangle, RotateCcw } from 'lucide-react'
+import { ChevronLeft, Search, RefreshCw, Bookmark, ExternalLink, ChevronRight, BookOpen, X, XCircle, CheckCircle, Sparkles, AlertTriangle, RotateCcw, Newspaper } from 'lucide-react'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 import { skeletonBreath } from '../hooks/useSequentialReveal'
+import EmptyState from '../components/EmptyState'
 
 const CATEGORIES = [
   'All', 'Polity', 'Economy', 'International', 'Environment', 'Science & Tech', 'History & Culture', 'Geography',
@@ -224,7 +225,7 @@ export default function CurrentAffairs() {
             exit={{ opacity: 0, y: -20 }}
             style={{
               position: 'fixed', top: 60, left: '50%', transform: 'translateX(-50%)', zIndex: 999,
-              background: 'var(--surface-alt)', color: 'var(--text)', padding: '8px 20px', borderRadius: 12,
+              background: 'var(--surface-alt)', color: 'var(--text)', padding: '8px 20px', borderRadius: 'var(--radius-md)',
               fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
             }}
           >
@@ -237,7 +238,7 @@ export default function CurrentAffairs() {
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
           <motion.button whileTap={{scale:0.96}} onClick={loadNews} style={{
-            width: 34, height: 34, borderRadius: 12, border: '1px solid var(--border)',
+            width: 34, height: 34, borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
             background: 'var(--surface-alt)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <RefreshCw size={16} color="var(--text-2)" className={loading ? 'spin' : ''} />
@@ -247,7 +248,7 @@ export default function CurrentAffairs() {
         <div style={{ position: 'relative' }}>
           <Search size={14} color="var(--text-3)" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search articles..." style={{
-            width: '100%', padding: '8px 8px 8px 32px', borderRadius: 8, border: '1px solid var(--border)',
+            width: '100%', padding: '8px 8px 8px 32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)',
             fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', boxSizing: 'border-box',
           }} />
         </div>
@@ -274,7 +275,7 @@ export default function CurrentAffairs() {
               onClick={retry}
               disabled={retrying}
               style={{
-                padding: '5px 12px', borderRadius: 8, border: '1px solid var(--warning)',
+                padding: '5px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--warning)',
                 background: 'transparent', color: 'var(--warning)', fontSize: 11, fontWeight: 600,
                 cursor: retrying ? 'default' : 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
                 display: 'flex', alignItems: 'center', gap: 4, opacity: retrying ? 0.6 : 1,
@@ -301,7 +302,7 @@ export default function CurrentAffairs() {
             onClick={() => setActiveCategory(cat)}
             transition={{ type: 'spring', stiffness: 400, damping: 22 }}
             style={{
-              padding: '4px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+              padding: '4px 12px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
               fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
               background: activeCategory === cat ? 'var(--primary)' : 'var(--surface-alt)',
               color: activeCategory === cat ? '#fff' : 'var(--text-3)',
@@ -318,7 +319,7 @@ export default function CurrentAffairs() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', minWidth: 0 }}>
               {[1,2,3,4].map(i => (
                   <div key={i} style={{
-                    background: 'var(--card-bg)', borderRadius: 24, padding: 20,
+                    background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', padding: 20,
                     display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0,
                     boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
                   }}>
@@ -338,16 +339,12 @@ export default function CurrentAffairs() {
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>📰</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No articles found</div>
-              <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>Try a different category or check back later</div>
-            </div>
+            <EmptyState icon={Newspaper} title="No articles found" description="Try a different category or check back later" />
           ) : (
             <motion.div key={activeCategory} variants={{ visible: { transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="visible"
               style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', minWidth: 0 }}>
               {filtered.map((a) => {
-                const catColor = categoryColors[a.category] || '#6B7280'
+                const catColor = categoryColors[a.category] || 'var(--text-3)'
                 const isRead = readArticles.has(a.title)
                 return (
                   <motion.div key={a.title}
@@ -358,7 +355,7 @@ export default function CurrentAffairs() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
                     style={{
-                      background: 'var(--card-bg)', borderRadius: 24, padding: 20, cursor: 'pointer',
+                      background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', padding: 20, cursor: 'pointer',
                       display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0,
                       boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
                       opacity: isRead ? 0.85 : 1,
@@ -429,7 +426,7 @@ export default function CurrentAffairs() {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={e => e.stopPropagation()}
               style={{
-                background: 'var(--card-bg)', borderRadius: 24,
+                background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)',
                 width: '100%', maxWidth: 400, maxHeight: '85vh',
                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
@@ -441,10 +438,10 @@ export default function CurrentAffairs() {
                   {selectedArticle.category || 'Article'}
                 </div>
                 <div style={{ display: 'flex', gap: 4 }}>
-                  <motion.button whileTap={{scale:0.85}} onClick={() => toggleBookmark(selectedArticle)} style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 8, display: 'flex' }}>
+                  <motion.button whileTap={{scale:0.85}} onClick={() => toggleBookmark(selectedArticle)} style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 'var(--radius-sm)', display: 'flex' }}>
                     <Bookmark size={15} color={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'none'} />
                   </motion.button>
-                  <motion.button whileTap={{scale:0.85}} onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }} style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 8, display: 'flex' }}>
+                  <motion.button whileTap={{scale:0.85}} onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }} style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 'var(--radius-sm)', display: 'flex' }}>
                     <X size={16} color="var(--text-2)" />
                   </motion.button>
                 </div>
@@ -469,9 +466,9 @@ export default function CurrentAffairs() {
                 <div style={{ marginBottom: 12 }}>
                   {selectedArticle.category && (
                     <span style={{
-                      display: 'inline-block', padding: '3px 10px', borderRadius: 99, fontSize: 10, fontWeight: 700,
-                      background: (categoryColors[selectedArticle.category] || '#6B7280') + '15',
-                      color: categoryColors[selectedArticle.category] || '#6B7280', marginBottom: 8,
+                      display: 'inline-block', padding: '3px 10px', borderRadius: 'var(--radius-pill)', fontSize: 10, fontWeight: 700,
+                      background: (categoryColors[selectedArticle.category] || 'var(--text-3)') + '15',
+                      color: categoryColors[selectedArticle.category] || 'var(--text-3)', marginBottom: 8,
                     }}>
                       {selectedArticle.category}
                     </span>
@@ -493,14 +490,14 @@ export default function CurrentAffairs() {
                     <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Tags</div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {selectedArticle.tags.map((t, i) => (
-                        <span key={i} style={{ fontSize: 10, color: 'var(--text-3)', background: 'var(--surface-alt)', padding: '3px 10px', borderRadius: 99 }}>{t}</span>
+                        <span key={i} style={{ fontSize: 10, color: 'var(--text-3)', background: 'var(--surface-alt)', padding: '3px 10px', borderRadius: 'var(--radius-pill)' }}>{t}</span>
                       ))}
                     </div>
                   </div>
                 )}
 
                 {/* UPSC Relevance */}
-                <div style={{ background: `${(categoryColors[selectedArticle.category] || '#6B7280')}0D`, borderRadius: 10, padding: 10, marginBottom: 14 }}>
+                <div style={{                   background: `${(categoryColors[selectedArticle.category] || 'var(--text-3)')}0D`, borderRadius: 'var(--radius-md)', padding: 10, marginBottom: 14 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: categoryColors[selectedArticle.category] || 'var(--primary)', marginBottom: 4 }}>UPSC Relevance</div>
                   <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
                     This article is relevant for {selectedArticle.category || 'General Studies'} preparation. Analyze the key facts, government initiatives, and constitutional aspects mentioned. Link with static syllabus topics for Mains answers.
@@ -510,7 +507,7 @@ export default function CurrentAffairs() {
                 {/* Actions */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <motion.button whileTap={{scale:0.96}} onClick={() => generateMCQs(selectedArticle)} disabled={mcqLoading} style={{
-                    width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
+                    width: '100%', padding: '10px 0', borderRadius: 'var(--radius-md)', border: 'none',
                     background: mcqLoading ? 'var(--surface-alt)' : 'var(--primary)', color: '#fff',
                     fontSize: 12, fontWeight: 700, cursor: mcqLoading ? 'default' : 'pointer', fontFamily: 'inherit',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -519,7 +516,7 @@ export default function CurrentAffairs() {
                   </motion.button>
                   {selectedArticle.link && (
                     <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" style={{
-                      width: '100%', padding: '10px 0', borderRadius: 12, border: '1.5px solid var(--border)',
+                      width: '100%', padding: '10px 0', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border)',
                       background: 'var(--card-bg)', color: 'var(--text-3)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, textDecoration: 'none',
                     }}>
@@ -555,7 +552,7 @@ export default function CurrentAffairs() {
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
               style={{
-                background: 'var(--card-bg)', borderRadius: 16, width: '100%', maxWidth: 420, maxHeight: '80vh',
+                background: 'var(--card-bg)', borderRadius: 'var(--radius-lg)', width: '100%', maxWidth: 420, maxHeight: '80vh',
                 overflow: 'hidden', display: 'flex', flexDirection: 'column',
               }}
             >
@@ -588,7 +585,7 @@ export default function CurrentAffairs() {
                     <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>Questions correct</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {mcqQuestions.map((q, i) => (
-                        <div key={i} style={{ fontSize: 11, color: 'var(--text-2)', textAlign: 'left', background: 'var(--surface-alt)', borderRadius: 10, padding: 10 }}>
+                        <div key={i} style={{ fontSize: 11, color: 'var(--text-2)', textAlign: 'left', background: 'var(--surface-alt)', borderRadius: 'var(--radius-md)', padding: 10 }}>
                           <div style={{ fontWeight: 600, marginBottom: 4, color: mcqAnswers[i] === q.ans ? 'var(--success)' : 'var(--error)' }}>
                             {mcqAnswers[i] === q.ans ? '✓ Correct' : '✗ Incorrect'} — {q.q}
                           </div>
@@ -599,7 +596,7 @@ export default function CurrentAffairs() {
                       ))}
                     </div>
                     <motion.button onClick={() => { clearMcqTimers(); setMcqLoading(false); setMcqProgress(''); setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }} whileTap={{scale:0.97}} style={{
-                      marginTop: 16, width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
+                      marginTop: 16, width: '100%', padding: '10px 0', borderRadius: 'var(--radius-md)', border: 'none',
                       background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                     }}>
                       Close
@@ -617,7 +614,7 @@ export default function CurrentAffairs() {
                         const isCorrect = mcqQuestions[mcqCurrent]?.ans === oi
                         return (
                           <motion.button key={oi} onClick={() => answerMcq(oi)} whileTap={{ scale: 0.97 }} disabled={answered} style={{
-                            width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid',
+                            width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-md)', border: '1.5px solid',
                             borderColor: answered ? (isCorrect ? 'var(--success)' : selected ? 'var(--error)' : 'var(--border)') : 'var(--border)',
                             background: answered ? (isCorrect ? 'var(--success-light)' : selected ? 'var(--error-light)' : 'var(--card-bg)') : 'var(--card-bg)',
                             color: 'var(--text)', fontSize: 12, fontWeight: 500, cursor: answered ? 'default' : 'pointer',

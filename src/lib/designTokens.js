@@ -23,7 +23,7 @@ export const colors = {
 
 export const card = {
   background: colors.cardBg,
-  borderRadius: 'var(--radius-lg)',
+  borderRadius: 'var(--radius-xl)',
   border: `1px solid ${colors.border}`,
 }
 
