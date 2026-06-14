@@ -496,7 +496,7 @@ export default function AIChatbot() {
       )}
 
       {/* Premium input bar — always visible */}
-      <div style={{ padding: '8px 14px', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
+      <div style={{ padding: '8px 14px 100px', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} style={{
             width: 44, height: 44, borderRadius: 12, border: 'none', flexShrink: 0,
