@@ -460,7 +460,7 @@ function NotesTab() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 padding: 16,
               }}>
-              <motion.div
+              <motion.div layoutId={`note-${selectedNote.id}`}
                 initial={{ opacity: 0, scale: 0.92, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.92, y: 20 }}
