@@ -75,6 +75,7 @@ function NotesTab() {
   })
   const [selectedNote, setSelectedNote] = useState(null)
   const [notesLoading, setNotesLoading] = useState(true)
+  const [menuNoteId, setMenuNoteId] = useState(null)
 
   const toggleBookmark = (id) => {
     setBookmarkedIds(prev => {
@@ -93,6 +94,13 @@ function NotesTab() {
       setNotesLoading(false)
     })
   }, [userId])
+
+  useEffect(() => {
+    if (!menuNoteId) return
+    const close = () => setMenuNoteId(null)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [menuNoteId])
 
   const saveNote = async () => {
     if (!content.trim() || !userId) return
@@ -233,8 +241,8 @@ function NotesTab() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '0 0 40px' }}>
           {[1,2,3].map(i => (
             <div key={i} style={{
-              background: 'var(--card-bg)', borderRadius: 14,
-              border: '1px solid var(--border)', padding: 14,
+              background: 'var(--card-bg)', borderRadius: 24,
+              padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
               ...(i > 1 ? { marginTop: -(100 - i * 12), transform: `scale(${1 - (i * 0.03)})`, opacity: 1 - (i * 0.15) } : {}),
             }}>
               <SkeletonBlock width="35%" height={10} radius={4} style={{ marginBottom: 8 }} />
@@ -248,13 +256,13 @@ function NotesTab() {
           ))}
         </div>
       ) : filteredNotes.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 14px' }}>
-          <BookOpen size={32} color="var(--text-3)" style={{ marginBottom: 8 }} />
-          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No notes yet</div>
-          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>Create a new note to get started</div>
+        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <BookOpen size={32} color="var(--text-3)" style={{ marginBottom: 10 }} />
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-2)' }}>No notes yet</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 4 }}>Create a new note to get started</div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingBottom: 20 }}>
           {filteredNotes.map((n, index) => {
             const subjectObj = upscSubjects.find(s => s.id === n.subject)
             const subjectColor = subjectObj?.color || 'var(--text-3)'
@@ -263,41 +271,64 @@ function NotesTab() {
               const stripped = raw.replace(/<[^>]*>/g, '').replace(/==/g, '').replace(/\*\*/g, '').replace(/\[image\]\([^)]*\)/g, '[image]')
               return stripped.slice(0, 100)
             })()
+            const menuOpen = menuNoteId === n.id
             return (
               <motion.div key={n.id} layoutId={`note-${n.id}`} onClick={() => setSelectedNote(n)}
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}
-                whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}
-                  style={{
-                    background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--border)', padding: 14,
-                    cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', gap: 6,
-                    overflow: 'hidden', wordBreak: 'break-word',
-                  }}>
-                {n.subject && (
-                  <span style={{
-                    alignSelf: 'flex-start', fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
-                    padding: '2px 8px', borderRadius: 99,
-                    background: subjectColor + '15', color: subjectColor,
-                  }}>
-                    {subjectObj?.name || n.subject}
-                  </span>
-                )}
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.title || 'Untitled'}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}
+                style={{
+                  background: 'var(--card-bg)', borderRadius: 24, padding: 20,
+                  cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', gap: 8,
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
+                }}>
+                {/* Subject chip + menu */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  {n.subject && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: subjectColor }} />
+                      <span style={{ fontSize: 10, fontWeight: 600, color: subjectColor }}>
+                        {subjectObj?.name || n.subject}
+                      </span>
+                    </div>
+                  )}
+                  <div style={{ position: 'relative' }}>
+                    <motion.button onClick={e => { e.stopPropagation(); setMenuNoteId(menuOpen ? null : n.id) }} whileTap={{ scale: 0.85 }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', color: 'var(--text-3)' }}>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+                    </motion.button>
+                    <AnimatePresence>
+                      {menuOpen && (
+                        <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.92 }}
+                          transition={{ duration: 0.15 }}
+                          style={{ position: 'absolute', top: 24, right: 0, zIndex: 50, background: 'var(--card-bg)', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', border: '1px solid var(--border)', overflow: 'hidden', minWidth: 100 }}>
+                          <motion.button onClick={e => { e.stopPropagation(); setMenuNoteId(null); deleteNote(n.id) }} whileTap={{ scale: 0.97 }}
+                            style={{ width: '100%', padding: '8px 14px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 11, color: 'var(--error)', fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            Delete
+                          </motion.button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+                {/* Title */}
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {n.title || 'Untitled'}
+                </div>
+                {/* Preview */}
+                <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {preview}
                 </div>
-                <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 'auto', paddingTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span>{new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
-                  <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(n.id) }} whileTap={{ scale: 0.85 }} style={{
-                    background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex',
-                  }}>
-                    <Bookmark size={13} color={bookmarkedIds.has(n.id) ? '#F59E0B' : 'var(--text-3)'} fill={bookmarkedIds.has(n.id) ? '#F59E0B' : 'none'} />
+                {/* Metadata row */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 4 }}>
+                  <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>
+                    {new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                  </span>
+                  <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(n.id) }} whileTap={{ scale: 0.8 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
+                    <Bookmark size={14} color={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'none'} />
                   </motion.button>
                 </div>
-                <motion.button onClick={e => { e.stopPropagation(); deleteNote(n.id) }} whileTap={{ scale: 0.9 }} style={{
-                  position: 'absolute', top: 8, right: 8, width: 22, height: 22, borderRadius: '50%',
-                  background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, color: 'var(--text-3)', lineHeight: 1,
-                }}>×</motion.button>
               </motion.div>
             )
           })}
@@ -321,37 +352,38 @@ function NotesTab() {
                 display: 'flex', flexDirection: 'column',
               }}>
               {/* Header bar */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '48px 16px 8px', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '48px 20px 8px', background: 'var(--card-bg)' }}>
                 <motion.button onClick={handleCloseNote} whileTap={{ scale: 0.9 }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--text-2)', fontSize: 18, lineHeight: 1 }}>
                   ←
                 </motion.button>
-                <div style={{ flex: 1, fontSize: 16, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ flex: 1, fontSize: 17, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {selectedNote.title || 'Untitled'}
                 </div>
                 <motion.button onClick={() => { navigate('/note/' + selectedNote.id) }} whileTap={{ scale: 0.9 }}
-                  style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600, color: 'var(--text-2)', fontFamily: 'inherit' }}>
+                  style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: '6px 14px', borderRadius: 8, fontSize: 11, fontWeight: 600, color: 'var(--text-2)', fontFamily: 'inherit' }}>
                   Edit
                 </motion.button>
               </div>
               {/* Metadata */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05, duration: 0.2 }}
-                style={{ padding: '12px 16px 8px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid var(--border)' }}>
+                style={{ padding: '8px 20px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 {selectedNote.subject && (() => {
                   const subjObj = upscSubjects.find(s => s.id === selectedNote.subject)
                   return (
-                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', padding: '2px 10px', borderRadius: 99, background: (subjObj?.color || 'var(--text-3)') + '15', color: subjObj?.color || 'var(--text-3)' }}>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: subjObj?.color || 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ width: 5, height: 5, borderRadius: '50%', background: subjObj?.color || 'var(--text-3)' }} />
                       {subjObj?.name || selectedNote.subject}
                     </span>
                   )
                 })()}
-                <span style={{ fontSize: 11, color: 'var(--text-3)' }}>
+                <span style={{ fontSize: 10, color: 'var(--text-3)' }}>
                   {new Date(selectedNote.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               </motion.div>
               {/* Body */}
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.25 }}
-                style={{ flex: 1, overflowY: 'auto', padding: 16, fontSize: 14, lineHeight: 1.7, color: 'var(--text)' }}>
+                style={{ flex: 1, overflowY: 'auto', padding: '0 20px 20px', fontSize: 14, lineHeight: 1.8, color: 'var(--text)' }}>
                 {(() => {
                   const raw = selectedNote.content || ''
                   const text = raw.replace(/<[^>]*>/g, '').replace(/==/g, '').replace(/\*\*/g, '').replace(/\[image\]\([^)]*\)/g, '[image]')
@@ -360,14 +392,14 @@ function NotesTab() {
               </motion.div>
               {/* Actions */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.2 }}
-                style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
+                style={{ padding: '12px 20px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
                 <motion.button onClick={() => { toggleBookmark(selectedNote.id); handleCloseNote() }} whileTap={{ scale: 0.95 }}
-                  style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: bookmarkedIds.has(selectedNote.id) ? '#F59E0B' : 'var(--surface-alt)', color: bookmarkedIds.has(selectedNote.id) ? '#fff' : 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: bookmarkedIds.has(selectedNote.id) ? 'var(--primary)' : 'var(--surface-alt)', color: bookmarkedIds.has(selectedNote.id) ? '#fff' : 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <Bookmark size={14} fill={bookmarkedIds.has(selectedNote.id) ? '#fff' : 'none'} />
                   {bookmarkedIds.has(selectedNote.id) ? 'Bookmarked' : 'Bookmark'}
                 </motion.button>
                 <motion.button onClick={() => { deleteNote(selectedNote.id) }} whileTap={{ scale: 0.95 }}
-                  style={{ padding: '10px 20px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--error)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  style={{ padding: '10px 20px', borderRadius: 12, border: 'none', background: 'var(--surface-alt)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
                   Delete
                 </motion.button>
               </motion.div>
