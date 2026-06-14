@@ -327,7 +327,7 @@ export default function CurrentAffairs() {
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>Try a different category or check back later</div>
             </div>
           ) : (
-            <motion.div key={activeCategory} variants={{ visible: { transition: { staggerChildren: 0.05 } } }} initial="hidden" animate="visible"
+            <motion.div key={activeCategory} variants={{ visible: { transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="visible"
               style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {filtered.map((a, i) => {
                 const catColor = categoryColors[a.category] || '#6B7280'
@@ -335,19 +335,16 @@ export default function CurrentAffairs() {
                 const isRead = readArticles.has(a.title)
                 return (
                   <motion.div key={i}
-                    variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
-                    transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                    whileHover={{ y: -6, scale: 1.02 }}
-                    whileTap={{ scale: 0.96 }}
+                    variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
                     style={{
                       background: 'var(--card-bg)', borderRadius: 14, border: selectedArticle?.title === a.title ? '2px solid var(--primary)' : '1px solid var(--border)',
-                      cursor: 'pointer', overflow: 'hidden', transition: 'box-shadow 0.3s ease',
-                      boxShadow: 'var(--shadow-card)',
+                      cursor: 'pointer', overflow: 'hidden',
                       opacity: isRead ? 0.85 : 1,
                     }}
-                    onMouseEnter={e => { if (!isRead) e.currentTarget.style.boxShadow = 'var(--shadow-hover)' }}
-                    onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow-card)' }
                   >
                     {/* Colored placeholder */}
                     <div style={{
@@ -398,7 +395,7 @@ export default function CurrentAffairs() {
             initial={{ opacity: 0, x: 320 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 320 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 30, mass: 0.9 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
             style={{
               position: 'fixed', right: 0, top: 0, bottom: 0, width: '100%', maxWidth: 400,
               background: 'var(--card-bg)', zIndex: 200, boxShadow: 'var(--shadow-strong)',

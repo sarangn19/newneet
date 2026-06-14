@@ -229,43 +229,15 @@ export default function UpscHome() {
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     onClick={() => { if (isCenter) openRevision(t); else setFeedIdx(idx) }}
                     style={{ position: 'absolute', width: 340, cursor: 'pointer', perspective: 1200 }}
-                    onMouseMove={(e) => {
-                      if (!isCenter) return
-                      const el = e.currentTarget.firstChild
-                      const rect = el.getBoundingClientRect()
-                      const rotateX = ((e.clientY - rect.top - rect.height / 2) / rect.height / 2) * -12
-                      const rotateY = ((e.clientX - rect.left - rect.width / 2) / rect.width / 2) * 12
-                      el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
-                    }}
-                    onTouchMove={(e) => {
-                      if (!isCenter) return
-                      const touch = e.touches[0]
-                      const el = e.currentTarget.firstChild
-                      const rect = el.getBoundingClientRect()
-                      const rotateX = ((touch.clientY - rect.top - rect.height / 2) / rect.height / 2) * -12
-                      const rotateY = ((touch.clientX - rect.left - rect.width / 2) / rect.width / 2) * 12
-                      el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.firstChild.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
-                    }}
-                    onTouchEnd={(e) => {
-                      e.currentTarget.firstChild.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
-                    }}
+                    whileHover={isCenter ? { scale: 1.02 } : {}}
                   >
-                    <motion.div animate={{
-                      boxShadow: isCenter
-                        ? ['0 30px 60px -15px rgba(0,0,0,0.5)', '0 35px 70px -10px rgba(99,102,241,0.15)', '0 30px 60px -15px rgba(0,0,0,0.5)']
-                        : '0 8px 20px -8px rgba(0,0,0,0.3)',
-                    }} transition={isCenter ? { duration: 3, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
-                    style={{
+                    <motion.div style={{
                       background: 'var(--card-bg)',
                       border: isCenter ? '1px solid rgba(99,102,241,0.15)' : '1px solid var(--border)',
                       backdropFilter: 'blur(40px)',
                       borderRadius: 32,
                       overflow: 'hidden',
-                      transformStyle: 'preserve-3d',
-                      transition: 'transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1)',
+                      boxShadow: isCenter ? '0 30px 60px -15px rgba(0,0,0,0.5)' : '0 8px 20px -8px rgba(0,0,0,0.3)',
                     }}>
                       {/* Image area — no padding */}
                       <div style={{
