@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { useRecommendations } from '../lib/useRecommendations'
@@ -9,19 +9,29 @@ import { upscMCQs } from '../data/upsc/questions'
 import { upscSubjects } from '../data/upsc/subjects'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
 import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, TrendingUp, Clock, Search, FileText, Zap, Target } from 'lucide-react'
+import { useSequentialReveal, easePreset, skeletonBreath } from '../hooks/useSequentialReveal'
+import { SkeletonBlock } from '../components/SkeletonBlock'
 
 export default function UpscHome() {
   const navigate = useNavigate()
   const { user, topicScores, saveTopicScore, recordQuestionAttempt, startSession, endSession, updateStats, revisionSchedule, revisionSeenQuestions, markTopicReviewed, revisionMastery, setRevisionMastery, recordSeenQuestion } = useStore()
   const { allTopics } = useRecommendations('upsc')
   const todayStr = new Date().toISOString().slice(0, 10)
-  const [dailyMix] = useState(() => getRevisionMix(allTopics, topicScores, revisionSchedule, 5))
+  const [pageReady, setPageReady] = useState(false)
+  const [dailyMix, setDailyMix] = useState([])
   const [feedIdx, setFeedIdx] = useState(0)
   const [feedDone, setFeedDone] = useState(() => new Set(
     Object.entries(revisionSchedule)
       .filter(([_, v]) => v.lastReviewed === todayStr)
       .map(([k]) => k)
   ))
+
+  useEffect(() => {
+    const mix = getRevisionMix(allTopics, topicScores, revisionSchedule, 5)
+    setDailyMix(mix)
+    const t = setTimeout(() => setPageReady(true), 100)
+    return () => clearTimeout(t)
+  }, [allTopics, topicScores, revisionSchedule])
 
   const remainingFeed = useMemo(() => dailyMix.filter(t => !feedDone.has(t.id)), [dailyMix, feedDone])
   const currentTopic = remainingFeed[feedIdx]
@@ -154,7 +164,29 @@ export default function UpscHome() {
   return (
     <div style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-        {/* GòÉGòÉ TOP BAR GòÉGòÉ */}
+        {!pageReady ? (
+          <>
+            <div style={{ padding: '48px 20px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <SkeletonBlock width={100} height={20} />
+                <SkeletonBlock width={160} height={12} />
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <SkeletonBlock width={34} height={34} radius={99} />
+                <SkeletonBlock width={34} height={34} radius={99} />
+                <SkeletonBlock width={34} height={34} radius={99} />
+              </div>
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', gap: 12 }}>
+              <SkeletonBlock width={340} height={150} radius={32} />
+              <SkeletonBlock width={340} height={160} radius={32} />
+              <div style={{ display: 'flex', gap: 5 }}>
+                {[1,2,3,4].map(i => <SkeletonBlock key={i} width={i === 1 ? 22 : 6} height={6} radius={3} />)}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>{/* Gï¿½ï¿½Gï¿½ï¿½ TOP BAR Gï¿½ï¿½Gï¿½ï¿½ */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28 }}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '48px 20px 8px' }}>
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.05 }}>
@@ -181,7 +213,7 @@ export default function UpscHome() {
           </motion.div>
         </motion.div>
 
-        {/* GòÉGòÉ ALERTS GòÉGòÉ */}
+        {/* Gï¿½ï¿½Gï¿½ï¿½ ALERTS Gï¿½ï¿½Gï¿½ï¿½ */}
         {alerts.length > 0 && (
           <div style={{ padding: '12px 20px 0' }}>
             <AnimatePresence>
@@ -203,7 +235,7 @@ export default function UpscHome() {
           </div>
         )}
 
-        {/* GòÉGòÉ TODAY'S REVISION CAROUSEL GòÉGòÉ */}
+        {/* Gï¿½ï¿½Gï¿½ï¿½ TODAY'S REVISION CAROUSEL Gï¿½ï¿½Gï¿½ï¿½ */}
         {remainingFeed.length > 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0', touchAction: 'none', userSelect: 'none' }}
             onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
@@ -215,7 +247,7 @@ export default function UpscHome() {
                 const t = remainingFeed[idx]
                 const isCenter = offset === 0
                 const pi = isCenter ? priorityInfo : calculatePriorityScore(t.id, topicScores, revisionSchedule)
-                const reason = pi?.weakness >= 0.6 ? `Weak GÇö ${t.accuracy || 0}% accuracy` : pi?.forgetting >= 0.8 ? 'Over 2 weeks since review' : pi?.forgetting >= 0.5 ? 'Due for review' : pi?.importance >= 0.6 ? 'High-yield topic' : 'Keep fresh'
+                const reason = pi?.weakness >= 0.6 ? `Weak Gï¿½ï¿½ ${t.accuracy || 0}% accuracy` : pi?.forgetting >= 0.8 ? 'Over 2 weeks since review' : pi?.forgetting >= 0.5 ? 'Due for review' : pi?.importance >= 0.6 ? 'High-yield topic' : 'Keep fresh'
                 const accentColor = pi?.weakness >= 0.6 ? '#ef4444' : pi?.forgetting >= 0.5 ? '#f59e0b' : 'var(--primary)'
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'
                 const badgeBg = pi?.weakness >= 0.6 ? 'var(--error-light)' : pi?.forgetting >= 0.5 ? 'var(--warning-light)' : 'var(--primary-light)'
@@ -239,7 +271,7 @@ export default function UpscHome() {
                       overflow: 'hidden',
                       boxShadow: isCenter ? '0 30px 60px -15px rgba(0,0,0,0.5)' : '0 8px 20px -8px rgba(0,0,0,0.3)',
                     }}>
-                      {/* Image area GÇö no padding */}
+                      {/* Image area Gï¿½ï¿½ no padding */}
                       <div style={{
                         height: 150, width: '100%', background: subjGradient,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -296,7 +328,7 @@ export default function UpscHome() {
                               }}
                             >Start Practice</motion.button>
                           ) : (
-                            <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em' }}>Tap to view GåÆ</div>
+                            <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em' }}>Tap to view Gï¿½ï¿½</div>
                           )}
                         </div>
                       </div>
@@ -319,7 +351,7 @@ export default function UpscHome() {
           </div>
         )}
 
-        {/* Empty GÇö all done */}
+        {/* Empty Gï¿½ï¿½ all done */}
         {dailyMix.length > 0 && remainingCount === 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
             <div style={{ textAlign: 'center' }}>
@@ -334,7 +366,7 @@ export default function UpscHome() {
           </div>
         )}
 
-        {/* Empty GÇö no mix */}
+        {/* Empty Gï¿½ï¿½ no mix */}
         {dailyMix.length === 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
             <div style={{ textAlign: 'center' }}>
@@ -348,10 +380,12 @@ export default function UpscHome() {
             </div>
           </div>
         )}
+          </>
+        )}
 
       </div>
 
-      {/* GòÉGòÉ REVISION POPUP GòÉGòÉ */}
+      {/* Gï¿½ï¿½Gï¿½ï¿½ REVISION POPUP Gï¿½ï¿½Gï¿½ï¿½ */}
       <AnimatePresence>
         {revisionPopupTopic && (
           <motion.div
@@ -435,7 +469,7 @@ export default function UpscHome() {
                             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--error)' }}>Common Mistakes</span>
                           </div>
                           {revisionContent.commonMistakes.slice(0, 3).map((m, i) => (
-                            <div key={i} style={{ fontSize: 11, color: 'var(--error)', padding: '3px 0', lineHeight: 1.5 }}>GÇó {m}</div>
+                            <div key={i} style={{ fontSize: 11, color: 'var(--error)', padding: '3px 0', lineHeight: 1.5 }}>Gï¿½ï¿½ {m}</div>
                           ))}
                         </div>
                       )}
@@ -446,7 +480,7 @@ export default function UpscHome() {
                             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)' }}>Memory Aids</span>
                           </div>
                           {revisionContent.mnemonics.map((m, i) => (
-                            <div key={i} style={{ fontSize: 11, color: 'var(--text-2)', padding: '2px 0', fontStyle: 'italic', lineHeight: 1.5 }}>=ƒºá {m}</div>
+                            <div key={i} style={{ fontSize: 11, color: 'var(--text-2)', padding: '2px 0', fontStyle: 'italic', lineHeight: 1.5 }}>=ï¿½ï¿½ï¿½ {m}</div>
                           ))}
                         </div>
                       )}
@@ -490,7 +524,7 @@ export default function UpscHome() {
                               color: practiceSubmitted && isAns ? '#fff' : isSel ? '#fff' : border,
                               borderColor: practiceSubmitted && isAns ? 'var(--success)' : isSel ? 'var(--primary)' : border,
                             }}>
-                              {practiceSubmitted && isAns ? 'G£ô' : isSel && !isAns ? 'G£ù' : String.fromCharCode(65 + oi)}
+                              {practiceSubmitted && isAns ? 'Gï¿½ï¿½' : isSel && !isAns ? 'Gï¿½ï¿½' : String.fromCharCode(65 + oi)}
                             </div>
                             {opt}
                           </motion.div>
@@ -510,7 +544,7 @@ export default function UpscHome() {
                     ) : (
                       <motion.button onClick={nextPractice} whileTap={{ scale: 0.97 }}
                         style={{ width: '100%', padding: '8px 0', borderRadius: 12, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 11, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
-                        {practiceIdx < practiceQ.length - 1 ? 'Next Question GåÆ' : 'See Results'}
+                        {practiceIdx < practiceQ.length - 1 ? 'Next Question Gï¿½ï¿½' : 'See Results'}
                       </motion.button>
                     )}
                   </div>

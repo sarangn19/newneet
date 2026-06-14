@@ -6,6 +6,8 @@ import { supabase } from '../lib/supabase'
 import { upscSubjects } from '../data/upsc/subjects'
 import { getAllUpscQuestions } from '../data/upsc/questions'
 import { BookOpen, FileText, Search, ChevronRight, Plus, Zap, CheckCircle, XCircle, RefreshCw, Rotate3D, Star, Bookmark, Check } from 'lucide-react'
+import { SkeletonBlock } from '../components/SkeletonBlock'
+import { easePreset } from '../hooks/useSequentialReveal'
 import { card as cardStyle, cardHover, spring, spacing, font, colors, btn } from '../lib/designTokens'
 
 const TABS = [
@@ -72,6 +74,7 @@ function NotesTab() {
     try { return new Set(JSON.parse(localStorage.getItem('bookmarked_notes') || '[]')) } catch { return new Set() }
   })
   const [selectedNote, setSelectedNote] = useState(null)
+  const [notesLoading, setNotesLoading] = useState(true)
 
   const toggleBookmark = (id) => {
     setBookmarkedIds(prev => {
@@ -84,8 +87,10 @@ function NotesTab() {
 
   useEffect(() => {
     if (!userId) return
+    setNotesLoading(true)
     supabase.from('notes').select('*').eq('user_id', userId).order('created_at', { ascending: false }).then(({ data }) => {
       if (data) setNotes(data)
+      setNotesLoading(false)
     })
   }, [userId])
 
@@ -223,8 +228,26 @@ function NotesTab() {
         </motion.div>
       )}
 
-      {/* Notes - 2-column grid */}
-      {filteredNotes.length === 0 ? (
+      {/* Notes */}
+      {notesLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '0 0 40px' }}>
+          {[1,2,3].map(i => (
+            <div key={i} style={{
+              background: 'var(--card-bg)', borderRadius: 14,
+              border: '1px solid var(--border)', padding: 14,
+              ...(i > 1 ? { marginTop: -(100 - i * 12), transform: `scale(${1 - (i * 0.03)})`, opacity: 1 - (i * 0.15) } : {}),
+            }}>
+              <SkeletonBlock width="35%" height={10} radius={4} style={{ marginBottom: 8 }} />
+              <SkeletonBlock width="85%" height={14} radius={4} style={{ marginBottom: 6 }} />
+              <SkeletonBlock width="60%" height={10} radius={4} style={{ marginBottom: 6 }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                <SkeletonBlock width={50} height={10} radius={4} />
+                <SkeletonBlock width={50} height={10} radius={4} />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filteredNotes.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 14px' }}>
           <BookOpen size={32} color="var(--text-3)" style={{ marginBottom: 8 }} />
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)' }}>No notes yet</div>

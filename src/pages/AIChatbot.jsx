@@ -40,6 +40,14 @@ export default function AIChatbot() {
   const [showHistory, setShowHistory] = useState(false)
   const [savedNotes, setSavedNotes] = useState(new Set())
   const [quizState, setQuizState] = useState(null)
+  const [loadingStatus, setLoadingStatus] = useState(0)
+  const statusPhrases = {
+    explain: ['Understanding your question…', 'Organizing relevant concepts…', 'Preparing explanation…'],
+    challenge: ['Analyzing your knowledge gaps…', 'Generating challenging questions…', 'Preparing practice set…'],
+    debate: ['Identifying perspectives…', 'Gathering counterarguments…', 'Structuring debate…'],
+    revise: ['Scanning key points…', 'Compiling must-know facts…', 'Formatting revision notes…'],
+    summarise: ['Extracting key ideas…', 'Condensing information…', 'Writing summary…'],
+  }
   const inputRef = useRef(null)
   const endRef = useRef(null)
   const sessionRef = useRef(null)
@@ -57,6 +65,15 @@ export default function AIChatbot() {
       if (data) setHistory(data)
     })
   }, [userId])
+
+  useEffect(() => {
+    if (!loading) { setLoadingStatus(0); return }
+    const phrases = statusPhrases[mode] || statusPhrases.explain
+    const interval = setInterval(() => {
+      setLoadingStatus(i => (i + 1) % phrases.length)
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [loading, mode])
 
   const sendMessage = async (voiceText) => {
     const text = (voiceText || input).trim()
@@ -331,16 +348,16 @@ export default function AIChatbot() {
               <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 10 }}>
                 <div style={{
                   background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 14,
-                  padding: '10px 16px', display: 'flex', gap: 4,
+                  padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10,
                 }}>
-                  {[0, 1, 2].map(i => (
-                    <motion.div
-                      key={i}
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                      style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--primary)' }}
-                    />
-                  ))}
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--primary)', flexShrink: 0 }}
+                  />
+                  <span style={{ fontSize: 12, color: 'var(--text-2)', fontWeight: 500 }}>
+                    {(statusPhrases[mode] || statusPhrases.explain)[loadingStatus]}
+                  </span>
                 </div>
               </div>
             )}

@@ -5,6 +5,8 @@ import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { fetchCurrentAffairs } from '../lib/currentAffairs'
 import { ChevronLeft, Search, RefreshCw, Bookmark, ExternalLink, ChevronRight, BookOpen, X, XCircle, CheckCircle, Sparkles, AlertTriangle, RotateCcw } from 'lucide-react'
+import { SkeletonBlock } from '../components/SkeletonBlock'
+import { skeletonBreath } from '../hooks/useSequentialReveal'
 
 const CATEGORIES = [
   'All', 'Polity', 'Economy', 'International', 'Environment', 'Science & Tech', 'History & Culture', 'Geography',
@@ -316,9 +318,26 @@ export default function CurrentAffairs() {
         {/* Articles grid */}
         <div style={{ flex: 1, padding: '10px 14px', overflowY: 'auto' }}>
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--primary)', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
-              <div style={{ fontSize: 12, color: 'var(--text-3)' }}>Loading news...</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{
+                  background: 'var(--card-bg)', borderRadius: 14,
+                  border: '1px solid var(--border)', overflow: 'hidden',
+                }}>
+                  <motion.div animate={skeletonBreath}
+                    style={{ height: 80, background: 'var(--surface-alt)', position: 'relative' }}
+                  />
+                  <div style={{ padding: '10px 12px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <SkeletonBlock width="40%" height={10} radius={4} />
+                    <SkeletonBlock width="90%" height={12} radius={4} />
+                    <SkeletonBlock width="70%" height={12} radius={4} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                      <SkeletonBlock width={60} height={10} radius={4} />
+                      <SkeletonBlock width={20} height={10} radius={4} />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>

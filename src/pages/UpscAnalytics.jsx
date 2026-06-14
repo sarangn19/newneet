@@ -4,12 +4,37 @@ import useStore from '../store/useStore'
 import { Brain, TrendingUp, Clock, CheckCircle, BookOpen, MessageSquare, Globe, BarChart3, Flame, Target, Rotate3D } from 'lucide-react'
 import { upscSubjects } from '../data/upsc/subjects'
 import { supabase } from '../lib/supabase'
+import { useSequentialReveal, easePreset } from '../hooks/useSequentialReveal'
+import { SkeletonBlock } from '../components/SkeletonBlock'
+
+function AnimatedValue({ value, suffix = '', decimals = 0 }) {
+  const [display, setDisplay] = useState(0)
+  useEffect(() => {
+    if (value === 0) { setDisplay(0); return }
+    const start = performance.now()
+    const duration = 400
+    const from = 0
+    const to = value
+    let frame
+    const tick = (now) => {
+      const elapsed = now - start
+      const p = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - p, 3)
+      setDisplay(Math.round(from + (to - from) * eased))
+      if (p < 1) frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [value])
+  return <>{display.toLocaleString()}{suffix}</>
+}
 
 export default function UpscAnalytics() {
   const { stats, topicScores, questionHistory, revisionSchedule, user } = useStore()
   const [notesCount, setNotesCount] = useState(0)
   const [chatCount, setChatCount] = useState(0)
   const [dailyRows, setDailyRows] = useState([])
+  const [pageReady, setPageReady] = useState(false)
   const refreshInterval = useRef(null)
 
   const userId = useStore(s => s.userId)
@@ -36,6 +61,11 @@ export default function UpscAnalytics() {
       if (refreshInterval.current) clearInterval(refreshInterval.current)
     }
   }, [userId, refreshDailyStats])
+
+  useEffect(() => {
+    const t = setTimeout(() => setPageReady(true), 150)
+    return () => clearTimeout(t)
+  }, [])
 
   const totalQ = stats.upscTotal || 0
   const correct = stats.upscCorrect || 0
@@ -123,13 +153,25 @@ export default function UpscAnalytics() {
         <motion.div variants={{ visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } } }} initial="hidden" animate="visible"
           style={{ padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* KPI Row */}
+          {!pageReady ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: '14px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <SkeletonBlock width={28} height={28} radius={8} />
+                  <SkeletonBlock width={36} height={20} />
+                  <SkeletonBlock width={50} height={10} />
+                </div>
+              ))}
+            </div>
+          ) : (
           <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}
             style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
-            <KpiBox icon={Brain} value={totalQ} label="Questions" color="#6366f1" />
-            <KpiBox icon={Target} value={`${accuracy}%`} label="Accuracy" color={accuracy >= 60 ? '#059669' : '#DC2626'} />
-            <KpiBox icon={Flame} value={streak} label="Streak" color="#EF4444" />
-            <KpiBox icon={Clock} value={`${Math.floor(timeSpent / 60)}h`} label="Study Time" color="#8B5CF6" />
+            <KpiBox icon={Brain} value={<AnimatedValue value={totalQ} />} label="Questions" color="#6366f1" />
+            <KpiBox icon={Target} value={<><AnimatedValue value={accuracy} />%</>} label="Accuracy" color={accuracy >= 60 ? '#059669' : '#DC2626'} />
+            <KpiBox icon={Flame} value={<AnimatedValue value={streak} />} label="Streak" color="#EF4444" />
+            <KpiBox icon={Clock} value={<><AnimatedValue value={Math.floor(timeSpent / 60)} /><span style={{fontSize:12}}>h</span></>} label="Study Time" color="#8B5CF6" />
           </motion.div>
+          )}
 
           {/* Weekly Summary */}
           <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -137,15 +179,15 @@ export default function UpscAnalytics() {
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>This Week</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary)' }}>{weeklyStats.questions}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary)' }}><AnimatedValue value={weeklyStats.questions} /></div>
                 <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Questions</div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: '#059669' }}>{weeklyStats.accuracy}%</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#059669' }}><AnimatedValue value={weeklyStats.accuracy} />%</div>
                 <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Accuracy</div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>{weeklyStats.daysActive}/7</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}><AnimatedValue value={weeklyStats.daysActive} />/7</div>
                 <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Active Days</div>
               </div>
             </div>
@@ -156,10 +198,10 @@ export default function UpscAnalytics() {
             style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Activity Overview</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <ActivityItem icon={BookOpen} label="Notes Created" value={notesCount} color="#6366f1" />
-              <ActivityItem icon={MessageSquare} label="Chat Messages" value={chatCount} color="#8B5CF6" />
-              <ActivityItem icon={Rotate3D} label="Due for Revision" value={dueRevisionCount} color="#F59E0B" />
-              <ActivityItem icon={BarChart3} label="Topics Attempted" value={`${topicStatus.attempted}/${topicStatus.total}`} color="#10B981" />
+              <ActivityItem icon={BookOpen} label="Notes Created" value={<AnimatedValue value={notesCount} />} color="#6366f1" />
+              <ActivityItem icon={MessageSquare} label="Chat Messages" value={<AnimatedValue value={chatCount} />} color="#8B5CF6" />
+              <ActivityItem icon={Rotate3D} label="Due for Revision" value={<AnimatedValue value={dueRevisionCount} />} color="#F59E0B" />
+              <ActivityItem icon={BarChart3} label="Topics Attempted" value={<><AnimatedValue value={topicStatus.attempted} />/<AnimatedValue value={topicStatus.total} /></>} color="#10B981" />
             </div>
           </motion.div>
 
