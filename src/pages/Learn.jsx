@@ -71,6 +71,7 @@ function NotesTab() {
   const [bookmarkedIds, setBookmarkedIds] = useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem('bookmarked_notes') || '[]')) } catch { return new Set() }
   })
+  const [selectedNote, setSelectedNote] = useState(null)
 
   const toggleBookmark = (id) => {
     setBookmarkedIds(prev => {
@@ -105,7 +106,10 @@ function NotesTab() {
     await supabase.from('notes').delete().eq('id', id)
     setNotes(prev => prev.filter(n => n.id !== id))
     setBookmarkedIds(prev => { const s = new Set(prev); s.delete(id); return s })
+    if (selectedNote?.id === id) setSelectedNote(null)
   }
+
+  const handleCloseNote = () => setSelectedNote(null)
 
   const filteredNotes = useMemo(() => {
     let list = notes
@@ -237,9 +241,9 @@ function NotesTab() {
               return stripped.slice(0, 100)
             })()
             return (
-              <motion.div key={n.id} onClick={() => navigate('/note/' + n.id)}
+              <motion.div key={n.id} layoutId={`note-${n.id}`} onClick={() => setSelectedNote(n)}
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}
-                whileHover={{ y: -3 }}
+                whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}
                   style={{
                     background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--border)', padding: 14,
                     cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', gap: 6,
@@ -277,6 +281,77 @@ function NotesTab() {
         </div>
       )}
 
+      {/* Note detail overlay */}
+      <AnimatePresence>
+        {selectedNote && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={handleCloseNote}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, backdropFilter: 'blur(4px)' }}
+            />
+            <motion.div layoutId={`note-${selectedNote.id}`}
+              style={{
+                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 110,
+                background: 'var(--page-bg)', borderRadius: 0, overflow: 'hidden',
+                display: 'flex', flexDirection: 'column',
+              }}>
+              {/* Header bar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '48px 16px 8px', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)' }}>
+                <motion.button onClick={handleCloseNote} whileTap={{ scale: 0.9 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--text-2)', fontSize: 18, lineHeight: 1 }}>
+                  ←
+                </motion.button>
+                <div style={{ flex: 1, fontSize: 16, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {selectedNote.title || 'Untitled'}
+                </div>
+                <motion.button onClick={() => { navigate('/note/' + selectedNote.id) }} whileTap={{ scale: 0.9 }}
+                  style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600, color: 'var(--text-2)', fontFamily: 'inherit' }}>
+                  Edit
+                </motion.button>
+              </div>
+              {/* Metadata */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05, duration: 0.2 }}
+                style={{ padding: '12px 16px 8px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid var(--border)' }}>
+                {selectedNote.subject && (() => {
+                  const subjObj = upscSubjects.find(s => s.id === selectedNote.subject)
+                  return (
+                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', padding: '2px 10px', borderRadius: 99, background: (subjObj?.color || 'var(--text-3)') + '15', color: subjObj?.color || 'var(--text-3)' }}>
+                      {subjObj?.name || selectedNote.subject}
+                    </span>
+                  )
+                })()}
+                <span style={{ fontSize: 11, color: 'var(--text-3)' }}>
+                  {new Date(selectedNote.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              </motion.div>
+              {/* Body */}
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.25 }}
+                style={{ flex: 1, overflowY: 'auto', padding: 16, fontSize: 14, lineHeight: 1.7, color: 'var(--text)' }}>
+                {(() => {
+                  const raw = selectedNote.content || ''
+                  const text = raw.replace(/<[^>]*>/g, '').replace(/==/g, '').replace(/\*\*/g, '').replace(/\[image\]\([^)]*\)/g, '[image]')
+                  return text || 'No content'
+                })()}
+              </motion.div>
+              {/* Actions */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.2 }}
+                style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
+                <motion.button onClick={() => { toggleBookmark(selectedNote.id); handleCloseNote() }} whileTap={{ scale: 0.95 }}
+                  style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: bookmarkedIds.has(selectedNote.id) ? '#F59E0B' : 'var(--surface-alt)', color: bookmarkedIds.has(selectedNote.id) ? '#fff' : 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <Bookmark size={14} fill={bookmarkedIds.has(selectedNote.id) ? '#fff' : 'none'} />
+                  {bookmarkedIds.has(selectedNote.id) ? 'Bookmarked' : 'Bookmark'}
+                </motion.button>
+                <motion.button onClick={() => { deleteNote(selectedNote.id) }} whileTap={{ scale: 0.95 }}
+                  style={{ padding: '10px 20px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'transparent', color: 'var(--error)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  Delete
+                </motion.button>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

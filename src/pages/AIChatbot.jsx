@@ -5,13 +5,14 @@ import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { buildRules, formatPrompt, createSession, buildStudentProfile } from '../lib/behaviorEngine'
 import { callAI } from '../lib/callAI'
-import { ChevronLeft, Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2 } from 'lucide-react'
+import { ChevronLeft, Send, Sparkles, BookOpen, MessageSquare, ClipboardList, Search, Trash2, Mic, Volume2, Zap, Rotate3D } from 'lucide-react'
 
 const MODES = [
-  { id: 'explain', label: 'Explain', icon: BookOpen, color: '#3B82F6' },
-  { id: 'quiz', label: 'Quiz Me', icon: ClipboardList, color: '#8B5CF6' },
-  { id: 'summarise', label: 'Summarise', icon: Search, color: '#10B981' },
-  { id: 'deepdive', label: 'Deep Dive', icon: Sparkles, color: '#3B82F6' },
+  { id: 'explain', label: 'Explain', icon: BookOpen, color: '#3F7DFF', subtitle: 'Understand any topic' },
+  { id: 'challenge', label: 'Challenge Me', icon: Zap, color: '#AF52DE', subtitle: 'Test your knowledge' },
+  { id: 'debate', label: 'Debate', icon: MessageSquare, color: '#34C759', subtitle: 'Explore perspectives' },
+  { id: 'revise', label: 'Revise', icon: Rotate3D, color: '#D4A853', subtitle: 'Quick revision' },
+  { id: 'summarise', label: 'Summarise', icon: Search, color: '#3F7DFF', subtitle: 'Concise overview' },
 ]
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
@@ -19,9 +20,10 @@ const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || ''
 
 const MODE_PROMPTS = {
   explain: `You are a UPSC CSE mentor. Explain the given topic in detail with a structured breakdown including definition, key features, historical background, contemporary relevance, and exam perspective. Use plain text only - no stars, no hashes, no markdown. Use numbered sections and dashes for lists.`,
-  quiz: `You are a UPSC CSE mentor. Generate a multiple-choice quiz question on the given topic. Include 4 options (A, B, C, D) and indicate the correct answer after the question. Use plain text only - no stars, no hashes, no markdown.`,
+  challenge: `You are a UPSC CSE mentor. Generate a challenging multiple-choice question on the given topic. Include 4 options (A, B, C, D) and indicate the correct answer after the question. Use plain text only - no stars, no hashes, no markdown.`,
+  debate: `You are a UPSC CSE mentor. Present multiple perspectives on the given topic covering different schools of thought, ideological positions, and academic debates. Encourage critical thinking by highlighting areas of agreement and disagreement. Use plain text only - no stars, no hashes, no markdown.`,
+  revise: `You are a UPSC CSE mentor. Provide a rapid revision summary of the given topic covering must-know facts, key data points, previous year question patterns, and quick memory aids. Make it concise and exam-focused. Use plain text only - no stars, no hashes, no markdown.`,
   summarise: `You are a UPSC CSE mentor. Provide a concise summary of the given topic covering key points, must-know facts, and UPSC angle. Use dashes for bullet points, no stars, no hashes, no markdown.`,
-  deepdive: `You are a UPSC CSE mentor. Provide a comprehensive deep dive analysis of the given topic covering multiple dimensions (historical, constitutional, administrative, social, economic), case studies, critical analysis, and interlinkages with other GS papers. Use plain text only - no stars, no hashes, no markdown.`,
 }
 
 export default function AIChatbot() {
@@ -208,8 +210,8 @@ export default function AIChatbot() {
             <ChevronLeft size={18} color="var(--text)" />
           </motion.button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Chatbot</div>
-            <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your UPSC study assistant</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Mentor</div>
+            <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your intelligent study companion</div>
           </div>
           <motion.button whileTap={{scale:0.96}} onClick={() => setShowHistory(!showHistory)} style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', position: 'relative',
@@ -222,21 +224,32 @@ export default function AIChatbot() {
         </div>
       </div>
 
-      {/* Mode chips */}
-      <div style={{ display: 'flex', gap: 4, padding: '8px 14px', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)', overflowX: 'auto', scrollbarWidth: 'none' }}>
+      {/* Mode action cards */}
+      <div style={{ padding: '12px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, background: 'var(--page-bg)' }}>
         {MODES.map(m => {
           const Icon = m.icon
           const active = mode === m.id
           return (
-              <motion.button whileTap={{scale:0.96}} key={m.id} onClick={() => setMode(m.id)} style={{
-                display: 'flex', alignItems: 'center', gap: 4, padding: '7px 14px', borderRadius: 12, border: 'none',
-                cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit',
-                background: active ? m.color + '18' : 'var(--surface-alt)',
-                color: active ? m.color : 'var(--text-2)', fontSize: 12, fontWeight: 600,
+            <motion.button key={m.id} onClick={() => setMode(m.id)}
+              whileTap={{ scale: 0.97 }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
+                borderRadius: 12, border: active ? `1.5px solid ${m.color}` : '1px solid var(--border)',
+                cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                background: active ? `${m.color}0D` : 'var(--card-bg)',
               }}>
-                <Icon size={15} />
-                {m.label}
-              </motion.button>
+              <div style={{
+                width: 32, height: 32, borderRadius: 8,
+                background: active ? m.color : 'var(--surface-alt)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <Icon size={15} color={active ? '#fff' : 'var(--text-3)'} />
+              </div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: active ? m.color : 'var(--text)' }}>{m.label}</div>
+                <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 1 }}>{m.subtitle}</div>
+              </div>
+            </motion.button>
           )
         })}
       </div>
@@ -251,10 +264,10 @@ export default function AIChatbot() {
               <div style={{ textAlign: 'center', padding: '40px 20px 20px' }}>
                 <Sparkles size={28} color="var(--primary)" style={{ marginBottom: 10, opacity: 0.6 }} />
                 <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 16 }}>
-                  Pick a mode above, then type your question below. I can help explain concepts, quiz you, summarise topics, or dive deep.
+                  Pick a mode above, then type your question. I can explain concepts, challenge you, debate perspectives, or help revise.
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxWidth: 240, margin: '0 auto' }}>
-                  {['What is federalism?', 'Explain Fundamental Rights', 'Quiz me on Polity'].map((suggestion, i) => (
+                  {['What is federalism?', 'Explain Fundamental Rights', 'Challenge me on Polity'].map((suggestion, i) => (
                     <motion.button key={i} whileTap={{ scale: 0.97 }}
                       onClick={() => { setInput(suggestion); inputRef.current?.focus() }}
                       style={{

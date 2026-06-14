@@ -48,37 +48,61 @@ export default function Navbar() {
             exit={{ y: 30, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 24 }}
             style={{
-              position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
+              position: 'fixed', bottom: 20, left: 0, right: 0, zIndex: 100,
               display: 'flex', justifyContent: 'center', alignItems: 'center',
-              height: 56,
-              background: 'var(--nav-bg)',
-              borderTop: '1px solid var(--border)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
+              pointerEvents: 'none',
             }}
           >
             <div style={{
-              display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
-              gap: 36,
-              maxWidth: '100%',
+              display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4,
+              padding: '6px 8px',
+              background: 'var(--nav-bg)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRadius: 99,
+              boxShadow: 'var(--shadow-float)',
+              pointerEvents: 'auto',
             }}>
-              {tabs.map((tab) => {
+              {tabs.map((tab, i) => {
                 const IconComp = iconMap[tab.icon];
                 return (
                   <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
                     textDecoration: 'none', WebkitTapHighlightColor: 'transparent', fontFamily: 'inherit',
+                    position: 'relative',
                   }}>
                     {({ isActive }) => (
-                      <div style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        width: 28, height: 28, cursor: 'pointer',
-                      }}>
+                      <motion.div layout={isActive} transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 6,
+                          padding: isActive ? '8px 16px 8px 12px' : '8px 12px',
+                          borderRadius: 99,
+                          cursor: 'pointer',
+                          position: 'relative',
+                          background: isActive ? 'var(--primary)' : 'transparent',
+                        }}>
+                        {isActive && (
+                          <motion.div layoutId="navBg" style={{
+                            position: 'absolute', inset: 0, borderRadius: 99,
+                            background: 'var(--primary)',
+                          }} transition={{ type: 'spring', stiffness: 400, damping: 30 }} />
+                        )}
                         <IconComp
-                          size={24}
+                          size={18}
                           strokeWidth={isActive ? 2.5 : 1.8}
-                          color={isActive ? 'var(--primary)' : 'var(--text-3)'}
+                          color={isActive ? '#FFFFFF' : 'var(--text-3)'}
+                          style={{ position: 'relative', zIndex: 1 }}
                         />
-                      </div>
+                        {isActive && (
+                          <motion.span initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }}
+                            transition={{ duration: 0.15, ease: 'easeOut' }}
+                            style={{
+                              fontSize: 12, fontWeight: 600, color: '#FFFFFF',
+                              position: 'relative', zIndex: 1, whiteSpace: 'nowrap',
+                            }}>
+                            {tab.label}
+                          </motion.span>
+                        )}
+                      </motion.div>
                     )}
                   </NavLink>
                 );
