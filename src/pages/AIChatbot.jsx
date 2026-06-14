@@ -489,52 +489,52 @@ export default function AIChatbot() {
                     {quizState.answered === quizState.correct ? 'Correct!' : 'Incorrect. The answer was ' + quizState.correct}
                   </div>
                 )}
-              </div>
-            )}
-          </div>
-
-          {/* Premium input bar */}
-          <div style={{ padding: '8px 14px calc(14px + 40px)', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} style={{
-                width: 44, height: 44, borderRadius: 12, border: 'none', flexShrink: 0,
-                background: listening ? 'var(--error)' : 'var(--surface-alt)', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Mic size={18} color={listening ? '#fff' : 'var(--text-2)'} />
-              </motion.button>
-              <div style={{ flex: 1, position: 'relative' }}>
-                <input
-                  className="chat-input"
-                  ref={inputRef}
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                  placeholder={dynamicPlaceholders[0] || 'Ask your mentor anything...'}
-                  style={{
-                    width: '100%', height: 44, padding: '0 14px', borderRadius: 12,
-                    border: '1px solid var(--border)', fontSize: 15, outline: 'none',
-                    fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)',
-                    boxSizing: 'border-box', transition: 'box-shadow 0.2s',
-                  }}
-                  onFocus={e => e.target.style.boxShadow = '0 0 0 2px var(--primary)'}
-                  onBlur={e => e.target.style.boxShadow = 'none'}
-                />
-              </div>
-              <motion.button whileTap={{scale:0.96}} onClick={() => sendMessage()} disabled={!input.trim() || loading} style={{
-                width: 44, height: 44, borderRadius: 12, border: 'none', flexShrink: 0,
-                background: input.trim() && !loading ? 'var(--primary)' : 'var(--border)',
-                cursor: input.trim() && !loading ? 'pointer' : 'default',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: input.trim() && !loading ? '0 2px 8px rgba(63,125,255,0.2)' : 'none',
-                transition: 'box-shadow 0.2s',
-              }}>
-                <Send size={18} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
-              </motion.button>
             </div>
-          </div>
+          )}
         </div>
+      </div>
       )}
+
+      {/* Premium input bar — always visible */}
+      <div style={{ padding: '8px 14px', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <motion.button whileTap={{ scale: 0.9 }} onClick={startVoice} style={{
+            width: 44, height: 44, borderRadius: 12, border: 'none', flexShrink: 0,
+            background: listening ? 'var(--error)' : 'var(--surface-alt)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Mic size={18} color={listening ? '#fff' : 'var(--text-2)'} />
+          </motion.button>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <input
+              className="chat-input"
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+              placeholder={dynamicPlaceholders[0] || 'Ask your mentor anything...'}
+              style={{
+                width: '100%', height: 44, padding: '0 14px', borderRadius: 12,
+                border: '1px solid var(--border)', fontSize: 15, outline: 'none',
+                fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)',
+                boxSizing: 'border-box', transition: 'box-shadow 0.2s',
+              }}
+              onFocus={e => e.target.style.boxShadow = '0 0 0 2px var(--primary)'}
+              onBlur={e => e.target.style.boxShadow = 'none'}
+            />
+          </div>
+          <motion.button whileTap={{scale:0.96}} onClick={() => sendMessage()} disabled={!input.trim() || loading} style={{
+            width: 44, height: 44, borderRadius: 12, border: 'none', flexShrink: 0,
+            background: input.trim() && !loading ? 'var(--primary)' : 'var(--border)',
+            cursor: input.trim() && !loading ? 'pointer' : 'default',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: input.trim() && !loading ? '0 2px 8px rgba(63,125,255,0.2)' : 'none',
+            transition: 'box-shadow 0.2s',
+          }}>
+            <Send size={18} color={input.trim() && !loading ? '#fff' : 'var(--text-3)'} />
+          </motion.button>
+        </div>
+      </div>
 
       {/* Mode picker bottom sheet */}
       <AnimatePresence>
