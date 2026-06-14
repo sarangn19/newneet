@@ -5,6 +5,43 @@ const FALLBACK_RESPONSES = {
   deepdive: `Deep Dive Analysis\n\nThis topic requires comprehensive understanding across multiple dimensions. Focus on interlinkages with current affairs and other GS papers for a holistic UPSC preparation strategy.`,
 }
 
+const requestQueue = []
+let processing = false
+
+async function processQueue() {
+  if (processing || requestQueue.length === 0) return
+  processing = true
+  const { resolve } = requestQueue.shift()
+  resolve()
+  await new Promise(r => setTimeout(r, 1100))
+  processing = false
+  processQueue()
+}
+
+async function waitForSlot() {
+  return new Promise(resolve => {
+    requestQueue.push({ resolve })
+    if (!processing) processQueue()
+  })
+}
+
+async function fetchWithRetry(url, options, retries = 2) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, options)
+      if (res.ok) return res
+      if (res.status === 429 && attempt < retries) {
+        await new Promise(r => setTimeout(r, (attempt + 1) * 2000))
+        continue
+      }
+      return res
+    } catch {
+      if (attempt < retries) await new Promise(r => setTimeout(r, 1000))
+      else return null
+    }
+  }
+}
+
 export async function callAI({ message, systemPrompt, mode, groqApiKey, geminiApiKey }) {
   let response = ''
 
@@ -46,10 +83,11 @@ export async function callAI({ message, systemPrompt, mode, groqApiKey, geminiAp
   }
 
   if (!response && geminiApiKey) {
+    await waitForSlot()
     try {
       const prompt = `${systemPrompt}\n\nTopic: ${message}`
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`
-      const res = await fetch(url, {
+      const res = await fetchWithRetry(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

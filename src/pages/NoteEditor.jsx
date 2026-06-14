@@ -92,6 +92,33 @@ export default function NoteEditor() {
     })
   }, [noteId, userId])
 
+  useEffect(() => {
+    const el = editorRef.current
+    if (!el || !highlighterMode) return
+    const handler = (e) => {
+      if (!isDrawing.current) return
+      e.preventDefault()
+      const touch = e.touches[0]
+      const range = document.caretRangeFromPoint(touch.clientX, touch.clientY)
+      if (!range || !drawStart.current) return
+      const sel = window.getSelection()
+      if (!sel) return
+      const r = document.createRange()
+      r.setStart(drawStart.current.node, drawStart.current.offset)
+      r.setEnd(range.startContainer, range.startOffset)
+      if (r.collapsed) return
+      sel.removeAllRanges()
+      sel.addRange(r)
+      document.execCommand('hiliteColor', false, '#FEF3C7')
+      const ns = window.getSelection()
+      if (ns && ns.rangeCount) {
+        drawStart.current = { node: ns.anchorNode, offset: ns.anchorOffset }
+      }
+    }
+    el.addEventListener('touchmove', handler, { passive: false })
+    return () => el.removeEventListener('touchmove', handler)
+  }, [highlighterMode])
+
   const exec = (cmd, val) => {
     const sel = savedSel.current || window.getSelection()
     if (sel && sel.rangeCount && editorRef.current?.contains(sel.anchorNode)) {
@@ -161,27 +188,6 @@ export default function NoteEditor() {
   const handleMouseMove = (e) => {
     if (!isDrawing.current || !highlighterMode) return
     const range = document.caretRangeFromPoint(e.clientX, e.clientY)
-    if (!range || !drawStart.current) return
-    const sel = window.getSelection()
-    if (!sel) return
-    const r = document.createRange()
-    r.setStart(drawStart.current.node, drawStart.current.offset)
-    r.setEnd(range.startContainer, range.startOffset)
-    if (r.collapsed) return
-    sel.removeAllRanges()
-    sel.addRange(r)
-    document.execCommand('hiliteColor', false, '#FEF3C7')
-    const ns = window.getSelection()
-    if (ns && ns.rangeCount) {
-      drawStart.current = { node: ns.anchorNode, offset: ns.anchorOffset }
-    }
-  }
-
-  const handleTouchMove = (e) => {
-    if (!isDrawing.current || !highlighterMode) return
-    e.preventDefault()
-    const touch = e.touches[0]
-    const range = document.caretRangeFromPoint(touch.clientX, touch.clientY)
     if (!range || !drawStart.current) return
     const sel = window.getSelection()
     if (!sel) return
@@ -480,7 +486,6 @@ export default function NoteEditor() {
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
           onMouseMove={handleMouseMove}
-          onTouchMove={handleTouchMove}
           onMouseUp={handleMouseUp}
           onTouchEnd={handleTouchEnd}
           onKeyUp={(e) => {

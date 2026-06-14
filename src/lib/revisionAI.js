@@ -4,6 +4,33 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`
 
+let lastGeminiCall = 0
+
+async function fetchGeminiWithRetry(body, retries = 2) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const now = Date.now()
+    const wait = Math.max(0, 1100 - (now - lastGeminiCall))
+    if (wait > 0) await new Promise(r => setTimeout(r, wait))
+    lastGeminiCall = Date.now()
+    try {
+      const res = await fetch(GEMINI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (res.ok) return res
+      if (res.status === 429 && attempt < retries) {
+        await new Promise(r => setTimeout(r, (attempt + 1) * 2000))
+        continue
+      }
+      return res
+    } catch {
+      if (attempt < retries) await new Promise(r => setTimeout(r, 1000))
+      else return null
+    }
+  }
+}
+
 const TOPIC_DETAILS = {
   'gs1-culture': { keywords: ['UNESCO', 'tangible heritage', 'intangible heritage', 'classical dance', 'folk art'], commonMistakes: ['Confusing classical vs folk dance forms', 'Mixing up temple architecture styles'] },
   'gs1-ancient': { keywords: ['IVC', 'Vedic age', 'Mauryan', 'Gupta', 'sangam'], commonMistakes: ['IVC and Vedic chronology', 'Mixing Buddhist and Jain councils'] },
@@ -76,13 +103,9 @@ Return a JSON object with exactly these fields:
 
 Make it concise, actionable, and tailored to the student's performance level. Use bullet-style points in the arrays. Return ONLY valid JSON.`
 
-      const res = await fetch(GEMINI_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
-        }),
+      const res = await fetchGeminiWithRetry({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
       })
       if (!res.ok) throw new Error(`Gemini API error: ${res.status}`)
       const data = await res.json()
