@@ -327,7 +327,7 @@ export default function CurrentAffairs() {
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>Try a different category or check back later</div>
             </div>
           ) : (
-            <motion.div variants={{ visible: { transition: { staggerChildren: 0.04 } } }} initial="hidden" animate="visible"
+            <motion.div key={activeCategory} variants={{ visible: { transition: { staggerChildren: 0.05 } } }} initial="hidden" animate="visible"
               style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {filtered.map((a, i) => {
                 const catColor = categoryColors[a.category] || '#6B7280'
@@ -335,15 +335,15 @@ export default function CurrentAffairs() {
                 const isRead = readArticles.has(a.title)
                 return (
                   <motion.div key={i}
-                    variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-                    whileHover={{ y: -4, scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
+                    variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
+                    transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
                     onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
                     style={{
                       background: 'var(--card-bg)', borderRadius: 14, border: selectedArticle?.title === a.title ? '2px solid var(--primary)' : '1px solid var(--border)',
                       cursor: 'pointer', overflow: 'hidden', transition: 'box-shadow 0.3s ease',
-                      boxShadow: 'var(--shadow-sm)',
+                      boxShadow: 'var(--shadow-card)',
                       opacity: isRead ? 0.85 : 1,
                     }}
                     onMouseEnter={e => { if (!isRead) e.currentTarget.style.boxShadow = 'var(--shadow-hover)' }}

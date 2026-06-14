@@ -120,10 +120,10 @@ export default function UpscAnalytics() {
           </div>
         </motion.div>
 
-        <motion.div variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } } }} initial="hidden" animate="visible"
+        <motion.div variants={{ visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } } }} initial="hidden" animate="visible"
           style={{ padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* KPI Row */}
-          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+          <motion.div variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0 } }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
             <KpiBox icon={Brain} value={totalQ} label="Questions" color="#6366f1" />
             <KpiBox icon={Target} value={`${accuracy}%`} label="Accuracy" color={accuracy >= 60 ? '#059669' : '#DC2626'} />
@@ -269,13 +269,13 @@ export default function UpscAnalytics() {
 
 function KpiBox({ icon: Icon, value, label, color }) {
   return (
-    <motion.div variants={{ hidden: { opacity: 0, scale: 0.85 }, visible: { opacity: 1, scale: 1 } }}
-      transition={{ type: 'spring', stiffness: 350, damping: 26 }}
-      whileHover={{ y: -4, scale: 1.02 }}
-      whileTap={{ scale: 0.96 }}
+    <motion.div variants={{ hidden: { opacity: 0, y: 20, scale: 0.9 }, visible: { opacity: 1, y: 0, scale: 1 } }}
+      transition={{ type: 'spring', stiffness: 320, damping: 25 }}
+      whileHover={{ y: -6, scale: 1.03 }}
+      whileTap={{ scale: 0.95 }}
       style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: '14px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, boxShadow: 'var(--shadow-card)' }}
-      onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--shadow-float)'}
-      onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow-card)'}>
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-float)'; e.currentTarget.style.borderColor = color }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card)'; e.currentTarget.style.borderColor = 'var(--border)' }}>
       <div style={{ width: 32, height: 32, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Icon size={16} color={color} />
       </div>
@@ -287,10 +287,15 @@ function KpiBox({ icon: Icon, value, label, color }) {
 
 function ActivityItem({ icon: Icon, label, value, color }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: 'var(--surface-alt)', border: '1px solid var(--border)', borderRadius: 10 }}>
+    <motion.div
+      initial={{ opacity: 0, x: -12 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+      whileHover={{ x: 3 }}
+      style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: 'var(--surface-alt)', border: '1px solid var(--border)', borderRadius: 10, cursor: 'default' }}>
       <Icon size={14} color={color} />
       <div style={{ flex: 1, fontSize: 11, color: 'var(--text-2)', fontWeight: 500 }}>{label}</div>
       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>{value}</div>
-    </div>
+    </motion.div>
   )
 }
