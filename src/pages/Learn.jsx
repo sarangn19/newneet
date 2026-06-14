@@ -31,7 +31,7 @@ export default function Learn() {
   }, [tab])
 
   return (
-    <motion.div layout style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
+    <motion.div layout style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100, overflowX: 'hidden' }}>
       {/* Header — premium editorial */}
       <div style={{ padding: '20px 16px 16px' }}>
 
@@ -189,7 +189,7 @@ function NotesTab() {
 
   return (
     <>
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ overflowX: 'hidden' }}>
       {/* Search + Create Note */}
       <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--page-bg)', paddingTop: 4, paddingBottom: 12 }}>
         <div style={{ display: 'flex', gap: 10 }}>

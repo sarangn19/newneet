@@ -136,7 +136,7 @@ export default function UpscAnalytics() {
   }, [topicScores, revisionSchedule])
 
   return (
-    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100, position: 'relative' }}>
+    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100, position: 'relative', overflowX: 'hidden' }}>
       <div className="bg-pattern" style={{ position: 'fixed', inset: 0, opacity: 0.4, pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* Header */}

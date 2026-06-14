@@ -214,7 +214,7 @@ export default function CurrentAffairs() {
   }
 
   return (
-    <div style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
+    <div style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100, overflowX: 'hidden' }}>
       {/* Toast */}
       <AnimatePresence>
         {toast && (

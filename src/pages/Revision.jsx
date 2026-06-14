@@ -60,7 +60,7 @@ export default function Revision() {
   }
 
   return (
-    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100 }}>
+    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100, overflowX: 'hidden' }}>
       {/* ══ HEADER ══ */}
       <div style={{ background: '#fff', borderBottom: `1px solid ${colors.borderLight}`, padding: spacing.header }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

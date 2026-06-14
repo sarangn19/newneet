@@ -79,7 +79,7 @@ export default function Profile() {
   }
 
   return (
-    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100 }}>
+    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100, overflowX: 'hidden' }}>
       <div className="page-header-light">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button className="back-btn-dark" onClick={() => navigate('/')}>

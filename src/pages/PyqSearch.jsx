@@ -119,7 +119,7 @@ export default function PyqSearch() {
   }
 
   return (
-    <div style={{ background: '#f4f6f8', minHeight: '100vh', paddingBottom: 100, position: 'relative' }}>
+    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100, position: 'relative', overflowX: 'hidden' }}>
       <div className="bg-pattern" style={{ position: 'fixed', inset: 0, opacity: 0.4, pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={{ padding: '48px 16px 10px', background: '#fff', borderBottom: '2px solid #e2e8f0' }}>

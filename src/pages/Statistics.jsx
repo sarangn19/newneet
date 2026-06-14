@@ -200,6 +200,7 @@ export default function Statistics() {
       background: 'var(--page-bg)',
       minHeight: '100vh', paddingBottom: 100, color: 'var(--text)',
       fontFamily: 'Satoshi, -apple-system, BlinkMacSystemFont, sans-serif',
+      overflowX: 'hidden',
     }}>
       {/* Title on purple background — no container */}
         <div style={{ padding: '44px 20px 16px', textAlign: 'center' }}>

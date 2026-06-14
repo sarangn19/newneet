@@ -162,7 +162,7 @@ export default function UpscHome() {
   }
 
   return (
-    <div style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
+    <div style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100, overflowX: 'hidden' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {!pageReady ? (
           <>
