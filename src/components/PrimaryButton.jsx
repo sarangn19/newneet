@@ -9,9 +9,9 @@ export default function PrimaryButton({ onClick, children, style, disabled = fal
       disabled={disabled}
       className="shared-primary-btn"
       style={{
-        width: fullWidth ? '100%' : undefined,
-        background: disabled ? 'var(--border)' : 'var(--primary)',
-        color: disabled ? 'var(--text-3)' : '#fff',
+        '--btn-w': fullWidth ? '100%' : 'auto',
+        '--btn-bg': disabled ? 'var(--border)' : 'var(--primary)',
+        '--btn-color': disabled ? 'var(--text-3)' : '#fff',
         ...style,
       }}
     >

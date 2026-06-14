@@ -5,6 +5,10 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   overflow: hidden;
+  padding: var(--card-p, 16px);
+}
+.shared-card-clickable {
+  cursor: pointer;
 }
 
 .shared-badge {
@@ -14,6 +18,8 @@
   font-size: 9px;
   font-weight: 700;
   white-space: nowrap;
+  background: var(--badge-bg, var(--surface-alt));
+  color: var(--badge-color, var(--text-3));
 }
 
 .shared-primary-btn {
@@ -29,6 +35,9 @@
   justify-content: center;
   gap: 6px;
   transition: opacity 0.15s;
+  width: var(--btn-w, 100%);
+  background: var(--btn-bg, var(--primary));
+  color: var(--btn-color, #fff);
 }
 .shared-primary-btn:disabled {
   cursor: default;
@@ -42,25 +51,30 @@
   text-align: center;
   border-radius: var(--radius-md);
   padding: 10px;
+  background: var(--stat-bg, var(--surface-alt));
 }
-
 .shared-stat-value {
   font-size: 20px;
   font-weight: 800;
+  color: var(--stat-color, var(--text));
 }
-
 .shared-stat-label {
   font-size: 10px;
+  color: var(--text-2);
 }
 
 .shared-progress-track {
   border-radius: var(--radius-pill);
   overflow: hidden;
+  height: var(--prog-h, 4px);
+  background: var(--surface-alt);
 }
 .shared-progress-fill {
   height: 100%;
   border-radius: var(--radius-pill);
   transition: width 0.3s;
+  width: var(--prog-pct, 0%);
+  background: var(--prog-color, var(--primary));
 }
 
 .shared-page-header {
@@ -99,6 +113,17 @@
   padding: 0;
   flex-shrink: 0;
 }
+.shared-back-icon {
+  color: var(--text-2);
+}
+
+.shared-header-content {
+  flex: 1;
+  min-width: 0;
+}
+.shared-header-right {
+  flex-shrink: 0;
+}
 
 .shared-search-wrapper {
   position: relative;
@@ -110,6 +135,7 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+  color: var(--text-3);
 }
 .shared-search-input {
   width: 100%;

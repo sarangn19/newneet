@@ -9,14 +9,14 @@ export default function PageHeader({ title, subtitle, backTo, children }) {
       <div className="shared-page-header-inner">
         {backTo && (
           <div onClick={() => navigate(backTo)} className="shared-back-btn">
-            <ChevronLeft size={18} color="var(--text-2)" />
+            <ChevronLeft size={18} className="shared-back-icon" />
           </div>
         )}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="shared-header-content">
           <div className="shared-page-header-title">{title}</div>
           {subtitle && <div className="shared-page-header-subtitle">{subtitle}</div>}
         </div>
-        {children && <div style={{ flexShrink: 0 }}>{children}</div>}
+        {children && <div className="shared-header-right">{children}</div>}
       </div>
     </div>
   )

@@ -4,7 +4,7 @@ import './shared.css'
 export default function SearchInput({ value, onChange, placeholder = 'Search...' }) {
   return (
     <div className="shared-search-wrapper">
-      <Search size={14} color="var(--text-3)" className="shared-search-icon" />
+      <Search size={14} className="shared-search-icon" />
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
