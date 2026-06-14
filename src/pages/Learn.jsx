@@ -166,6 +166,7 @@ function NotesTab() {
   }, [notes])
 
   return (
+    <>
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       {/* Search + Create Note */}
       <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--page-bg)', paddingTop: 4, paddingBottom: 12 }}>
@@ -419,6 +420,7 @@ function NotesTab() {
           })}
         </div>
       )}
+    </motion.div>
 
       {/* Note detail popup */}
       <AnimatePresence>
@@ -480,10 +482,6 @@ function NotesTab() {
               {/* Actions */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.2 }}
                 style={{ padding: '8px 20px 20px', display: 'flex', gap: 8 }}>
-                <motion.button onClick={() => { navigate('/note/' + selectedNote.id) }} whileTap={{ scale: 0.95 }}
-                  style={{ flex: 1, padding: '9px 0', borderRadius: 12, border: '1.5px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-                  Edit
-                </motion.button>
                 <motion.button onClick={() => { toggleBookmark(selectedNote.id); handleCloseNote() }} whileTap={{ scale: 0.95 }}
                   style={{ flex: 1, padding: '9px 0', borderRadius: 12, border: 'none', background: bookmarkedIds.has(selectedNote.id) ? 'var(--primary)' : 'var(--surface-alt)', color: bookmarkedIds.has(selectedNote.id) ? '#fff' : 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <Bookmark size={14} fill={bookmarkedIds.has(selectedNote.id) ? '#fff' : 'none'} />
@@ -498,7 +496,7 @@ function NotesTab() {
           </>
         )}
       </AnimatePresence>
-    </motion.div>
+    </>
   )
 }
 
