@@ -33,14 +33,7 @@ export default function Learn() {
     <motion.div layout style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
       {/* Header — premium editorial */}
       <div style={{ padding: '20px 16px 16px' }}>
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 32, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.02em', marginBottom: 4 }}>
-            Learn
-          </div>
-          <div style={{ fontSize: 15, fontWeight: 400, color: 'var(--text-3)' }}>
-            Organize. Revise. Master.
-          </div>
-        </div>
+
 
         {/* Study Mode Switcher — Apple segmented control */}
         <div ref={segContainerRef} style={{

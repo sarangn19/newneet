@@ -189,14 +189,7 @@ export default function UpscHome() {
           <>{/* G��G�� TOP BAR G��G�� */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28 }}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '48px 20px 8px' }}>
-          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.05 }}>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.03em', margin: 0 }}>
-              UPSC<span style={{ color: 'var(--primary)' }}>.</span>
-            </h1>
-            <p style={{ fontSize: 12, color: 'var(--text-3)', margin: '2px 0 0', fontWeight: 500 }}>
-              {greeting()}, {user?.name?.split(' ')[0] || 'Student'} -+ {dayLabels[dayOfWeek]}
-            </p>
-          </motion.div>
+
           <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.1 }}
             style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" onClick={() => navigate('/pyq-search')} style={{ padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', gap: 4 }}>

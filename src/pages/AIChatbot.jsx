@@ -242,18 +242,15 @@ export default function AIChatbot() {
           <motion.button whileTap={{scale:0.96}} onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
             <ChevronLeft size={18} color="var(--text)" />
           </motion.button>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>AI Mentor</div>
-            {!chatStarted ? (
-              <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Your intelligent UPSC study companion</div>
-            ) : (
+          {chatStarted && (
+            <div style={{ flex: 1 }}>
               <motion.button onClick={() => setShowModePicker(true)} whileTap={{ scale: 0.97 }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: 'var(--text-2)', fontFamily: 'inherit' }}>
                 {modeObj?.label}
                 <ChevronDown size={10} />
               </motion.button>
-            )}
-          </div>
+            </div>
+          )}
           <motion.button whileTap={{scale:0.96}} onClick={() => setShowHistory(!showHistory)} style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', position: 'relative',
           }}>

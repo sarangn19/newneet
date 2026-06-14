@@ -234,11 +234,7 @@ export default function CurrentAffairs() {
 
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Current Affairs</div>
-            <div style={{ fontSize: 11, color: 'var(--text-2)' }}>UPSC-focused news feed</div>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
           <motion.button whileTap={{scale:0.96}} onClick={loadNews} style={{
             width: 34, height: 34, borderRadius: 12, border: '1px solid var(--border)',
             background: 'var(--surface-alt)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
