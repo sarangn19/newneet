@@ -421,7 +421,7 @@ function NotesTab() {
                   </motion.button>
                 </div>
                 {/* Title — max 2 lines */}
-                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1 }}>
                   {n.title || 'Untitled'}
                 </div>
                 {/* Date at bottom */}
