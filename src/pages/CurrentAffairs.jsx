@@ -350,7 +350,6 @@ export default function CurrentAffairs() {
               style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {filtered.map((a) => {
                 const catColor = categoryColors[a.category] || '#6B7280'
-                const gradient = `linear-gradient(135deg, ${catColor}22, ${catColor}08)`
                 const isRead = readArticles.has(a.title)
                 return (
                   <motion.div key={a.title}
@@ -361,44 +360,39 @@ export default function CurrentAffairs() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
                     style={{
-                      background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--border)',
-                      cursor: 'pointer', overflow: 'hidden',
+                      background: 'var(--card-bg)', borderRadius: 24, padding: 20, cursor: 'pointer',
+                      display: 'flex', flexDirection: 'column',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
                       opacity: isRead ? 0.85 : 1,
                     }}
                   >
-                    <div style={{
-                      height: 80, background: gradient,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 28, position: 'relative',
-                    }}>
-                      <span style={{ opacity: 0.3 }}>📰</span>
-                      <span style={{
-                        position: 'absolute', top: 6, right: 6, fontSize: 9, fontWeight: 700,
-                          padding: '2px 8px', borderRadius: 99, background: 'var(--card-bg)', color: catColor,
-                      }}>
-                        {a.category}
-                      </span>
+                    {/* Top row: category chip + date */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: catColor }} />
+                        <span style={{ fontSize: 10, fontWeight: 600, color: catColor }}>{a.category}</span>
+                      </div>
+                      <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>{a.date}</span>
                     </div>
-                    <div style={{ padding: '10px 12px 12px' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: isRead ? 'var(--text-2)' : 'var(--text)', lineHeight: 1.4, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {a.title}
+                    {/* Title — max 2 lines */}
+                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {a.title}
+                    </div>
+                    {/* Preview — max 3 lines */}
+                    {a.summary && (
+                      <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 10 }}>
+                        {a.summary}
                       </div>
-                      {a.summary && (
-                        <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 6 }}>
-                          {a.summary}
-                        </div>
-                      )}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          {isRead && <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />}
-                          <div style={{ fontSize: 10, color: 'var(--text-3)' }}>{a.date}</div>
-                        </div>
-                        <motion.button whileTap={{scale:0.9}} onClick={e => { e.stopPropagation(); toggleBookmark(a) }} style={{
-                          background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex',
-                        }}>
-                          <Bookmark size={13} color={bookmarked.has(a.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(a.title) ? 'var(--primary)' : 'none'} />
-                        </motion.button>
-                      </div>
+                    )}
+                    {/* Bottom row: continue reading + bookmark */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 2 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)' }}>
+                        Continue reading →
+                      </span>
+                      <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(a) }} whileTap={{ scale: 0.8 }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+                        <Bookmark size={14} color={bookmarked.has(a.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(a.title) ? 'var(--primary)' : 'none'} />
+                      </motion.button>
                     </div>
                   </motion.div>
                 )
