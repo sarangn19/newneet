@@ -329,24 +329,24 @@ export default function CurrentAffairs() {
           ) : (
             <motion.div key={activeCategory} variants={{ visible: { transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="visible"
               style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {filtered.map((a, i) => {
+              {filtered.map((a) => {
                 const catColor = categoryColors[a.category] || '#6B7280'
                 const gradient = `linear-gradient(135deg, ${catColor}22, ${catColor}08)`
                 const isRead = readArticles.has(a.title)
                 return (
-                  <motion.div key={i}
+                  <motion.div key={a.title}
+                    layoutId={`article-${a.title}`}
                     variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
                     transition={{ duration: 0.3, ease: 'easeOut' }}
                     whileHover={{ y: -3 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
                     style={{
-                      background: 'var(--card-bg)', borderRadius: 14, border: selectedArticle?.title === a.title ? '2px solid var(--primary)' : '1px solid var(--border)',
+                      background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--border)',
                       cursor: 'pointer', overflow: 'hidden',
                       opacity: isRead ? 0.85 : 1,
                     }}
                   >
-                    {/* Colored placeholder */}
                     <div style={{
                       height: 80, background: gradient,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -388,98 +388,129 @@ export default function CurrentAffairs() {
           )}
         </div>
 
-        {/* Detail panel */}
+        {/* Article detail overlay */}
         <AnimatePresence>
         {selectedArticle && (
-          <motion.div
-            initial={{ opacity: 0, x: 320 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 320 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            style={{
-              position: 'fixed', right: 0, top: 0, bottom: 0, width: '100%', maxWidth: 400,
-              background: 'var(--card-bg)', zIndex: 200, boxShadow: 'var(--shadow-strong)',
-              display: 'flex', flexDirection: 'column', overflow: 'hidden',
-            }}
-          >
-            <div style={{ padding: '50px 14px 10px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <motion.button whileTap={{scale:0.96}} onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; if (selectedArticle) recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-                <ChevronLeft size={18} color="var(--text)" />
-              </motion.button>
-              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>Article</div>
-            </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: '14px 14px 100px' }}>
-              {/* Category-colored header */}
-              <div style={{
-                height: 100, borderRadius: 12, marginBottom: 12,
-                background: `linear-gradient(135deg, ${(categoryColors[selectedArticle.category] || '#6B7280')}30, ${(categoryColors[selectedArticle.category] || '#6B7280')}10)`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40,
-              }}>
-                📰
-              </div>
-              {selectedArticle.category && (
-                <span style={{
-                  display: 'inline-block', padding: '3px 10px', borderRadius: 99, fontSize: 10, fontWeight: 700,
-                  background: (categoryColors[selectedArticle.category] || '#6B7280') + '15',
-                  color: categoryColors[selectedArticle.category] || '#6B7280', marginBottom: 8,
-                }}>
-                  {selectedArticle.category}
-                </span>
-              )}
-              <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 6 }}>{selectedArticle.title}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 12 }}>
-                {selectedArticle.date} · {selectedArticle.source}
-              </div>
-              {/* Detailed analysis sections */}
-              <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
-                {selectedArticle.summary || 'Full article content would appear here. Fetch the complete story from the source link below.'}
-              </div>
-              {selectedArticle.tags?.length > 0 && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Tags</div>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {selectedArticle.tags.map((t, i) => (
-                      <span key={i} style={{ fontSize: 10, color: 'var(--text-3)', background: 'var(--surface-alt)', padding: '3px 10px', borderRadius: 99 }}>{t}</span>
-                    ))}
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, backdropFilter: 'blur(4px)' }}
+            />
+            <motion.div
+              layoutId={`article-${selectedArticle.title}`}
+              style={{
+                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                zIndex: 110, background: 'var(--page-bg)', borderRadius: 0,
+                overflow: 'hidden', display: 'flex', flexDirection: 'column',
+              }}
+            >
+              {/* Header */}
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0, duration: 0.2 }}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '48px 16px 8px', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)' }}>
+                <motion.button whileTap={{scale:0.96}} onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                  <ChevronLeft size={18} color="var(--text)" />
+                </motion.button>
+                <div style={{ flex: 1, fontSize: 16, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {selectedArticle.category || 'Article'}
+                </div>
+                <motion.button whileTap={{scale:0.9}} onClick={() => toggleBookmark(selectedArticle)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+                  <Bookmark size={16} color={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'none'} />
+                </motion.button>
+              </motion.div>
+
+              {/* Scrollable content */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px 90px' }}>
+                {/* Category banner */}
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05, duration: 0.2 }}
+                  style={{
+                    height: 100, borderRadius: 12, marginBottom: 12, position: 'relative', overflow: 'hidden',
+                    background: `linear-gradient(135deg, ${(categoryColors[selectedArticle.category] || '#6B7280')}30, ${(categoryColors[selectedArticle.category] || '#6B7280')}08)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40,
+                  }}
+                >
+                  <span style={{ opacity: 0.3 }}>📰</span>
+                </motion.div>
+
+                {/* Category + meta */}
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05, duration: 0.2 }}>
+                  {selectedArticle.category && (
+                    <span style={{
+                      display: 'inline-block', padding: '3px 10px', borderRadius: 99, fontSize: 10, fontWeight: 700,
+                      background: (categoryColors[selectedArticle.category] || '#6B7280') + '15',
+                      color: categoryColors[selectedArticle.category] || '#6B7280', marginBottom: 8,
+                    }}>
+                      {selectedArticle.category}
+                    </span>
+                  )}
+                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4 }}>{selectedArticle.title}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 12 }}>
+                    {selectedArticle.date} · {selectedArticle.source}
                   </div>
-                </div>
-              )}
-              {/* UPSC Relevance */}
-              <div style={{ background: 'var(--success-light)', borderRadius: 10, padding: 10, marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--success)', marginBottom: 4 }}>UPSC Relevance</div>
-                <div style={{ fontSize: 11, color: 'var(--success-dark)', lineHeight: 1.5 }}>
-                  This article is relevant for {selectedArticle.category || 'General Studies'} preparation. Analyze the key facts, government initiatives, and constitutional aspects mentioned. Link with static syllabus topics for Mains answers.
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <motion.button whileTap={{scale:0.96}} onClick={() => toggleBookmark(selectedArticle)} style={{
-                  width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
-                  background: bookmarked.has(selectedArticle.title) ? 'var(--error)' : 'var(--primary)',
-                  color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                }}>
-                  {bookmarked.has(selectedArticle.title) ? <><X size={14} /> Remove Bookmark</> : <><BookOpen size={14} /> Save as Note</>}
-                </motion.button>
-                <motion.button whileTap={{scale:0.96}} onClick={() => generateMCQs(selectedArticle)} disabled={mcqLoading} style={{
-                  width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
-                  background: mcqLoading ? 'var(--surface-alt)' : 'var(--success)', color: '#fff',
-                  fontSize: 12, fontWeight: 700, cursor: mcqLoading ? 'default' : 'pointer', fontFamily: 'inherit',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                }}>
-                  <Sparkles size={14} /> {mcqLoading ? 'Generating...' : 'Practice Related MCQs'}
-                </motion.button>
-                {selectedArticle.url && (
-                  <a href={selectedArticle.url} target="_blank" rel="noopener noreferrer" style={{
-                    width: '100%', padding: '10px 0', borderRadius: 8, border: '1.5px solid var(--border)',
-                    background: 'var(--card-bg)', color: 'var(--text-3)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, textDecoration: 'none',
-                  }}>
-                    <ExternalLink size={14} /> Read Full Article
-                  </a>
+                </motion.div>
+
+                {/* Summary */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.25 }}
+                  style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
+                  {selectedArticle.summary || 'Full article content would appear here. Fetch the complete story from the source link below.'}
+                </motion.div>
+
+                {/* Tags */}
+                {selectedArticle.tags?.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.2 }}
+                    style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Tags</div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {selectedArticle.tags.map((t, i) => (
+                        <span key={i} style={{ fontSize: 10, color: 'var(--text-3)', background: 'var(--surface-alt)', padding: '3px 10px', borderRadius: 99 }}>{t}</span>
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
+
+                {/* UPSC Relevance */}
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.2 }}
+                  style={{ background: `${(categoryColors[selectedArticle.category] || '#6B7280')}0D`, borderRadius: 10, padding: 10, marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: categoryColors[selectedArticle.category] || 'var(--primary)', marginBottom: 4 }}>UPSC Relevance</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
+                    This article is relevant for {selectedArticle.category || 'General Studies'} preparation. Analyze the key facts, government initiatives, and constitutional aspects mentioned. Link with static syllabus topics for Mains answers.
+                  </div>
+                </motion.div>
+
+                {/* Actions */}
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.2 }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <motion.button whileTap={{scale:0.96}} onClick={() => generateMCQs(selectedArticle)} disabled={mcqLoading} style={{
+                    width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
+                    background: mcqLoading ? 'var(--surface-alt)' : 'var(--primary)', color: '#fff',
+                    fontSize: 12, fontWeight: 700, cursor: mcqLoading ? 'default' : 'pointer', fontFamily: 'inherit',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  }}>
+                    <Sparkles size={14} /> {mcqLoading ? 'Generating...' : 'Practice Related MCQs'}
+                  </motion.button>
+                  {selectedArticle.url && (
+                    <a href={selectedArticle.url} target="_blank" rel="noopener noreferrer" style={{
+                      width: '100%', padding: '10px 0', borderRadius: 12, border: '1.5px solid var(--border)',
+                      background: 'var(--card-bg)', color: 'var(--text-3)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, textDecoration: 'none',
+                    }}>
+                      <ExternalLink size={14} /> Read Full Article
+                    </a>
+                  )}
+                </motion.div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
         </AnimatePresence>
       </div>

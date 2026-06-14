@@ -151,220 +151,207 @@ export default function UpscHome() {
     }
   }
 
-  const dueCount = useMemo(() => {
-    return allTopics.filter(t => {
-      const s = topicScores[t.id]
-      if (!s || !s.total) return false
-      const acc = (s.correct / s.total) * 100
-      let interval = 1
-      if (acc >= 80) interval = 7
-      else if (acc >= 60) interval = 4
-      else if (acc >= 40) interval = 2
-      const review = revisionSchedule[t.id]
-      if (!review?.lastReviewed) return true
-      return Math.floor((new Date() - new Date(review.lastReviewed)) / (8.64e7)) >= interval
-    }).length
-  }, [allTopics, topicScores, revisionSchedule])
-
-  const totalQs = useMemo(() => {
-    return Object.values(topicScores).reduce((sum, s) => sum + (s.total || 0), 0)
-  }, [topicScores])
-
-  const overallAccuracy = useMemo(() => {
-    let c = 0, t = 0
-    Object.values(topicScores).forEach(s => { c += s.correct || 0; t += s.total || 0 })
-    return t > 0 ? Math.round(c / t * 100) : 0
-  }, [topicScores])
-
-  const topWeakTopic = useMemo(() => {
-    return allTopics
-      .map(t => ({ ...t, acc: topicScores[t.id] ? (topicScores[t.id].correct / topicScores[t.id].total) * 100 : 0 }))
-      .sort((a, b) => a.acc - b.acc)[0]
-  }, [allTopics, topicScores])
-
-  const progressInsight = useMemo(() => {
-    if (totalQs === 0) return 'Start practicing to get personalized insights'
-    if (topWeakTopic) return `${topWeakTopic.name} needs attention ‚Äî ${Math.round(topWeakTopic.acc)}% accuracy`
-    if (overallAccuracy >= 70) return `Strong momentum ‚Äî ${overallAccuracy}% overall accuracy`
-    return `${dueCount} topics due for revision ‚Äî keep the momentum going`
-  }, [totalQs, topWeakTopic, overallAccuracy, dueCount])
-
   return (
     <div style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px' }}>
-        {/* ‚ïê‚ïê GREETING ‚ïê‚ïê */}
-        <div style={{ padding: '56px 0 4px' }}>
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
-            <p style={{ fontSize: 14, color: 'var(--text-2)', fontWeight: 500 }}>{greeting()},</p>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.03em', margin: 0 }}>
-                {user?.name?.split(' ')[0] || 'Student'}
-              </h1>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <motion.button whileTap={{ scale: 0.95 }} onClick={() => navigate('/pyq-search')} style={{ background: 'var(--surface-alt)', border: 'none', borderRadius: 99, width: 34, height: 34, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Search size={15} color="var(--text-2)" />
-                </motion.button>
-                <motion.button whileTap={{ scale: 0.95 }} onClick={() => navigate('/profile')} style={{
-                  width: 34, height: 34, borderRadius: 99, border: 'none', cursor: 'pointer',
-                  background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {user?.name?.[0] || 'U'}
-                </motion.button>
-              </div>
-            </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+        {/* GÚ…GÚ… TOP BAR GÚ…GÚ… */}
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '48px 20px 8px' }}>
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.05 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.03em', margin: 0 }}>
+              UPSC<span style={{ color: 'var(--primary)' }}>.</span>
+            </h1>
+            <p style={{ fontSize: 12, color: 'var(--text-3)', margin: '2px 0 0', fontWeight: 500 }}>
+              {greeting()}, {user?.name?.split(' ')[0] || 'Student'} -+ {dayLabels[dayOfWeek]}
+            </p>
           </motion.div>
-        </div>
+          <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.1 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" onClick={() => navigate('/pyq-search')} style={{ padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Search size={14} color="var(--primary)" />
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)' }}>PYQs</span>
+            </motion.button>
+            <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)' }}>
+              <Flame size={14} color="#f97316" />
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{streak}</span>
+            </motion.button>
+            <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" onClick={() => navigate('/profile')} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'var(--primary-light)', borderRadius: 9999, border: '2px solid var(--border)', overflow: 'hidden', fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>
+              {user?.name?.[0] || 'U'}
+            </motion.button>
+          </motion.div>
+        </motion.div>
 
-        {/* ‚ïê‚ïê TODAY'S FOCUS ‚ïê‚ïê */}
-        <div style={{ marginTop: 16 }}>
-          <p style={{ fontSize: 12, color: 'var(--text-3)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Today's Focus</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-            {[
-              { label: 'Due for Revision', value: dueCount, color: 'var(--primary)' },
-              { label: 'Questions Solved', value: totalQs, color: '#34C759' },
-              { label: 'Accuracy', value: `${overallAccuracy}%`, color: '#AF52DE' },
-            ].map((item, i) => (
-              <motion.div key={item.label}
-                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05, duration: 0.3, ease: 'easeOut' }}
-                style={{ background: 'var(--card-bg)', borderRadius: 14, padding: '10px 8px', textAlign: 'center', border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: 18, fontWeight: 700, color: item.color }}>{item.value}</div>
-                <div style={{ fontSize: 10, color: 'var(--text-2)', fontWeight: 500, marginTop: 2 }}>{item.label}</div>
+        {/* GÚ…GÚ… ALERTS GÚ…GÚ… */}
+        {alerts.length > 0 && (
+          <div style={{ padding: '12px 20px 0' }}>
+            <AnimatePresence>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {alerts.slice(0, 1).map((alert, i) => {
+                  const iconMap = { critical: TrendingDown, weak: AlertTriangle, declining: TrendingDown, streak: Flame, inactive: Clock, consistency: BarChart3 }
+                  const colorMap = { critical: '#DC2626', weak: '#D97706', declining: '#DC2626', streak: '#B45309', inactive: 'var(--text-3)', consistency: '#2563EB' }
+                  const bgMap = { critical: 'var(--error-light)', weak: 'var(--warning-light)', declining: 'var(--error-light)', streak: 'var(--warning-light)', inactive: 'var(--surface-alt)', consistency: 'var(--primary-light)' }
+                  const Icon = iconMap[alert.type] || AlertTriangle
+                  return (
+                    <div key={i} style={{ padding: '6px 10px', borderRadius: 8, background: bgMap[alert.type], display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.4 }}>
+                      <Icon size={13} color={colorMap[alert.type]} style={{ flexShrink: 0 }} />
+                      {alert.message}
+                    </div>
+                  )
+                })}
               </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* ‚ïê‚ïê CONTINUE LEARNING ‚ïê‚ïê */}
-        {currentTopic && (
-          <div style={{ marginTop: 20 }}>
-            <p style={{ fontSize: 12, color: 'var(--text-3)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Continue Learning</p>
-            <motion.div
-              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.35, ease: 'easeOut' }}
-              whileHover={{ y: -2 }}
-              onClick={() => openRevision(currentTopic)}
-              style={{
-                background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 20,
-                cursor: 'pointer', position: 'relative', overflow: 'hidden',
-              }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{currentTopic.subjectName}</div>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)', marginTop: 4, lineHeight: 1.3 }}>{currentTopic.name}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 4, lineHeight: 1.4 }}>
-                    {priorityInfo?.weakness >= 0.6 ? `Weak area ‚Äî ${currentTopic.accuracy || 0}% accuracy` : 'Due for revision'}
-                  </div>
-                </div>
-                <motion.div whileTap={{ scale: 0.95 }} style={{
-                  background: 'var(--primary)', borderRadius: 99, width: 40, height: 40,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </motion.div>
-              </div>
-              <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-                <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
-                  Level {getMastery(currentTopic.id, revisionMastery)}/4
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
-                  Est. {getMastery(currentTopic.id, revisionMastery) === 1 ? '3m' : '5m'}
-                </div>
-              </div>
-            </motion.div>
+            </AnimatePresence>
           </div>
         )}
 
-        {/* ‚ïê‚ïê REVISION RADAR ‚ïê‚ïê */}
-        {remainingFeed.length > 1 && (
-          <div style={{ marginTop: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <p style={{ fontSize: 12, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Revision Radar</p>
-              <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{remainingFeed.length} topics</span>
-            </div>
-            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
-              {remainingFeed.slice(0, 8).map((t, i) => {
-                const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
-                const urgency = pi?.weakness >= 0.6 ? '#FF3B30' : pi?.forgetting >= 0.5 ? '#D4A853' : 'var(--text-3)'
+        {/* GÚ…GÚ… TODAY'S REVISION CAROUSEL GÚ…GÚ… */}
+        {remainingFeed.length > 0 && (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0', touchAction: 'none', userSelect: 'none' }}
+            onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+          >
+            <div style={{ position: 'relative', width: '100%', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {[-1, 0, 1].map((offset) => {
+                const idx = feedIdx + offset
+                if (idx < 0 || idx >= remainingFeed.length) return null
+                const t = remainingFeed[idx]
+                const isCenter = offset === 0
+                const pi = isCenter ? priorityInfo : calculatePriorityScore(t.id, topicScores, revisionSchedule)
+                const reason = pi?.weakness >= 0.6 ? `Weak G«ˆ ${t.accuracy || 0}% accuracy` : pi?.forgetting >= 0.8 ? 'Over 2 weeks since review' : pi?.forgetting >= 0.5 ? 'Due for review' : pi?.importance >= 0.6 ? 'High-yield topic' : 'Keep fresh'
+                const accentColor = pi?.weakness >= 0.6 ? '#ef4444' : pi?.forgetting >= 0.5 ? '#f59e0b' : 'var(--primary)'
+                const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'
+                const badgeBg = pi?.weakness >= 0.6 ? 'var(--error-light)' : pi?.forgetting >= 0.5 ? 'var(--warning-light)' : 'var(--primary-light)'
+                const badgeColor = pi?.weakness >= 0.6 ? '#dc2626' : pi?.forgetting >= 0.5 ? '#d97706' : 'var(--primary)'
+                const level = getMastery(t.id, revisionMastery)
+                const subj = upscSubjects.find(s => s.id === t.subjectId)
+                const subjGradient = subj?.gradient || 'linear-gradient(135deg, var(--primary-dark), var(--primary))'
                 return (
                   <motion.div key={t.id}
-                    initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.03, duration: 0.2, ease: 'easeOut' }}
-                    whileHover={{ y: -2 }}
-                    onClick={() => openRevision(t)}
-                    style={{
-                      minWidth: 140, background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--border)',
-                      padding: 12, cursor: 'pointer', flexShrink: 0,
-                      borderLeft: `3px solid ${urgency}`,
+                    animate={{ x: offset * 200, scale: isCenter ? 1 : 0.85, opacity: isCenter ? 1 : 0.4, zIndex: isCenter ? 10 : 5 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    onClick={() => { if (isCenter) openRevision(t); else setFeedIdx(idx) }}
+                    style={{ position: 'absolute', width: 340, cursor: 'pointer', perspective: 1200 }}
+                    whileHover={isCenter ? { scale: 1.02 } : {}}
+                  >
+                    <motion.div style={{
+                      background: 'var(--card-bg)',
+                      border: isCenter ? '1px solid rgba(99,102,241,0.15)' : '1px solid var(--border)',
+                      backdropFilter: 'blur(40px)',
+                      borderRadius: 32,
+                      overflow: 'hidden',
+                      boxShadow: isCenter ? '0 30px 60px -15px rgba(0,0,0,0.5)' : '0 8px 20px -8px rgba(0,0,0,0.3)',
                     }}>
-                    <div style={{ fontSize: 10, fontWeight: 600, color: urgency, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t.subjectName}</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginTop: 3, lineHeight: 1.3 }}>{t.name}</div>
-                    <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 4 }}>
-                      {t.total ? `${t.accuracy}% accuracy` : 'New topic'}
-                    </div>
+                      {/* Image area G«ˆ no padding */}
+                      <div style={{
+                        height: 150, width: '100%', background: subjGradient,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        position: 'relative', overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0%, transparent 60%), radial-gradient(circle at 70% 60%, rgba(255,255,255,0.06) 0%, transparent 50%)',
+                        }} />
+                        <div style={{
+                          fontSize: 48, fontWeight: 900, color: 'rgba(255,255,255,0.12)',
+                          letterSpacing: '-0.06em', userSelect: 'none',
+                          textTransform: 'uppercase',
+                        }}>{t.subjectName}</div>
+                      </div>
+
+                      <div style={{ padding: 20 }}>
+                        {/* Subject + badge */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.subjectName}</div>
+                          <div style={{ padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: 700, background: badgeBg, color: badgeColor }}>{badgeLabel}</div>
+                        </div>
+
+                        {/* Topic name */}
+                        <div style={{ fontSize: isCenter ? 18 : 16, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginTop: 5, letterSpacing: '-0.02em' }}>{t.name}</div>
+
+                        {/* Meta line */}
+                        <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 5, fontWeight: 500 }}>
+                          GS I -+ L{level}/4 -+ {reason}
+                        </div>
+
+                        {/* Stats row */}
+                        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
+                          {t.total > 0 && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <Target size={11} color="var(--primary)" />
+                              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)' }}>{t.accuracy}%</span>
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <Clock size={11} color="var(--text-3)" />
+                            <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{level === 1 ? '3m' : '5m'}</span>
+                          </div>
+                        </div>
+
+                        {/* Action */}
+                        <div style={{ marginTop: 16 }}>
+                          {isCenter ? (
+                            <motion.button whileTap={{ scale: 0.97 }} onClick={(e) => { e.stopPropagation(); openRevision(t) }}
+                              style={{
+                                width: '100%', padding: '13px 0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
+                                cursor: 'pointer', border: 'none', background: 'var(--primary)', color: '#fff',
+                                borderRadius: 12, letterSpacing: '0.01em',
+                              }}
+                            >Start Practice</motion.button>
+                          ) : (
+                            <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em' }}>Tap to view GÂ∆</div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
                   </motion.div>
                 )
               })}
             </div>
+
+            {/* Dot indicators */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10 }}>
+              {remainingFeed.slice(0, 10).map((_, i) => (
+                <div key={i} onClick={() => setFeedIdx(i)} style={{
+                  width: i === feedIdx ? 22 : 6, height: 6, borderRadius: 3,
+                  background: i === feedIdx ? 'var(--primary)' : 'var(--text-3)',
+                  transition: 'all 0.3s', cursor: 'pointer', opacity: i === feedIdx ? 1 : 0.5,
+                }} />
+              ))}
+            </div>
           </div>
         )}
 
-        {/* ‚ïê‚ïê CURRENT AFFAIRS SNAPSHOT ‚ïê‚ïê */}
-        <div style={{ marginTop: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-            <p style={{ fontSize: 12, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Affairs</p>
-            <motion.button whileTap={{ scale: 0.95 }} onClick={() => navigate('/current-affairs')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: 'var(--primary)', fontWeight: 600, fontFamily: 'inherit' }}>
-              View all
-            </motion.button>
-          </div>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.3, ease: 'easeOut' }}
-            onClick={() => navigate('/current-affairs')}
-            style={{
-              background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border)',
-              padding: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,
-            }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/></svg>
+        {/* Empty G«ˆ all done */}
+        {dailyMix.length > 0 && remainingCount === 0 && (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <CheckCircle size={32} color="#10B981" style={{ marginBottom: 10 }} />
+              <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>All caught up!</div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3, lineHeight: 1.5 }}>Check back tomorrow for fresh topics.</div>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/learn')}
+                style={{ marginTop: 14, padding: '8px 20px', borderRadius: 10, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
+                Practice More
+              </motion.button>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>Today's UPSC Stories</div>
-              <div style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 2 }}>3 new articles ¬∑ Economy, Polity, Environment</div>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </motion.div>
-        </div>
-
-        {/* ‚ïê‚ïê PROGRESS INSIGHT ‚ïê‚ïê */}
-        <div style={{ marginTop: 20, marginBottom: 90 }}>
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.3 }}
-            style={{
-              background: 'var(--primary-light)', borderRadius: 14, padding: '12px 16px',
-              display: 'flex', alignItems: 'center', gap: 10,
-            }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
-            </div>
-            <p style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 500, lineHeight: 1.4, margin: 0 }}>
-              {progressInsight}
-            </p>
-          </motion.div>
-        </div>
-
-        {/* ‚ïê‚ïê EMPTY STATE ‚ïê‚ïê */}
-        {dailyMix.length === 0 && totalQs === 0 && (
-          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)' }}>No topics yet</div>
-            <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 4 }}>Practice some questions to get started.</div>
-            <motion.button whileTap={{ scale: 0.95 }} onClick={() => navigate('/learn')}
-              style={{ marginTop: 14, padding: '10px 24px', borderRadius: 12, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
-              Get Started
-            </motion.button>
           </div>
         )}
+
+        {/* Empty G«ˆ no mix */}
+        {dailyMix.length === 0 && (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <FileText size={32} color="var(--text-3)" style={{ marginBottom: 10 }} />
+              <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>No topics yet</div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3, lineHeight: 1.5 }}>Practice some questions to get started.</div>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/learn')}
+                style={{ marginTop: 14, padding: '8px 20px', borderRadius: 10, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
+                Get Started
+              </motion.button>
+            </div>
+          </div>
+        )}
+
       </div>
 
-      {/* ‚ïê‚ïê REVISION POPUP ‚ïê‚ïê */}
+      {/* GÚ…GÚ… REVISION POPUP GÚ…GÚ… */}
       <AnimatePresence>
         {revisionPopupTopic && (
           <motion.div
@@ -448,7 +435,7 @@ export default function UpscHome() {
                             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--error)' }}>Common Mistakes</span>
                           </div>
                           {revisionContent.commonMistakes.slice(0, 3).map((m, i) => (
-                            <div key={i} style={{ fontSize: 11, color: 'var(--error)', padding: '3px 0', lineHeight: 1.5 }}>‚Ä¢ {m}</div>
+                            <div key={i} style={{ fontSize: 11, color: 'var(--error)', padding: '3px 0', lineHeight: 1.5 }}>G«Û {m}</div>
                           ))}
                         </div>
                       )}
@@ -459,7 +446,7 @@ export default function UpscHome() {
                             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)' }}>Memory Aids</span>
                           </div>
                           {revisionContent.mnemonics.map((m, i) => (
-                            <div key={i} style={{ fontSize: 11, color: 'var(--text-2)', padding: '2px 0', fontStyle: 'italic', lineHeight: 1.5 }}>üß† {m}</div>
+                            <div key={i} style={{ fontSize: 11, color: 'var(--text-2)', padding: '2px 0', fontStyle: 'italic', lineHeight: 1.5 }}>=É∫· {m}</div>
                           ))}
                         </div>
                       )}
@@ -503,7 +490,7 @@ export default function UpscHome() {
                               color: practiceSubmitted && isAns ? '#fff' : isSel ? '#fff' : border,
                               borderColor: practiceSubmitted && isAns ? 'var(--success)' : isSel ? 'var(--primary)' : border,
                             }}>
-                              {practiceSubmitted && isAns ? '‚úì' : isSel && !isAns ? '‚úó' : String.fromCharCode(65 + oi)}
+                              {practiceSubmitted && isAns ? 'G£Ù' : isSel && !isAns ? 'G£˘' : String.fromCharCode(65 + oi)}
                             </div>
                             {opt}
                           </motion.div>
@@ -523,7 +510,7 @@ export default function UpscHome() {
                     ) : (
                       <motion.button onClick={nextPractice} whileTap={{ scale: 0.97 }}
                         style={{ width: '100%', padding: '8px 0', borderRadius: 12, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 11, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
-                        {practiceIdx < practiceQ.length - 1 ? 'Next Question ‚Üí' : 'See Results'}
+                        {practiceIdx < practiceQ.length - 1 ? 'Next Question GÂ∆' : 'See Results'}
                       </motion.button>
                     )}
                   </div>
