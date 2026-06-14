@@ -315,23 +315,23 @@ export default function CurrentAffairs() {
         {/* Articles grid */}
         <div style={{ flex: 1, padding: '10px 14px', overflowY: 'auto' }}>
           {loading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', minWidth: 0 }}>
               {[1,2,3,4].map(i => (
                 <div key={i} style={{
-                  background: 'var(--card-bg)', borderRadius: 14,
-                  border: '1px solid var(--border)', overflow: 'hidden',
+                  background: 'var(--card-bg)', borderRadius: 24, padding: 20,
+                  display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0,
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
                 }}>
-                  <motion.div animate={skeletonBreath}
-                    style={{ height: 80, background: 'var(--surface-alt)', position: 'relative' }}
-                  />
-                  <div style={{ padding: '10px 12px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <SkeletonBlock width="40%" height={10} radius={4} />
-                    <SkeletonBlock width="90%" height={12} radius={4} />
-                    <SkeletonBlock width="70%" height={12} radius={4} />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                      <SkeletonBlock width={60} height={10} radius={4} />
-                      <SkeletonBlock width={20} height={10} radius={4} />
-                    </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <SkeletonBlock width={60} height={10} radius={4} />
+                    <SkeletonBlock width={80} height={10} radius={4} />
+                  </div>
+                  <SkeletonBlock width="85%" height={16} radius={4} style={{ marginBottom: 8 }} />
+                  <SkeletonBlock width="60%" height={12} radius={4} style={{ marginBottom: 4 }} />
+                  <SkeletonBlock width="70%" height={12} radius={4} style={{ marginBottom: 10 }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 2 }}>
+                    <SkeletonBlock width={80} height={10} radius={4} />
+                    <SkeletonBlock width={20} height={10} radius={4} />
                   </div>
                 </div>
               ))}
@@ -344,7 +344,7 @@ export default function CurrentAffairs() {
             </div>
           ) : (
             <motion.div key={activeCategory} variants={{ visible: { transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="visible"
-              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', minWidth: 0 }}>
               {filtered.map((a) => {
                 const catColor = categoryColors[a.category] || '#6B7280'
                 const isRead = readArticles.has(a.title)
@@ -358,7 +358,7 @@ export default function CurrentAffairs() {
                     onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
                     style={{
                       background: 'var(--card-bg)', borderRadius: 24, padding: 20, cursor: 'pointer',
-                      display: 'flex', flexDirection: 'column',
+                      display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0,
                       boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
                       opacity: isRead ? 0.85 : 1,
                     }}
