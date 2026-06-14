@@ -408,7 +408,7 @@ export default function CurrentAffairs() {
             onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }}
             style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
           >
-            <motion.div
+            <motion.div layoutId={`article-${selectedArticle.title}`}
               initial={{ opacity: 0, scale: 0.92, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 20 }}
