@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { upscSubjects } from '../data/upsc/subjects'
 import { getAllUpscQuestions } from '../data/upsc/questions'
-import { BookOpen, FileText, Search, ChevronRight, Plus, Zap, CheckCircle, XCircle, RefreshCw, Rotate3D, Star, Bookmark, Check } from 'lucide-react'
+import { BookOpen, FileText, Search, ChevronRight, Plus, Zap, CheckCircle, XCircle, RefreshCw, Rotate3D, Star, Bookmark, Check, X } from 'lucide-react'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 import { easePreset } from '../hooks/useSequentialReveal'
 import { card as cardStyle, cardHover, spring, spacing, font, colors, btn } from '../lib/designTokens'
@@ -20,28 +20,56 @@ export default function Learn() {
   const navigate = useNavigate()
   const { user, userId, completedModules, completeModule } = useStore()
   const [tab, setTab] = useState('notes')
+  const segContainerRef = useRef(null)
+  const [segIndicator, setSegIndicator] = useState({ left: 0, width: 0 })
+
+  useEffect(() => {
+    if (!segContainerRef.current) return
+    const el = segContainerRef.current.querySelector(`[data-seg="${tab}"]`)
+    if (el) setSegIndicator({ left: el.offsetLeft, width: el.offsetWidth })
+  }, [tab])
 
   return (
     <motion.div layout style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
-      {/* Header */}
-      <div style={{ background: 'var(--card-bg)', padding: spacing.header, borderBottom: `1px solid ${colors.borderLight}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Learn</div>
+      {/* Header — premium editorial */}
+      <div style={{ padding: '20px 16px 16px' }}>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 32, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.02em', marginBottom: 4 }}>
+            Learn
+          </div>
+          <div style={{ fontSize: 15, fontWeight: 400, color: 'var(--text-3)' }}>
+            Organize. Revise. Master.
+          </div>
         </div>
-        {/* Tab bar */}
-        <div style={{ display: 'flex', gap: 4, background: 'var(--surface-alt)', borderRadius: 10, padding: 3 }}>
+
+        {/* Study Mode Switcher — Apple segmented control */}
+        <div ref={segContainerRef} style={{
+          display: 'flex', background: 'var(--surface-alt)', borderRadius: 12, padding: 3,
+          position: 'relative',
+        }}>
+          <motion.div
+            animate={{ left: segIndicator.left, width: segIndicator.width }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            style={{
+              position: 'absolute', top: 3, bottom: 3, borderRadius: 10,
+              background: 'var(--card-bg)', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.02)',
+            }}
+          />
           {TABS.map(t => {
             const Icon = t.icon
             const active = tab === t.id
             return (
-              <motion.button key={t.id} onClick={() => setTab(t.id)} whileTap={{ scale: 0.97 }} style={{
-                flex: 1, padding: '7px 0', borderRadius: 12, border: 'none', cursor: 'pointer',
-                background: active ? 'var(--card-bg)' : 'transparent', fontFamily: 'inherit',
-                fontSize: 11, fontWeight: 600, color: active ? 'var(--text)' : 'var(--text-3)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', transition: '0.15s',
-              }}>
-                <Icon size={14} />
+              <motion.button key={t.id} data-seg={t.id} onClick={() => setTab(t.id)}
+                whileTap={{ scale: 0.98 }}
+                style={{
+                  flex: 1, padding: '10px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
+                  fontFamily: 'inherit', fontSize: 15, fontWeight: active ? 600 : 500,
+                  color: active ? 'var(--text)' : 'var(--text-3)',
+                  background: 'transparent', position: 'relative', zIndex: 1,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  transition: 'color 0.2s', WebkitTapHighlightColor: 'transparent',
+                }}>
+                <Icon size={16} strokeWidth={active ? 2.5 : 1.5} />
                 {t.label}
               </motion.button>
             )
@@ -76,6 +104,11 @@ function NotesTab() {
   const [selectedNote, setSelectedNote] = useState(null)
   const [notesLoading, setNotesLoading] = useState(true)
   const [searchFocused, setSearchFocused] = useState(false)
+  const [searchRecentOpen, setSearchRecentOpen] = useState(false)
+  const [searchHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('note_search_history') || '["Polity","Laxmikanth","Fundamental Rights"]') } catch { return [] }
+  })
+  const searchRef = useRef(null)
 
   const toggleBookmark = (id) => {
     setBookmarkedIds(prev => {
@@ -141,49 +174,104 @@ function NotesTab() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      {/* Sticky Search */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--page-bg)', paddingTop: 4, paddingBottom: 8 }}>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <Search size={14} color="var(--text-3)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
-            <input value={search} onChange={e => setSearch(e.target.value)}
-              onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)}
-              placeholder="Search notes..." style={{
-              width: '100%', padding: '10px 10px 10px 36px', borderRadius: 12,
-              border: searchFocused ? '1.5px solid var(--primary)' : '1px solid var(--border)',
-              fontSize: 13, outline: 'none', fontFamily: 'inherit', background: 'var(--card-bg)',
-              boxSizing: 'border-box', transition: 'border 0.2s',
-            }} />
+      {/* Search + Create Note */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--page-bg)', paddingTop: 4, paddingBottom: 12 }}>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <div ref={searchRef} style={{ flex: 1, position: 'relative' }}>
+            <motion.div
+              animate={{ borderRadius: searchFocused ? 14 : 12, boxShadow: searchFocused ? '0 0 0 2px var(--primary), 0 2px 8px rgba(63,125,255,0.08)' : '0 1px 3px rgba(0,0,0,0.04)' }}
+              transition={{ duration: 0.2 }}
+              style={{ position: 'relative', height: 56 }}>
+              <Search size={18} color="var(--text-3)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }} />
+              <motion.input
+                value={search} onChange={e => { setSearch(e.target.value); setSearchRecentOpen(true) }}
+                onFocus={() => { setSearchFocused(true); setSearchRecentOpen(true) }}
+                onBlur={() => { setSearchFocused(false); setTimeout(() => setSearchRecentOpen(false), 200) }}
+                placeholder="Search notes..."
+                animate={{ paddingLeft: search ? 44 : 44, fontSize: 16 }}
+                style={{
+                  width: '100%', height: '100%', padding: '0 16px 0 44px', borderRadius: 12,
+                  border: '1px solid var(--border)', fontSize: 16, outline: 'none',
+                  fontFamily: 'inherit', background: 'var(--card-bg)', color: 'var(--text)',
+                  boxSizing: 'border-box', transition: 'border-color 0.2s, box-shadow 0.2s',
+                }} />
+            </motion.div>
+
+            {/* Recent searches */}
+            <AnimatePresence>
+              {searchRecentOpen && !search && searchHistory.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
+                  style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 30,
+                    background: 'var(--card-bg)', borderRadius: 14, marginTop: 6,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.03)',
+                    overflow: 'hidden',
+                  }}>
+                  <div style={{ padding: '10px 14px 4px', fontSize: 11, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Recent
+                  </div>
+                  {searchHistory.map((term, i) => (
+                    <motion.button key={term} onClick={() => { setSearch(term); setSearchRecentOpen(false) }}
+                      initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        width: '100%', padding: '8px 14px', border: 'none', background: 'transparent',
+                        cursor: 'pointer', fontFamily: 'inherit', fontSize: 15, color: 'var(--text)',
+                        display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left',
+                      }}>
+                      <Search size={14} color="var(--text-3)" />
+                      {term}
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <motion.button onClick={() => setShowForm(!showForm)} whileTap={{ scale: 0.97 }} style={{
-            padding: '0 14px', borderRadius: 12, border: 'none', background: 'var(--primary)',
-            color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-            display: 'flex', alignItems: 'center', gap: 4,
-          }}>
-            <Plus size={14} /> New
+
+          {/* Create Note */}
+          <motion.button onClick={() => setShowForm(!showForm)}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              height: 56, padding: '0 20px', borderRadius: 14, border: 'none',
+              background: 'var(--primary)', color: '#fff',
+              fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+              display: 'flex', alignItems: 'center', gap: 6,
+              boxShadow: '0 2px 8px rgba(63,125,255,0.2)',
+              transition: 'box-shadow 0.2s',
+            }}>
+            <Plus size={18} strokeWidth={2.5} />
+            New
           </motion.button>
         </div>
       </div>
 
-      {/* Category filters with animated selection */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 12, overflowX: 'auto', scrollbarWidth: 'none', position: 'relative' }}>
-        {[{ id: 'all', name: 'All' }, ...upscSubjects].map(s => {
+      {/* Subject Filters */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 20, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 2 }}>
+        {[{ id: 'all', name: 'All' }, ...upscSubjects].map((s, i) => {
           const active = subjectFilter === s.id
           return (
             <motion.button key={s.id} onClick={() => setSubjectFilter(s.id)}
-              layout
-              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0, transition: { delay: i * 0.04 } }}
+              whileTap={{ scale: 0.97 }}
               style={{
-                padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
-                fontSize: 11, fontWeight: 600, fontFamily: 'inherit', position: 'relative',
-                background: active ? s.color || 'var(--primary)' : 'var(--surface-alt)',
-                color: active ? '#fff' : 'var(--text-3)',
-                transition: 'background 0.25s',
+                padding: '8px 16px', borderRadius: 99, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+                fontSize: 14, fontWeight: active ? 600 : 500, fontFamily: 'inherit',
+                background: active ? 'var(--primary)' : 'var(--surface-alt)',
+                color: active ? '#fff' : 'var(--text-2)',
+                transition: 'background 0.2s, box-shadow 0.2s',
+                boxShadow: active ? '0 2px 8px rgba(63,125,255,0.15)' : 'none',
+                display: 'flex', alignItems: 'center', gap: 6,
+                minHeight: 36,
               }}>
               {s.name}
-              <span style={{
-                fontSize: 10, fontWeight: 600, marginLeft: 5, opacity: 0.7,
-              }}>{subjectCounts[s.id]}</span>
+              {subjectCounts[s.id] > 0 && (
+                <span style={{
+                  fontSize: 12, fontWeight: 600, opacity: 0.75,
+                }}>
+                  {subjectCounts[s.id]}
+                </span>
+              )}
             </motion.button>
           )
         })}
