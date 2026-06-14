@@ -294,12 +294,19 @@ export default function CurrentAffairs() {
         background: 'var(--card-bg)', borderBottom: '1px solid var(--border)',
       }}>
         {CATEGORIES.map(cat => (
-          <motion.button whileTap={{scale:0.96}} key={cat} onClick={() => setActiveCategory(cat)} style={{
-            padding: '4px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
-            fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
-            background: activeCategory === cat ? 'var(--primary)' : 'var(--surface-alt)',
-            color: activeCategory === cat ? '#fff' : 'var(--text-3)',
-          }}>
+          <motion.button
+            layout
+            whileTap={{scale: 0.92}}
+            whileHover={{scale: 1.04}}
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+            style={{
+              padding: '4px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+              fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
+              background: activeCategory === cat ? 'var(--primary)' : 'var(--surface-alt)',
+              color: activeCategory === cat ? '#fff' : 'var(--text-3)',
+            }}>
             {cat}
           </motion.button>
         ))}
@@ -320,22 +327,27 @@ export default function CurrentAffairs() {
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>Try a different category or check back later</div>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <motion.div variants={{ visible: { transition: { staggerChildren: 0.04 } } }} initial="hidden" animate="visible"
+              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {filtered.map((a, i) => {
                 const catColor = categoryColors[a.category] || '#6B7280'
                 const gradient = `linear-gradient(135deg, ${catColor}22, ${catColor}08)`
                 const isRead = readArticles.has(a.title)
                 return (
                   <motion.div key={i}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.02 }}
-                    whileHover={{ y: -3 }}
+                    variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+                    whileHover={{ y: -4, scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
                     style={{
                       background: 'var(--card-bg)', borderRadius: 14, border: selectedArticle?.title === a.title ? '2px solid var(--primary)' : '1px solid var(--border)',
-                      cursor: 'pointer', overflow: 'hidden', transition: '0.15s', opacity: isRead ? 0.85 : 1,
+                      cursor: 'pointer', overflow: 'hidden', transition: 'box-shadow 0.3s ease',
+                      boxShadow: 'var(--shadow-sm)',
+                      opacity: isRead ? 0.85 : 1,
                     }}
+                    onMouseEnter={e => { if (!isRead) e.currentTarget.style.boxShadow = 'var(--shadow-hover)' }}
+                    onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow-card)' }
                   >
                     {/* Colored placeholder */}
                     <div style={{
@@ -375,7 +387,7 @@ export default function CurrentAffairs() {
                   </motion.div>
                 )
               })}
-            </div>
+            </motion.div>
           )}
         </div>
 
@@ -386,7 +398,7 @@ export default function CurrentAffairs() {
             initial={{ opacity: 0, x: 320 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 320 }}
-            transition={{ type: 'tween', duration: 0.25 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 30, mass: 0.9 }}
             style={{
               position: 'fixed', right: 0, top: 0, bottom: 0, width: '100%', maxWidth: 400,
               background: 'var(--card-bg)', zIndex: 200, boxShadow: 'var(--shadow-strong)',

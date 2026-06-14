@@ -155,29 +155,31 @@ export default function UpscHome() {
     <div style={{ background: 'var(--page-bg)', minHeight: '100%', paddingBottom: 100 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {/* ══ TOP BAR ══ */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '48px 20px 8px' }}>
-          <div>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '48px 20px 8px' }}>
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.05 }}>
             <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.03em', margin: 0 }}>
               UPSC<span style={{ color: 'var(--primary)' }}>.</span>
             </h1>
             <p style={{ fontSize: 12, color: 'var(--text-3)', margin: '2px 0 0', fontWeight: 500 }}>
               {greeting()}, {user?.name?.split(' ')[0] || 'Student'} · {dayLabels[dayOfWeek]}
             </p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button className="pill-3d" onClick={() => navigate('/pyq-search')} style={{ padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', gap: 4 }}>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.1 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" onClick={() => navigate('/pyq-search')} style={{ padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Search size={14} color="var(--primary)" />
               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)' }}>PYQs</span>
-            </button>
-            <button className="pill-3d" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)' }}>
+            </motion.button>
+            <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)' }}>
               <Flame size={14} color="#f97316" />
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{streak}</span>
-            </button>
-            <button className="pill-3d" onClick={() => navigate('/profile')} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'var(--primary-light)', borderRadius: 9999, border: '2px solid var(--border)', overflow: 'hidden', fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>
+            </motion.button>
+            <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" onClick={() => navigate('/profile')} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'var(--primary-light)', borderRadius: 9999, border: '2px solid var(--border)', overflow: 'hidden', fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>
               {user?.name?.[0] || 'U'}
-            </button>
-          </div>
-        </div>
+            </motion.button>
+          </motion.div>
+        </motion.div>
 
         {/* ══ ALERTS ══ */}
         {alerts.length > 0 && (
@@ -251,15 +253,19 @@ export default function UpscHome() {
                       e.currentTarget.firstChild.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
                     }}
                   >
-                    <div style={{
+                    <motion.div animate={{
+                      boxShadow: isCenter
+                        ? ['0 30px 60px -15px rgba(0,0,0,0.5)', '0 35px 70px -10px rgba(99,102,241,0.15)', '0 30px 60px -15px rgba(0,0,0,0.5)']
+                        : '0 8px 20px -8px rgba(0,0,0,0.3)',
+                    }} transition={isCenter ? { duration: 3, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
+                    style={{
                       background: 'var(--card-bg)',
-                      border: '1px solid var(--border)',
+                      border: isCenter ? '1px solid rgba(99,102,241,0.15)' : '1px solid var(--border)',
                       backdropFilter: 'blur(40px)',
                       borderRadius: 32,
                       overflow: 'hidden',
                       transformStyle: 'preserve-3d',
                       transition: 'transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1)',
-                      boxShadow: isCenter ? '0 30px 60px -15px rgba(0,0,0,0.5)' : '0 8px 20px -8px rgba(0,0,0,0.3)',
                     }}>
                       {/* Image area — no padding */}
                       <div style={{
@@ -322,7 +328,7 @@ export default function UpscHome() {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   </motion.div>
                 )
               })}
@@ -380,15 +386,17 @@ export default function UpscHome() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={() => { setRevisionPopupTopic(null); setRevisionContent(null) }}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 1000 }}
           >
             <motion.div
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.92, opacity: 0 }}
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 1 }}
               onClick={e => e.stopPropagation()}
-              style={{ width: '100%', maxWidth: 440, maxHeight: '90vh', background: 'var(--card-bg)', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}
+              style={{ width: '100%', maxWidth: 440, maxHeight: '92vh', background: 'var(--card-bg)', borderRadius: '20px 20px 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 -8px 40px rgba(0,0,0,0.2)' }}
             >
               {/* Header */}
               <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>

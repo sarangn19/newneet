@@ -110,26 +110,30 @@ export default function UpscAnalytics() {
       <div className="bg-pattern" style={{ position: 'fixed', inset: 0, opacity: 0.4, pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* Header */}
-        <div style={{ padding: '48px 16px 14px', background: 'var(--card-bg)', borderBottom: '2px solid var(--border)' }}>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+          style={{ padding: '48px 16px 14px', background: 'var(--card-bg)', borderBottom: '2px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div>
               <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text)' }}>Unified Analytics</div>
               <div style={{ fontSize: 11, color: 'var(--text-2)', fontWeight: 500, marginTop: 1 }}>All learning activity in one place</div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div style={{ padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <motion.div variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } } }} initial="hidden" animate="visible"
+          style={{ padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* KPI Row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+            style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
             <KpiBox icon={Brain} value={totalQ} label="Questions" color="#6366f1" />
             <KpiBox icon={Target} value={`${accuracy}%`} label="Accuracy" color={accuracy >= 60 ? '#059669' : '#DC2626'} />
             <KpiBox icon={Flame} value={streak} label="Streak" color="#EF4444" />
             <KpiBox icon={Clock} value={`${Math.floor(timeSpent / 60)}h`} label="Study Time" color="#8B5CF6" />
-          </div>
+          </motion.div>
 
           {/* Weekly Summary */}
-          <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
+          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+            style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>This Week</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               <div style={{ textAlign: 'center' }}>
@@ -145,10 +149,11 @@ export default function UpscAnalytics() {
                 <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Active Days</div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Activity Overview */}
-          <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
+          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+            style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Activity Overview</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <ActivityItem icon={BookOpen} label="Notes Created" value={notesCount} color="#6366f1" />
@@ -156,10 +161,11 @@ export default function UpscAnalytics() {
               <ActivityItem icon={Rotate3D} label="Due for Revision" value={dueRevisionCount} color="#F59E0B" />
               <ActivityItem icon={BarChart3} label="Topics Attempted" value={`${topicStatus.attempted}/${topicStatus.total}`} color="#10B981" />
             </div>
-          </div>
+          </motion.div>
 
           {/* Subject Accuracy */}
-          <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
+          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+            style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>Subject Accuracy</div>
             <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500, marginBottom: 10 }}>Percentages shown after {MIN_Q}+ questions per subject</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
@@ -199,11 +205,12 @@ export default function UpscAnalytics() {
                 </div>
               </div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Topic Breakdown */}
           {topicBreakdown.length > 0 && (
-            <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
+            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+              style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Second Brain — Topic Scores</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {topicBreakdown.sort((a, b) => (a.accuracy || 0) - (b.accuracy || 0)).slice(0, 15).map(t => (
@@ -227,12 +234,13 @@ export default function UpscAnalytics() {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Recent Activity */}
           {recentActivity.length > 0 && (
-            <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
+            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+              style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Recent Activity</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {recentActivity.map((e, i) => (
@@ -243,7 +251,7 @@ export default function UpscAnalytics() {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {totalQ === 0 && (
@@ -253,7 +261,7 @@ export default function UpscAnalytics() {
               <div style={{ fontSize: 12, color: 'var(--text-3)' }}>Start practicing to see your analytics.</div>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   )
@@ -261,13 +269,19 @@ export default function UpscAnalytics() {
 
 function KpiBox({ icon: Icon, value, label, color }) {
   return (
-    <div style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: '14px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+    <motion.div variants={{ hidden: { opacity: 0, scale: 0.85 }, visible: { opacity: 1, scale: 1 } }}
+      transition={{ type: 'spring', stiffness: 350, damping: 26 }}
+      whileHover={{ y: -4, scale: 1.02 }}
+      whileTap={{ scale: 0.96 }}
+      style={{ background: 'var(--card-bg)', borderRadius: 20, border: '1px solid var(--border)', padding: '14px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, boxShadow: 'var(--shadow-card)' }}
+      onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--shadow-float)'}
+      onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow-card)'}>
       <div style={{ width: 32, height: 32, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Icon size={16} color={color} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color, lineHeight: 1.2 }}>{value}</div>
       <div style={{ fontSize: 9, color: 'var(--text-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{label}</div>
-    </div>
+    </motion.div>
   )
 }
 
