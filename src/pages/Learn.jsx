@@ -420,7 +420,7 @@ function NotesTab() {
         </div>
       )}
 
-      {/* Note detail overlay */}
+      {/* Note detail popup */}
       <AnimatePresence>
         {selectedNote && (
           <>
@@ -428,31 +428,33 @@ function NotesTab() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={handleCloseNote}
-              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, backdropFilter: 'blur(4px)' }}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, backdropFilter: 'blur(6px)' }}
             />
             <motion.div layoutId={`note-${selectedNote.id}`}
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               style={{
-                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 110,
-                background: 'var(--page-bg)', borderRadius: 0, overflow: 'hidden',
-                display: 'flex', flexDirection: 'column',
+                position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+                zIndex: 110, background: 'var(--card-bg)', borderRadius: 24,
+                width: 'min(92vw, 400px)', maxHeight: '85vh',
+                display: 'flex', flexDirection: 'column', overflow: 'hidden',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
               }}>
-              {/* Header bar */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '48px 20px 8px', background: 'var(--card-bg)' }}>
-                <motion.button onClick={handleCloseNote} whileTap={{ scale: 0.9 }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--text-2)', fontSize: 18, lineHeight: 1 }}>
-                  ←
-                </motion.button>
-                <div style={{ flex: 1, fontSize: 17, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {/* Close button */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 0' }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                   {selectedNote.title || 'Untitled'}
                 </div>
-                <motion.button onClick={() => { navigate('/note/' + selectedNote.id) }} whileTap={{ scale: 0.9 }}
-                  style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: '6px 14px', borderRadius: 8, fontSize: 11, fontWeight: 600, color: 'var(--text-2)', fontFamily: 'inherit' }}>
-                  Edit
+                <motion.button onClick={handleCloseNote} whileTap={{ scale: 0.85 }}
+                  style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 8, display: 'flex', marginLeft: 8 }}>
+                  <X size={16} color="var(--text-2)" />
                 </motion.button>
               </div>
               {/* Metadata */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05, duration: 0.2 }}
-                style={{ padding: '8px 20px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                style={{ padding: '8px 20px 4px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 {selectedNote.subject && (() => {
                   const subjObj = upscSubjects.find(s => s.id === selectedNote.subject)
                   return (
@@ -468,7 +470,7 @@ function NotesTab() {
               </motion.div>
               {/* Body */}
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.25 }}
-                style={{ flex: 1, overflowY: 'auto', padding: '0 20px 20px', fontSize: 14, lineHeight: 1.8, color: 'var(--text)' }}>
+                style={{ flex: 1, overflowY: 'auto', padding: '12px 20px 16px', fontSize: 14, lineHeight: 1.8, color: 'var(--text)' }}>
                 {(() => {
                   const raw = selectedNote.content || ''
                   const text = raw.replace(/<[^>]*>/g, '').replace(/==/g, '').replace(/\*\*/g, '').replace(/\[image\]\([^)]*\)/g, '[image]')
@@ -477,14 +479,18 @@ function NotesTab() {
               </motion.div>
               {/* Actions */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.2 }}
-                style={{ padding: '12px 20px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
+                style={{ padding: '8px 20px 20px', display: 'flex', gap: 8 }}>
+                <motion.button onClick={() => { navigate('/note/' + selectedNote.id) }} whileTap={{ scale: 0.95 }}
+                  style={{ flex: 1, padding: '9px 0', borderRadius: 12, border: '1.5px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  Edit
+                </motion.button>
                 <motion.button onClick={() => { toggleBookmark(selectedNote.id); handleCloseNote() }} whileTap={{ scale: 0.95 }}
-                  style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: bookmarkedIds.has(selectedNote.id) ? 'var(--primary)' : 'var(--surface-alt)', color: bookmarkedIds.has(selectedNote.id) ? '#fff' : 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  style={{ flex: 1, padding: '9px 0', borderRadius: 12, border: 'none', background: bookmarkedIds.has(selectedNote.id) ? 'var(--primary)' : 'var(--surface-alt)', color: bookmarkedIds.has(selectedNote.id) ? '#fff' : 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <Bookmark size={14} fill={bookmarkedIds.has(selectedNote.id) ? '#fff' : 'none'} />
                   {bookmarkedIds.has(selectedNote.id) ? 'Bookmarked' : 'Bookmark'}
                 </motion.button>
                 <motion.button onClick={() => { deleteNote(selectedNote.id) }} whileTap={{ scale: 0.95 }}
-                  style={{ padding: '10px 20px', borderRadius: 12, border: 'none', background: 'var(--surface-alt)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  style={{ flex: 1, padding: '9px 0', borderRadius: 12, border: 'none', background: 'var(--surface-alt)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
                   Delete
                 </motion.button>
               </motion.div>

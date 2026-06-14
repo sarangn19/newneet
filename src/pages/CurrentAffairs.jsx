@@ -397,58 +397,49 @@ export default function CurrentAffairs() {
           )}
         </div>
 
-        {/* Article detail overlay */}
+        {/* Article detail popup */}
         <AnimatePresence>
         {selectedArticle && (
           <>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }}
-              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, backdropFilter: 'blur(4px)' }}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, backdropFilter: 'blur(6px)' }}
             />
             <motion.div
               layoutId={`article-${selectedArticle.title}`}
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               style={{
-                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                zIndex: 110, background: 'var(--page-bg)', borderRadius: 0,
-                overflow: 'hidden', display: 'flex', flexDirection: 'column',
+                position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+                zIndex: 110, background: 'var(--card-bg)', borderRadius: 24,
+                width: 'min(92vw, 400px)', maxHeight: '85vh',
+                display: 'flex', flexDirection: 'column', overflow: 'hidden',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
               }}
             >
               {/* Header */}
-              <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0, duration: 0.2 }}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '48px 16px 8px', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)' }}>
-                <motion.button whileTap={{scale:0.96}} onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-                  <ChevronLeft size={18} color="var(--text)" />
-                </motion.button>
-                <div style={{ flex: 1, fontSize: 16, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 0' }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                   {selectedArticle.category || 'Article'}
                 </div>
-                <motion.button whileTap={{scale:0.9}} onClick={() => toggleBookmark(selectedArticle)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
-                  <Bookmark size={16} color={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'none'} />
-                </motion.button>
-              </motion.div>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <motion.button whileTap={{scale:0.85}} onClick={() => toggleBookmark(selectedArticle)} style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 8, display: 'flex' }}>
+                    <Bookmark size={15} color={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'none'} />
+                  </motion.button>
+                  <motion.button whileTap={{scale:0.85}} onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }} style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 8, display: 'flex' }}>
+                    <X size={16} color="var(--text-2)" />
+                  </motion.button>
+                </div>
+              </div>
 
               {/* Scrollable content */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px 90px' }}>
-                {/* Category banner */}
-                <motion.div
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05, duration: 0.2 }}
-                  style={{
-                    height: 100, borderRadius: 12, marginBottom: 12, position: 'relative', overflow: 'hidden',
-                    background: `linear-gradient(135deg, ${(categoryColors[selectedArticle.category] || '#6B7280')}30, ${(categoryColors[selectedArticle.category] || '#6B7280')}08)`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40,
-                  }}
-                >
-                  <span style={{ opacity: 0.3 }}>📰</span>
-                </motion.div>
-
-                {/* Category + meta */}
-                <motion.div
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05, duration: 0.2 }}>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px 20px' }}>
+                {/* Title + meta */}
+                <div style={{ marginBottom: 12 }}>
                   {selectedArticle.category && (
                     <span style={{
                       display: 'inline-block', padding: '3px 10px', borderRadius: 99, fontSize: 10, fontWeight: 700,
@@ -459,46 +450,38 @@ export default function CurrentAffairs() {
                     </span>
                   )}
                   <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4 }}>{selectedArticle.title}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
                     {selectedArticle.date} · {selectedArticle.source}
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Summary */}
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.25 }}
-                  style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
+                <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
                   {selectedArticle.summary || 'Full article content would appear here. Fetch the complete story from the source link below.'}
-                </motion.div>
+                </div>
 
                 {/* Tags */}
                 {selectedArticle.tags?.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.2 }}
-                    style={{ marginBottom: 14 }}>
+                  <div style={{ marginBottom: 14 }}>
                     <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Tags</div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {selectedArticle.tags.map((t, i) => (
                         <span key={i} style={{ fontSize: 10, color: 'var(--text-3)', background: 'var(--surface-alt)', padding: '3px 10px', borderRadius: 99 }}>{t}</span>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* UPSC Relevance */}
-                <motion.div
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.2 }}
-                  style={{ background: `${(categoryColors[selectedArticle.category] || '#6B7280')}0D`, borderRadius: 10, padding: 10, marginBottom: 14 }}>
+                <div style={{ background: `${(categoryColors[selectedArticle.category] || '#6B7280')}0D`, borderRadius: 10, padding: 10, marginBottom: 14 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: categoryColors[selectedArticle.category] || 'var(--primary)', marginBottom: 4 }}>UPSC Relevance</div>
                   <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
                     This article is relevant for {selectedArticle.category || 'General Studies'} preparation. Analyze the key facts, government initiatives, and constitutional aspects mentioned. Link with static syllabus topics for Mains answers.
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Actions */}
-                <motion.div
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.2 }}
-                  style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <motion.button whileTap={{scale:0.96}} onClick={() => generateMCQs(selectedArticle)} disabled={mcqLoading} style={{
                     width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
                     background: mcqLoading ? 'var(--surface-alt)' : 'var(--primary)', color: '#fff',
@@ -516,7 +499,7 @@ export default function CurrentAffairs() {
                       <ExternalLink size={14} /> Read Full Article
                     </a>
                   )}
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           </>
