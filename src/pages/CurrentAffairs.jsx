@@ -9,6 +9,8 @@ import { ChevronLeft, Search, RefreshCw, Bookmark, ExternalLink, ChevronRight, B
 import { SkeletonBlock } from '../components/SkeletonBlock'
 import { skeletonBreath } from '../hooks/useSequentialReveal'
 import EmptyState from '../components/EmptyState'
+import FilterTabs from '../components/FilterTabs'
+import SearchInput from '../components/SearchInput'
 
 const CATEGORIES = [
   'All', 'Polity', 'Economy', 'International', 'Environment', 'Science & Tech', 'History & Culture', 'Geography',
@@ -245,13 +247,7 @@ export default function CurrentAffairs() {
           </motion.button>
         </div>
         {/* Search */}
-        <div style={{ position: 'relative' }}>
-          <Search size={14} color="var(--text-3)" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search articles..." style={{
-            width: '100%', padding: '8px 8px 8px 32px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)',
-            fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', boxSizing: 'border-box',
-          }} />
-        </div>
+        <SearchInput value={search} onChange={setSearch} placeholder="Search articles..." />
       </div>
 
       {/* Fallback warning banner */}
@@ -289,27 +285,8 @@ export default function CurrentAffairs() {
       </AnimatePresence>
 
       {/* Category tabs */}
-      <div style={{
-        display: 'flex', gap: 4, padding: '8px 14px', overflowX: 'auto', scrollbarWidth: 'none',
-        background: 'var(--card-bg)', borderBottom: '1px solid var(--border)',
-      }}>
-        {CATEGORIES.map(cat => (
-          <motion.button
-            layout
-            whileTap={{scale: 0.92}}
-            whileHover={{scale: 1.04}}
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-            style={{
-              padding: '4px 12px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
-              fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
-              background: activeCategory === cat ? 'var(--primary)' : 'var(--surface-alt)',
-              color: activeCategory === cat ? '#fff' : 'var(--text-3)',
-            }}>
-            {cat}
-          </motion.button>
-        ))}
+      <div style={{ background: 'var(--card-bg)', borderBottom: '1px solid var(--border)' }}>
+        <FilterTabs items={CATEGORIES} active={activeCategory} onChange={setActiveCategory} />
       </div>
 
       <div style={{ display: 'flex', gap: 0, position: 'relative' }}>

@@ -213,7 +213,7 @@ export default function UpscHome() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {alerts.slice(0, 1).map((alert, i) => {
                   const iconMap = { critical: TrendingDown, weak: AlertTriangle, declining: TrendingDown, streak: Flame, inactive: Clock, consistency: BarChart3 }
-                  const colorMap = { critical: '#DC2626', weak: '#D97706', declining: '#DC2626', streak: '#B45309', inactive: 'var(--text-3)', consistency: '#2563EB' }
+                  const colorMap = { critical: 'var(--error)', weak: 'var(--warning)', declining: 'var(--error)', streak: '#B45309', inactive: 'var(--text-3)', consistency: 'var(--primary-dark)' }
                   const bgMap = { critical: 'var(--error-light)', weak: 'var(--warning-light)', declining: 'var(--error-light)', streak: 'var(--warning-light)', inactive: 'var(--surface-alt)', consistency: 'var(--primary-light)' }
                   const Icon = iconMap[alert.type] || AlertTriangle
                   return (
@@ -244,7 +244,7 @@ export default function UpscHome() {
                 const accentColor = pi?.weakness >= 0.6 ? '#ef4444' : pi?.forgetting >= 0.5 ? '#f59e0b' : 'var(--primary)'
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'
                 const badgeBg = pi?.weakness >= 0.6 ? 'var(--error-light)' : pi?.forgetting >= 0.5 ? 'var(--warning-light)' : 'var(--primary-light)'
-                const badgeColor = pi?.weakness >= 0.6 ? '#dc2626' : pi?.forgetting >= 0.5 ? '#d97706' : 'var(--primary)'
+                const badgeColor = pi?.weakness >= 0.6 ? 'var(--error)' : pi?.forgetting >= 0.5 ? 'var(--warning)' : 'var(--primary)'
                 const level = getMastery(t.id, revisionMastery)
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjGradient = subj?.gradient || 'linear-gradient(135deg, var(--primary-dark), var(--primary))'
@@ -348,7 +348,7 @@ export default function UpscHome() {
         {dailyMix.length > 0 && remainingCount === 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
             <div style={{ textAlign: 'center' }}>
-              <CheckCircle size={32} color="#10B981" style={{ marginBottom: 10 }} />
+              <CheckCircle size={32} color="var(--success)" style={{ marginBottom: 10 }} />
               <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>All caught up!</div>
               <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3, lineHeight: 1.5 }}>Check back tomorrow for fresh topics.</div>
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/learn')}
@@ -419,7 +419,7 @@ export default function UpscHome() {
                   return (
                     <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
                       <div style={{ flex: 1, background: 'var(--success-light)', borderRadius: 10, padding: 10, textAlign: 'center' }}>
-                        <div style={{ fontSize: 20, fontWeight: 800, color: acc >= 60 ? '#059669' : '#DC2626' }}>{acc}%</div>
+                        <div style={{ fontSize: 20, fontWeight: 800, color: acc >= 60 ? 'var(--success-dark)' : 'var(--error)' }}>{acc}%</div>
                         <div style={{ fontSize: 10, color: 'var(--text-2)' }}>Accuracy</div>
                       </div>
                       <div style={{ flex: 1, background: 'var(--surface-alt)', borderRadius: 10, padding: 10, textAlign: 'center' }}>
@@ -458,7 +458,7 @@ export default function UpscHome() {
                       {revisionContent.commonMistakes?.length > 0 && (
                         <div style={{ marginBottom: 10, background: 'var(--error-light)', borderRadius: 10, padding: 10 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                            <AlertTriangle size={12} color="#DC2626" />
+                            <AlertTriangle size={12} color="var(--error)" />
                             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--error)' }}>Common Mistakes</span>
                           </div>
                           {revisionContent.commonMistakes.slice(0, 3).map((m, i) => (
@@ -500,8 +500,8 @@ export default function UpscHome() {
                         let border = 'var(--border)'
                         let color = 'var(--text)'
                         if (practiceSubmitted) {
-                          if (isAns) { bg = 'var(--success-light)'; border = '#10B981'; color = 'var(--success-dark)' }
-                          else if (isSel && !isAns) { bg = 'var(--error-light)'; border = '#EF4444'; color = 'var(--error-dark)' }
+                          if (isAns) { bg = 'var(--success-light)'; border = 'var(--success)'; color = 'var(--success-dark)' }
+                          else if (isSel && !isAns) { bg = 'var(--error-light)'; border = 'var(--error)'; color = 'var(--error-dark)' }
                           else { bg = 'var(--surface-alt)'; border = 'var(--border)'; color = 'var(--text-3)' }
                         } else if (isSel) { bg = 'var(--primary-light)'; border = 'var(--primary)'; color = 'var(--primary)' }
                         return (
@@ -546,7 +546,7 @@ export default function UpscHome() {
                 {/* Practice Results */}
                 {practiceDone && (
                   <div style={{ textAlign: 'center', padding: '8px 0' }}>
-                    <CheckCircle size={28} color="#10B981" style={{ marginBottom: 8 }} />
+                    <CheckCircle size={28} color="var(--success)" style={{ marginBottom: 8 }} />
                     <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>Practice Complete!</div>
                     <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 4, marginBottom: 10 }}>
                       {practiceAnswers.filter(a => a.correct).length}/{practiceAnswers.length + 1} correct (scores saved)

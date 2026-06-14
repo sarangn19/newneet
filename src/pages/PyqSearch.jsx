@@ -5,6 +5,8 @@ import { ChevronLeft, Search, Filter, Clock, CheckCircle, XCircle, Sliders, Shuf
 import useStore from '../store/useStore'
 import { upscMCQs, getAllUpscQuestions } from '../data/upsc/questions'
 import { upscSubjects } from '../data/upsc/subjects'
+import FilterTabs, { Chip } from '../components/FilterTabs'
+import SearchInput from '../components/SearchInput'
 
 const CHAPTER_NAMES = {}
 upscSubjects.forEach(s => s.chapters.forEach(c => { CHAPTER_NAMES[c.id] = c.name }))
@@ -122,43 +124,27 @@ export default function PyqSearch() {
     <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100, position: 'relative', overflowX: 'hidden' }}>
       <div className="bg-pattern" style={{ position: 'fixed', inset: 0, opacity: 0.4, pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
-      <div style={{ padding: '48px 16px 10px', background: '#fff', borderBottom: '2px solid #e2e8f0' }}>
+      <div style={{ padding: '48px 16px 10px', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button className="pill-3d" onClick={() => navigate('/')} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: '#fff', border: '2px solid #e2e8f0', borderRadius: 9999, padding: 0 }}>
-            <ChevronLeft size={18} color="#475569" />
+          <button className="pill-3d" onClick={() => navigate('/')} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'var(--card-bg)', border: '2px solid var(--border)', borderRadius: 9999, padding: 0 }}>
+            <ChevronLeft size={18} color="var(--text-2)" />
           </button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#1e293b' }}>PYQ Search</div>
-            <div style={{ fontSize: 11, color: '#64748b', fontWeight: 500, marginTop: 1 }}>{allQuestions.length} questions</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text)' }}>PYQ Search</div>
+            <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 500, marginTop: 1 }}>{allQuestions.length} questions</div>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 4, marginTop: 10 }}>
-          {['browse', 'test'].map(t => (
-            <motion.button key={t} whileTap={{scale:0.96}} onClick={() => { setTab(t); setTestPhase('setup') }} style={{
-              flex: 1, padding: '8px 0', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-              fontSize: 12, fontWeight: 700,
-              background: tab === t ? '#6366f1' : '#f1f5f9',
-              color: tab === t ? '#fff' : '#64748b',
-            }}>
-              {t === 'browse' ? 'Browse PYQs' : 'Custom Test'}
-            </motion.button>
-          ))}
-        </div>
+        <FilterTabs items={['browse', 'test']} labels={{ browse: 'Browse PYQs', test: 'Custom Test' }} active={tab} onChange={v => { setTab(v); setTestPhase('setup') }} />
       </div>
 
       {tab === 'browse' ? (
         <div style={{ padding: '12px 14px' }}>
-          <div style={{ position: 'relative', marginBottom: 10 }}>
-            <Search size={14} color="#9CA3AF" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search questions..." style={{
-              width: '100%', padding: '8px 8px 8px 32px', borderRadius: 10, border: '1px solid var(--border)',
-              fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--card-bg)', boxSizing: 'border-box',
-              color: 'var(--text)',
-            }} />
+          <div style={{ marginBottom: 10 }}>
+            <SearchInput value={search} onChange={setSearch} placeholder="Search questions..." />
           </div>
 
           <motion.button whileTap={{scale:0.96}} onClick={() => setShowFilters(!showFilters)} style={{
-            width: '100%', padding: '8px 0', borderRadius: 10, border: '1px solid var(--border)',
+            width: '100%', padding: '8px 0', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
             background: 'var(--card-bg)', cursor: 'pointer', fontFamily: 'inherit',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 10,
             fontSize: 12, fontWeight: 600, color: 'var(--text-2)',
@@ -171,14 +157,14 @@ export default function PyqSearch() {
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
                 <select value={subjectFilter} onChange={e => { setSubjectFilter(e.target.value); setChapterFilter('all') }} style={{
-                  flex: 1, padding: '8px', borderRadius: 10, border: '1px solid var(--border)',
+                  flex: 1, padding: '8px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
                   fontSize: 11, fontFamily: 'inherit', background: 'var(--card-bg)', color: 'var(--text)',
                 }}>
                   <option value="all">All Subjects</option>
                   {upscSubjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
                 <select value={chapterFilter} onChange={e => setChapterFilter(e.target.value)} style={{
-                  flex: 1, padding: '8px', borderRadius: 10, border: '1px solid var(--border)',
+                  flex: 1, padding: '8px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
                   fontSize: 11, fontFamily: 'inherit', background: 'var(--card-bg)', color: 'var(--text)',
                 }}>
                   <option value="all">All Chapters</option>
@@ -186,7 +172,7 @@ export default function PyqSearch() {
                 </select>
               </div>
               <select value={resultLimit} onChange={e => setResultLimit(Number(e.target.value))} style={{
-                width: '100%', padding: '8px', borderRadius: 10, border: '1px solid var(--border)',
+                width: '100%', padding: '8px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
                 fontSize: 11, fontFamily: 'inherit', background: 'var(--card-bg)', color: 'var(--text)',
               }}>
                 <option value={10}>Show 10 results</option>
@@ -212,17 +198,17 @@ export default function PyqSearch() {
                     background: 'var(--card-bg)', borderRadius: 12, border: '1px solid var(--border)', padding: 12,
                   }}>
                     <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
-                      {subId && <span style={{ padding: '1px 6px', borderRadius: 99, fontSize: 9, fontWeight: 700, background: '#EFF6FF', color: '#3B82F6' }}>{SUBJECT_NAMES[subId]}</span>}
-                      <span style={{ padding: '1px 6px', borderRadius: 99, fontSize: 9, fontWeight: 600, background: '#F3F4F6', color: '#6B7280' }}>{CHAPTER_NAMES[q.chapter] || q.chapter}</span>
+                      {subId && <Chip color={upscSubjects.find(s => s.id === subId)?.color}>{SUBJECT_NAMES[subId]}</Chip>}
+                      <span style={{ padding: '2px 8px', borderRadius: 'var(--radius-pill)', fontSize: 9, fontWeight: 600, background: 'var(--surface-alt)', color: 'var(--text-3)' }}>{CHAPTER_NAMES[q.chapter] || q.chapter}</span>
                     </div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 8, lineHeight: 1.5 }}>{q.q}</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
                       {q.options.map((opt, oi) => (
                         <div key={oi} style={{
                           padding: '6px 10px', borderRadius: 8, fontSize: 11,
-                          background: oi === q.ans ? '#D1FAE5' : '#F9FAFB',
-                          color: oi === q.ans ? '#065F46' : '#6B7280',
-                          border: oi === q.ans ? '1px solid #6EE7B7' : '1px solid transparent',
+                          background: oi === q.ans ? 'var(--success-light)' : 'var(--surface-alt)',
+                          color: oi === q.ans ? 'var(--success-dark)' : 'var(--text-3)',
+                          border: oi === q.ans ? '1px solid var(--success)' : '1px solid transparent',
                           fontWeight: oi === q.ans ? 600 : 400,
                         }}>
                           {String.fromCharCode(65 + oi)}) {opt}
@@ -230,7 +216,7 @@ export default function PyqSearch() {
                       ))}
                     </div>
                     {q.explanation && (
-                      <div style={{ marginTop: 8, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5, padding: '8px 10px', background: '#F9FAFB', borderRadius: 8 }}>
+                      <div style={{ marginTop: 8, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5, padding: '8px 10px', background: 'var(--surface-alt)', borderRadius: 8 }}>
                         {q.explanation}
                       </div>
                     )}
@@ -280,8 +266,8 @@ export default function PyqSearch() {
                   <motion.button key={n} whileTap={{scale:0.96}} onClick={() => setTestConfig(p => ({ ...p, count: n }))} style={{
                     flex: 1, padding: '10px 0', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                     fontSize: 13, fontWeight: 700,
-                    background: testConfig.count === n ? '#3B82F6' : '#F3F4F6',
-                    color: testConfig.count === n ? '#fff' : '#6B7280',
+                    background: testConfig.count === n ? 'var(--primary)' : 'var(--surface-alt)',
+                    color: testConfig.count === n ? '#fff' : 'var(--text-3)',
                   }}>
                     {n}
                   </motion.button>
@@ -291,7 +277,7 @@ export default function PyqSearch() {
 
             <motion.button whileTap={{scale:0.96}} onClick={startTest} style={{
               width: '100%', padding: '12px 0', borderRadius: 12, border: 'none',
-              background: '#3B82F6', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+              background: 'var(--primary)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             }}>
               <Shuffle size={16} /> Start Custom Test
@@ -301,9 +287,9 @@ export default function PyqSearch() {
       ) : testPhase === 'test' ? (
         <div style={{ padding: '12px 14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#3B82F6' }}>{testIdx + 1}/{testQuestions.length}</div>
-            <div style={{ flex: 1, height: 4, background: '#F3F4F6', borderRadius: 99 }}>
-              <div style={{ width: `${((testIdx + 1) / testQuestions.length) * 100}%`, height: '100%', background: '#3B82F6', borderRadius: 99 }} />
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>{testIdx + 1}/{testQuestions.length}</div>
+            <div style={{ flex: 1, height: 4, background: 'var(--surface-alt)', borderRadius: 'var(--radius-pill)' }}>
+              <div style={{ width: `${((testIdx + 1) / testQuestions.length) * 100}%`, height: '100%', background: 'var(--primary)', borderRadius: 'var(--radius-pill)' }} />
             </div>
           </div>
 
@@ -319,10 +305,10 @@ export default function PyqSearch() {
                 let border = '1px solid var(--border)'
                 let textColor = 'var(--text)'
                 if (testSubmitted) {
-                  if (oi === testQuestions[testIdx].ans) { bg = '#D1FAE5'; border = '1px solid #6EE7B7'; textColor = '#065F46' }
-                  else if (oi === testSelected) { bg = '#FEE2E2'; border = '1px solid #FCA5A5'; textColor = '#991B1B' }
+                  if (oi === testQuestions[testIdx].ans) { bg = 'var(--success-light)'; border = '1px solid var(--success)'; textColor = 'var(--success-dark)' }
+                  else if (oi === testSelected) { bg = 'var(--error-light)'; border = '1px solid var(--error)'; textColor = 'var(--error-dark)' }
                 } else if (oi === testSelected) {
-                  bg = '#EFF6FF'; border = '1px solid #93C5FD'; textColor = '#1E40AF'
+                  bg = 'var(--primary-light)'; border = '1px solid var(--primary)'; textColor = 'var(--primary-dark)'
                 }
                 return (
                   <motion.div key={oi} whileTap={testSubmitted ? {} : { scale: 0.98 }}
@@ -336,7 +322,7 @@ export default function PyqSearch() {
             </div>
 
             {testSubmitted && testQuestions[testIdx].explanation && (
-              <div style={{ marginTop: 10, padding: '8px 10px', background: '#F9FAFB', borderRadius: 8, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
+              <div style={{ marginTop: 10, padding: '8px 10px', background: 'var(--surface-alt)', borderRadius: 'var(--radius-sm)', fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
                 {testQuestions[testIdx].explanation}
               </div>
             )}
@@ -346,8 +332,8 @@ export default function PyqSearch() {
             {!testSubmitted ? (
               <motion.button whileTap={{scale:0.96}} onClick={submitAnswer} disabled={testSelected === null} style={{
                 flex: 1, padding: '11px 0', borderRadius: 12, border: 'none',
-                background: testSelected !== null ? '#3B82F6' : '#E5E7EB',
-                color: testSelected !== null ? '#fff' : '#9CA3AF',
+                background: testSelected !== null ? 'var(--primary)' : 'var(--border)',
+                color: testSelected !== null ? '#fff' : 'var(--text-3)',
                 fontSize: 12, fontWeight: 700, cursor: testSelected !== null ? 'pointer' : 'default', fontFamily: 'inherit',
               }}>
                 Submit Answer
@@ -355,7 +341,7 @@ export default function PyqSearch() {
             ) : (
               <motion.button whileTap={{scale:0.96}} onClick={nextQuestion} style={{
                 flex: 1, padding: '11px 0', borderRadius: 12, border: 'none',
-                background: '#3B82F6', color: '#fff',
+                background: 'var(--primary)', color: '#fff',
                 fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 {testIdx < testQuestions.length - 1 ? 'Next Question' : 'See Results'}
@@ -374,18 +360,18 @@ export default function PyqSearch() {
               {testAnswers.filter(a => a.correct).length}/{testAnswers.length} correct
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
-              <div style={{ background: '#D1FAE5', borderRadius: 10, padding: 12 }}>
-                <div style={{ fontSize: 28, fontWeight: 800, color: '#059669' }}>{testAnswers.filter(a => a.correct).length}</div>
-                <div style={{ fontSize: 10, color: '#059669' }}>Correct</div>
+              <div style={{ background: 'var(--success-light)', borderRadius: 'var(--radius-md)', padding: 12 }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--success)' }}>{testAnswers.filter(a => a.correct).length}</div>
+                <div style={{ fontSize: 10, color: 'var(--success)' }}>Correct</div>
               </div>
-              <div style={{ background: '#FEE2E2', borderRadius: 10, padding: 12 }}>
-                <div style={{ fontSize: 28, fontWeight: 800, color: '#DC2626' }}>{testAnswers.filter(a => !a.correct).length}</div>
-                <div style={{ fontSize: 10, color: '#DC2626' }}>Wrong</div>
+              <div style={{ background: 'var(--error-light)', borderRadius: 'var(--radius-md)', padding: 12 }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--error)' }}>{testAnswers.filter(a => !a.correct).length}</div>
+                <div style={{ fontSize: 10, color: 'var(--error)' }}>Wrong</div>
               </div>
             </div>
             <motion.button whileTap={{scale:0.96}} onClick={() => { setTestPhase('setup'); setTab('browse') }} style={{
               padding: '10px 24px', borderRadius: 12, border: 'none',
-              background: '#3B82F6', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+              background: 'var(--primary)', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
             }}>
               Back to Search
             </motion.button>
