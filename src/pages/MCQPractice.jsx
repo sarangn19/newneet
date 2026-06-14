@@ -6,7 +6,8 @@ import { subjects as neetSubjects, getMcqBank } from '../data/subjects'
 import { upscSubjects } from '../data/upsc/subjects'
 import { upscMCQs } from '../data/upsc/questions'
 import { supabase, hasQuestionsTable } from '../lib/supabase'
-import { ChevronLeft, Search } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
+import SearchInput from '../components/SearchInput'
 import useStore from '../store/useStore'
 import useSound from '../lib/useSound'
 import { upsertTodayStats } from '../lib/useDailyStats'
@@ -356,29 +357,7 @@ export default function MCQPractice() {
           </div>
         </div>
 
-        {/* Search bar */}
-        <div style={{ width: '100%', maxWidth: '100%' }}>
-          <div style={{
-            width: '100%', height: 52,
-            background: 'var(--card-bg)',
-            border: '2px solid var(--border)',
-            borderRadius: 12,
-            display: 'flex', alignItems: 'center', padding: '0 16px', gap: 10,
-            boxSizing: 'border-box',
-          }}>
-            <Search size={17} color="var(--text-3)" style={{ flexShrink: 0 }} />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search chapter name..."
-              style={{
-                border: 'none', outline: 'none', flex: 1,
-                fontSize: 15, fontFamily: 'Satoshi, sans-serif',
-                color: 'var(--text)', background: 'transparent',
-              }}
-            />
-          </div>
-        </div>
+        <SearchInput value={search} onChange={setSearch} placeholder="Search chapter name..." size="lg" />
 
         {/* Subject pills — multi-select */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 10, width: '100%' }}>

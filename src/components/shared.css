@@ -136,6 +136,8 @@
   transform: translateY(-50%);
   pointer-events: none;
   color: var(--text-3);
+  width: 14px;
+  height: 14px;
 }
 .shared-search-input {
   width: 100%;
@@ -148,4 +150,15 @@
   background: var(--surface-alt);
   color: var(--text);
   box-sizing: border-box;
+}
+
+.shared-search-wrapper.shared-search-lg .shared-search-icon {
+  width: 18px;
+  height: 18px;
+  left: 16px;
+}
+.shared-search-wrapper.shared-search-lg .shared-search-input {
+  padding: 18px 16px 18px 44px;
+  font-size: 16px;
+  border-radius: 12px;
 }

@@ -8,6 +8,7 @@ import { upscSubjects } from '../data/upsc/subjects'
 import { getAllUpscQuestions } from '../data/upsc/questions'
 import { BookOpen, FileText, Search, ChevronRight, Plus, Zap, CheckCircle, XCircle, RefreshCw, Rotate3D, Star, Bookmark, Check, X } from 'lucide-react'
 import { SkeletonBlock } from '../components/SkeletonBlock'
+import SearchInput from '../components/SearchInput'
 import { easePreset } from '../hooks/useSequentialReveal'
 import { card as cardStyle, cardHover, spring, spacing, font, colors, btn } from '../lib/designTokens'
 
@@ -194,24 +195,14 @@ function NotesTab() {
       <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--page-bg)', paddingTop: 4, paddingBottom: 12 }}>
         <div style={{ display: 'flex', gap: 10 }}>
           <div ref={searchRef} style={{ flex: 1, position: 'relative' }}>
-            <motion.div
-              animate={{ borderRadius: searchFocused ? 14 : 12, boxShadow: searchFocused ? '0 0 0 2px var(--primary), 0 2px 8px rgba(63,125,255,0.08)' : '0 1px 3px rgba(0,0,0,0.04)' }}
-              transition={{ duration: 0.2 }}
-              style={{ position: 'relative', height: 56 }}>
-              <Search size={18} color="var(--text-3)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }} />
-              <motion.input
-                value={search} onChange={e => { setSearch(e.target.value); setSearchRecentOpen(true) }}
-                onFocus={() => { setSearchFocused(true); setSearchRecentOpen(true) }}
-                onBlur={() => { setSearchFocused(false); setTimeout(() => setSearchRecentOpen(false), 200) }}
-                placeholder="Search notes..."
-                animate={{ paddingLeft: search ? 44 : 44, fontSize: 16 }}
-                style={{
-                  width: '100%', height: '100%', padding: '0 16px 0 44px', borderRadius: 12,
-                  border: '1px solid var(--border)', fontSize: 16, outline: 'none',
-                  fontFamily: 'inherit', background: 'var(--card-bg)', color: 'var(--text)',
-                  boxSizing: 'border-box', transition: 'border-color 0.2s, box-shadow 0.2s',
-                }} />
-            </motion.div>
+            <SearchInput
+              value={search}
+              onChange={v => { setSearch(v); setSearchRecentOpen(true) }}
+              onFocus={() => { setSearchFocused(true); setSearchRecentOpen(true) }}
+              onBlur={() => { setSearchFocused(false); setTimeout(() => setSearchRecentOpen(false), 200) }}
+              placeholder="Search notes..."
+              size="lg"
+            />
 
             {/* Recent searches */}
             <AnimatePresence>
@@ -1067,16 +1058,7 @@ function PracticeMCQTab() {
       <AnimatePresence mode="wait">
         <motion.div key="setup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
           <div style={{ paddingBottom: 72 }}>
-            {/* Search bar */}
-            <div style={{
-              ...cardStyle, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <Search size={15} color="var(--text-3)" />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search chapters..."
-                style={{ border: 'none', outline: 'none', flex: 1, fontSize: 13, fontFamily: 'inherit', background: 'transparent', color: 'var(--text)' }}
-              />
-            </div>
+            <SearchInput value={search} onChange={setSearch} placeholder="Search chapters..." />
 
             {/* Cognitive Twin Profile */}
             {(() => {
@@ -1558,16 +1540,7 @@ function FlashcardsTab() {
       <AnimatePresence mode="wait">
         <motion.div key="setup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
           <div style={{ paddingBottom: 72 }}>
-            {/* Search bar */}
-            <div style={{
-              ...cardStyle, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <Search size={15} color="var(--text-3)" />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search chapters..."
-                style={{ border: 'none', outline: 'none', flex: 1, fontSize: 13, fontFamily: 'inherit', background: 'transparent', color: 'var(--text)' }}
-              />
-            </div>
+            <SearchInput value={search} onChange={setSearch} placeholder="Search chapters..." />
 
             {/* Subject pills — multi-select */}
             <motion.div style={{ ...cardStyle, padding: 14, marginBottom: 10 }} whileHover={cardHover}>

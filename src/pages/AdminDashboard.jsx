@@ -3,8 +3,9 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/useAuth'
 import { subjects, getMcqBank } from '../data/subjects'
 import useStore from '../store/useStore'
-import { ChevronLeft, ChevronRight, Users, BookOpen, Trophy, AlertCircle, Plus, Trash2, Search, CheckCircle, Edit3, Download, ArrowLeft, BarChart3, Target, Book, Clock, Zap, Newspaper, Repeat, Activity, Timer, PieChart, Layers, Info } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Users, BookOpen, Trophy, AlertCircle, Plus, Trash2, CheckCircle, Edit3, Download, ArrowLeft, BarChart3, Target, Book, Clock, Zap, Newspaper, Repeat, Activity, Timer, PieChart, Layers, Info } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import SearchInput from '../components/SearchInput'
 
 const inputStyle = {
   width: '100%', padding: '10px 12px', borderRadius: 10,
@@ -482,14 +483,8 @@ export default function AdminDashboard() {
               ))}
             </div>
 
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              background: 'var(--white)', border: '1.5px solid var(--border)',
-              borderRadius: 10, padding: '8px 12px', marginBottom: 12,
-            }}>
-              <Search size={14} color="var(--text-3)" />
-              <input value={qFilter.search} onChange={e => setQFilter(f => ({ ...f, search: e.target.value }))}
-                placeholder="Search questions..." style={{ ...inputStyle, border: 'none', padding: 0 }} />
+            <div style={{ marginBottom: 12 }}>
+              <SearchInput value={qFilter.search} onChange={v => setQFilter(f => ({ ...f, search: v }))} placeholder="Search questions..." />
             </div>
 
             {qLoading ? (
