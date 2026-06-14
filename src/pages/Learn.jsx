@@ -430,7 +430,7 @@ function NotesTab() {
               onClick={handleCloseNote}
               style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, backdropFilter: 'blur(6px)' }}
             />
-            <motion.div layoutId={`note-${selectedNote.id}`}
+            <motion.div
               initial={{ opacity: 0, scale: 0.92, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 20 }}
