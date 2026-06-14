@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
@@ -398,24 +399,24 @@ export default function CurrentAffairs() {
         </div>
 
         {/* Article detail popup */}
+        {createPortal(
         <AnimatePresence>
         {selectedArticle && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }}
-              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, backdropFilter: 'blur(6px)' }}
-            />
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }}
+            style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.92, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 20 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              onClick={e => e.stopPropagation()}
               style={{
-                position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-                zIndex: 110, background: 'var(--card-bg)', borderRadius: 24,
-                width: 'min(92vw, 400px)', maxHeight: '85vh',
+                background: 'var(--card-bg)', borderRadius: 24,
+                width: '100%', maxWidth: 400, maxHeight: '85vh',
                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
               }}
@@ -501,9 +502,11 @@ export default function CurrentAffairs() {
                 </div>
               </div>
             </motion.div>
-          </>
+          </motion.div>
         )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
       </div>
 
       {/* MCQ Practice Modal */}
