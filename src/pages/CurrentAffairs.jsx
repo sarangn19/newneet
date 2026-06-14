@@ -1,16 +1,18 @@
-import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { supabase } from '../lib/supabase'
 import { fetchCurrentAffairs } from '../lib/currentAffairs'
-import { ChevronLeft, Search, RefreshCw, Bookmark, ExternalLink, ChevronRight, BookOpen, X, XCircle, CheckCircle, Sparkles, AlertTriangle, RotateCcw, Newspaper } from 'lucide-react'
+import { RefreshCw, Bookmark, ExternalLink, X, XCircle, CheckCircle, Sparkles, AlertTriangle, RotateCcw, Newspaper } from 'lucide-react'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 import { skeletonBreath } from '../hooks/useSequentialReveal'
 import EmptyState from '../components/EmptyState'
 import FilterTabs from '../components/FilterTabs'
 import SearchInput from '../components/SearchInput'
+import Card from '../components/Card'
+import Badge from '../components/Badge'
+import PrimaryButton from '../components/PrimaryButton'
 
 const CATEGORIES = [
   'All', 'Polity', 'Economy', 'International', 'Environment', 'Science & Tech', 'History & Culture', 'Geography',
@@ -27,7 +29,6 @@ const categoryColors = {
 }
 
 export default function CurrentAffairs() {
-  const navigate = useNavigate()
   const { userId, caHistory, recordArticleOpened, recordArticleClosed, recordArticleBookmarked, recordNotesGenerated, recordMCQsGenerated, incrementCaFallback, incrementCaRetryAttempt, incrementCaRetrySuccess, incrementCaMcqTimeout, incrementCaMcqFail } = useStore()
   const [articles, setArticles] = useState([])
   const [activeCategory, setActiveCategory] = useState('All')
@@ -295,11 +296,7 @@ export default function CurrentAffairs() {
           {loading ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', minWidth: 0 }}>
               {[1,2,3,4].map(i => (
-                  <div key={i} style={{
-                    background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', padding: 20,
-                    display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0,
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
-                  }}>
+                  <Card key={i} padding={20} style={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                       <SkeletonBlock width={60} height={10} radius={4} />
                       <SkeletonBlock width={80} height={10} radius={4} />
@@ -312,7 +309,7 @@ export default function CurrentAffairs() {
                       <SkeletonBlock width={80} height={10} radius={4} />
                       <SkeletonBlock width={20} height={10} radius={4} />
                     </div>
-                  </div>
+                  </Card>
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -324,25 +321,18 @@ export default function CurrentAffairs() {
                 const catColor = categoryColors[a.category] || 'var(--text-3)'
                 const isRead = readArticles.has(a.title)
                 return (
-                  <motion.div key={a.title}
-                    layoutId={`article-${a.title}`}
+                  <motion.div key={a.title} layout layoutId={`article-${a.title}`}
                     variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
                     transition={{ duration: 0.3, ease: 'easeOut' }}
                     whileHover={{ y: -3 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => { recordArticleOpened(a); articleOpenTime.current = Date.now(); setSelectedArticle(a) }}
-                    style={{
-                      background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', padding: 20, cursor: 'pointer',
-                      display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0,
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
-                      opacity: isRead ? 0.85 : 1,
-                    }}
                   >
-                    {/* Top row: category chip + date */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: catColor }} />
-                        <span style={{ fontSize: 10, fontWeight: 600, color: catColor }}>{a.category}</span>
+                    <Card padding={20} style={{ opacity: isRead ? 0.85 : 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: catColor }} />
+                          <Badge color={catColor}>{a.category}</Badge>
                       </div>
                       <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>{a.date}</span>
                     </div>
@@ -379,7 +369,7 @@ export default function CurrentAffairs() {
                         <Bookmark size={14} color={bookmarked.has(a.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(a.title) ? 'var(--primary)' : 'none'} />
                       </motion.button>
                     </div>
-                  </motion.div>
+                  </Card></motion.div>
                 )
               })}
             </motion.div>
@@ -401,60 +391,21 @@ export default function CurrentAffairs() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 20 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              onClick={e => e.stopPropagation()}
-              style={{
-                background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)',
+            >
+            <Card onClick={e => e.stopPropagation()} style={{
                 width: '100%', maxWidth: 400, maxHeight: '85vh',
                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-              }}
-            >
-              {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 0' }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                  {selectedArticle.category || 'Article'}
-                </div>
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <motion.button whileTap={{scale:0.85}} onClick={() => toggleBookmark(selectedArticle)} style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 'var(--radius-sm)', display: 'flex' }}>
-                    <Bookmark size={15} color={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarked.has(selectedArticle.title) ? 'var(--primary)' : 'none'} />
-                  </motion.button>
-                  <motion.button whileTap={{scale:0.85}} onClick={() => { const elapsed = articleOpenTime.current ? Math.round((Date.now() - articleOpenTime.current) / 1000) : 0; recordArticleClosed(selectedArticle.title, elapsed); setSelectedArticle(null) }} style={{ background: 'var(--surface-alt)', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 'var(--radius-sm)', display: 'flex' }}>
-                    <X size={16} color="var(--text-2)" />
-                  </motion.button>
-                </div>
-              </div>
-
-              {/* Scrollable content */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px 20px' }}>
-                {/* Image */}
-                <div style={{ margin: '0 -20px 12px', height: 180, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, var(--surface-alt), transparent)' }}>
-                  {selectedArticle.image ? (
-                    <img src={selectedArticle.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = 'linear-gradient(135deg, var(--surface-alt), transparent)' }} />
-                  ) : (
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.3">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                      <polyline points="21 15 16 10 5 21" />
-                    </svg>
-                  )}
-                </div>
-                {/* Title + meta */}
-                <div style={{ marginBottom: 12 }}>
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)', padding: 0,
+              }}>
                   {selectedArticle.category && (
-                    <span style={{
-                      display: 'inline-block', padding: '3px 10px', borderRadius: 'var(--radius-pill)', fontSize: 10, fontWeight: 700,
-                      background: (categoryColors[selectedArticle.category] || 'var(--text-3)') + '15',
-                      color: categoryColors[selectedArticle.category] || 'var(--text-3)', marginBottom: 8,
-                    }}>
+                    <Badge color={categoryColors[selectedArticle.category] || 'var(--text-3)'} bg={(categoryColors[selectedArticle.category] || 'var(--text-3)') + '15'}>
                       {selectedArticle.category}
-                    </span>
+                    </Badge>
                   )}
                   <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4 }}>{selectedArticle.title}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
                     {selectedArticle.date} · {selectedArticle.source}
                   </div>
-                </div>
 
                 {/* Summary */}
                 <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
@@ -467,30 +418,17 @@ export default function CurrentAffairs() {
                     <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Tags</div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {selectedArticle.tags.map((t, i) => (
-                        <span key={i} style={{ fontSize: 10, color: 'var(--text-3)', background: 'var(--surface-alt)', padding: '3px 10px', borderRadius: 'var(--radius-pill)' }}>{t}</span>
+                        <Badge key={i} bg="var(--surface-alt)" color="var(--text-3)">{t}</Badge>
                       ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* UPSC Relevance */}
-                <div style={{                   background: `${(categoryColors[selectedArticle.category] || 'var(--text-3)')}0D`, borderRadius: 'var(--radius-md)', padding: 10, marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: categoryColors[selectedArticle.category] || 'var(--primary)', marginBottom: 4 }}>UPSC Relevance</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
-                    This article is relevant for {selectedArticle.category || 'General Studies'} preparation. Analyze the key facts, government initiatives, and constitutional aspects mentioned. Link with static syllabus topics for Mains answers.
-                  </div>
-                </div>
+              </div>
+            </div>
+                  )}
 
                 {/* Actions */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <motion.button whileTap={{scale:0.96}} onClick={() => generateMCQs(selectedArticle)} disabled={mcqLoading} style={{
-                    width: '100%', padding: '10px 0', borderRadius: 'var(--radius-md)', border: 'none',
-                    background: mcqLoading ? 'var(--surface-alt)' : 'var(--primary)', color: '#fff',
-                    fontSize: 12, fontWeight: 700, cursor: mcqLoading ? 'default' : 'pointer', fontFamily: 'inherit',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  }}>
-                    <Sparkles size={14} /> {mcqLoading ? 'Generating...' : 'Practice Related MCQs'}
-                  </motion.button>
+                  <PrimaryButton disabled={mcqLoading} onClick={() => generateMCQs(selectedArticle)} style={{ padding: '10px 0' }}>
+              <Sparkles size={14} /> {mcqLoading ? 'Generating...' : 'Practice Related MCQs'}
+            </PrimaryButton>
                   {selectedArticle.link && (
                     <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" style={{
                       width: '100%', padding: '10px 0', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border)',
@@ -500,8 +438,8 @@ export default function CurrentAffairs() {
                       <ExternalLink size={14} /> Read Full Article
                     </a>
                   )}
-                </div>
               </div>
+            </Card>
             </motion.div>
           </motion.div>
         )}
@@ -527,13 +465,9 @@ export default function CurrentAffairs() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              onClick={e => e.stopPropagation()}
-              style={{
-                background: 'var(--card-bg)', borderRadius: 'var(--radius-lg)', width: '100%', maxWidth: 420, maxHeight: '80vh',
-                overflow: 'hidden', display: 'flex', flexDirection: 'column',
-              }}
             >
-              <div style={{ padding: '16px 16px 10px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Card onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 420, maxHeight: '80vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}>
+               <div style={{ padding: '16px 16px 10px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Sparkles size={16} color="var(--success)" />
                 <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>
                   {mcqLoading ? 'Generating Practice Set' : mcqResult ? 'Results' : `MCQ ${mcqCurrent + 1}/${mcqQuestions.length}`}
@@ -572,12 +506,9 @@ export default function CurrentAffairs() {
                         </div>
                       ))}
                     </div>
-                    <motion.button onClick={() => { clearMcqTimers(); setMcqLoading(false); setMcqProgress(''); setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }} whileTap={{scale:0.97}} style={{
-                      marginTop: 16, width: '100%', padding: '10px 0', borderRadius: 'var(--radius-md)', border: 'none',
-                      background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-                    }}>
+                    <PrimaryButton onClick={() => { clearMcqTimers(); setMcqLoading(false); setMcqProgress(''); setMcqPractice(null); setMcqQuestions([]); setMcqAnswers({}); setMcqResult(null); setMcqCurrent(0) }} style={{ marginTop: 16, padding: '10px 0' }}>
                       Close
-                    </motion.button>
+                    </PrimaryButton>
                   </div>
                 ) : (
                   <>
@@ -601,15 +532,14 @@ export default function CurrentAffairs() {
                             {answered && selected && !isCorrect && <XCircle size={14} color="var(--error)" />}
                             {!answered && <span style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--text-3)', display: 'inline-block' }} />}
                             {opt}
-                          </motion.button>
-                        )
-                      })}
-                    </div>
-                  </>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
+                </motion.button>
+              )})}
+            </div>
+            </>)}
+          </div>
+        </Card>
+        </motion.div>
+      </motion.div>
         )}
       </AnimatePresence>
 

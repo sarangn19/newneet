@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import useStore from '../store/useStore'
-import { Brain, TrendingUp, Clock, CheckCircle, BookOpen, MessageSquare, Globe, BarChart3, Flame, Target, Rotate3D } from 'lucide-react'
+import { Brain, TrendingUp, Clock, CheckCircle, BookOpen, MessageSquare, BarChart3, Flame, Target, Rotate3D } from 'lucide-react'
 import { upscSubjects } from '../data/upsc/subjects'
 import { supabase } from '../lib/supabase'
-import { useSequentialReveal, easePreset } from '../hooks/useSequentialReveal'
 import { SkeletonBlock } from '../components/SkeletonBlock'
+import Card from '../components/Card'
+import PageHeader from '../components/PageHeader'
+import SectionHeader from '../components/SectionHeader'
+import StatCard from '../components/StatCard'
 
 function AnimatedValue({ value, suffix = '', decimals = 0 }) {
   const [display, setDisplay] = useState(0)
@@ -136,16 +139,7 @@ export default function UpscAnalytics() {
     <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingBottom: 100, position: 'relative', overflowX: 'hidden' }}>
       <div className="bg-pattern" style={{ position: 'fixed', inset: 0, opacity: 0.4, pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-          style={{ padding: '48px 16px 14px', background: 'var(--card-bg)', borderBottom: '2px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text)' }}>Unified Analytics</div>
-              <div style={{ fontSize: 11, color: 'var(--text-2)', fontWeight: 500, marginTop: 1 }}>All learning activity in one place</div>
-            </div>
-          </div>
-        </motion.div>
+        <PageHeader title="Unified Analytics" subtitle="All learning activity in one place" />
 
         <motion.div variants={{ visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } } }} initial="hidden" animate="visible"
           style={{ padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -153,11 +147,11 @@ export default function UpscAnalytics() {
           {!pageReady ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
               {[1,2,3,4].map(i => (
-                <div key={i} style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', padding: '14px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <Card key={i} padding="14px 6px" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                   <SkeletonBlock width={28} height={28} radius={8} />
                   <SkeletonBlock width={36} height={20} />
                   <SkeletonBlock width={50} height={10} />
-                </div>
+                </Card>
               ))}
             </div>
           ) : (
@@ -171,60 +165,49 @@ export default function UpscAnalytics() {
           )}
 
           {/* Weekly Summary */}
-          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}
-            style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>This Week</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary)' }}><AnimatedValue value={weeklyStats.questions} /></div>
-                <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Questions</div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+            <Card>
+              <SectionHeader title="This Week" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--primary)' }}><AnimatedValue value={weeklyStats.questions} /></div>
+                  <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Questions</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--success)' }}><AnimatedValue value={weeklyStats.accuracy} />%</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Accuracy</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--warning)' }}><AnimatedValue value={weeklyStats.daysActive} />/7</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Active Days</div>
+                </div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--success)' }}><AnimatedValue value={weeklyStats.accuracy} />%</div>
-                <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Accuracy</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--warning)' }}><AnimatedValue value={weeklyStats.daysActive} />/7</div>
-                <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 600 }}>Active Days</div>
-              </div>
-            </div>
+            </Card>
           </motion.div>
 
           {/* Activity Overview */}
-          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}
-            style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Activity Overview</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <ActivityItem icon={BookOpen} label="Notes Created" value={<AnimatedValue value={notesCount} />} color="var(--primary)" />
-              <ActivityItem icon={MessageSquare} label="Chat Messages" value={<AnimatedValue value={chatCount} />} color="var(--phys)" />
-              <ActivityItem icon={Rotate3D} label="Due for Revision" value={<AnimatedValue value={dueRevisionCount} />} color="var(--warning)" />
-              <ActivityItem icon={BarChart3} label="Topics Attempted" value={<><AnimatedValue value={topicStatus.attempted} />/<AnimatedValue value={topicStatus.total} /></>} color="var(--success)" />
-            </div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+            <Card>
+              <SectionHeader title="Activity Overview" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <ActivityItem icon={BookOpen} label="Notes Created" value={<AnimatedValue value={notesCount} />} color="var(--primary)" />
+                <ActivityItem icon={MessageSquare} label="Chat Messages" value={<AnimatedValue value={chatCount} />} color="var(--phys)" />
+                <ActivityItem icon={Rotate3D} label="Due for Revision" value={<AnimatedValue value={dueRevisionCount} />} color="var(--warning)" />
+                <ActivityItem icon={BarChart3} label="Topics Attempted" value={<><AnimatedValue value={topicStatus.attempted} />/<AnimatedValue value={topicStatus.total} /></>} color="var(--success)" />
+              </div>
+            </Card>
           </motion.div>
 
           {/* Subject Accuracy */}
-          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}
-            style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>Subject Accuracy</div>
-            <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500, marginBottom: 10 }}>Percentages shown after {MIN_Q}+ questions per subject</div>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-              <div style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderRadius: 'var(--radius-md)', background: 'var(--success-light)' }}>
-                <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--success)' }}>{topicStatus.mastered}</div>
-                <div style={{ fontSize: 9, color: 'var(--success)', fontWeight: 600 }}>Mastered</div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+            <Card>
+              <SectionHeader title="Subject Accuracy" subtitle={`Percentages shown after ${MIN_Q}+ questions per subject`} />
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <StatCard value={topicStatus.mastered} label="Mastered" color="var(--success)" bg="var(--success-light)" />
+                <StatCard value={topicStatus.attempted} label="Attempted" color="var(--warning)" bg="var(--warning-light)" />
+                <StatCard value={topicStatus.weak} label="Weak" color="var(--error)" bg="var(--error-light)" />
+                <StatCard value={topicStatus.total - topicStatus.attempted} label="New" color="var(--text-2)" bg="var(--surface-alt)" />
               </div>
-              <div style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderRadius: 'var(--radius-md)', background: 'var(--warning-light)' }}>
-                <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--warning)' }}>{topicStatus.attempted}</div>
-                <div style={{ fontSize: 9, color: 'var(--warning)', fontWeight: 600 }}>Attempted</div>
-              </div>
-              <div style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderRadius: 'var(--radius-md)', background: 'var(--error-light)' }}>
-                <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--error)' }}>{topicStatus.weak}</div>
-                <div style={{ fontSize: 9, color: 'var(--error)', fontWeight: 600 }}>Weak</div>
-              </div>
-              <div style={{ flex: 1, padding: '8px 6px', textAlign: 'center', borderRadius: 'var(--radius-md)', background: 'var(--surface-alt)' }}>
-                <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-2)' }}>{topicStatus.total - topicStatus.attempted}</div>
-                <div style={{ fontSize: 9, color: 'var(--text-2)', fontWeight: 600 }}>New</div>
-              </div>
-            </div>
 
             {subjectAccuracies.map((sub, i) => (
               <div key={sub.id} style={{ marginBottom: 8 }}>
@@ -244,13 +227,14 @@ export default function UpscAnalytics() {
                 </div>
               </div>
             ))}
-          </motion.div>
+            </Card>
+            </motion.div>
 
           {/* Topic Breakdown */}
           {topicBreakdown.length > 0 && (
-            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}
-              style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', padding: 16 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Second Brain — Topic Scores</div>
+            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+              <Card>
+                <SectionHeader title="Second Brain — Topic Scores" />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {topicBreakdown.sort((a, b) => (a.accuracy || 0) - (b.accuracy || 0)).slice(0, 15).map(t => (
                   <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -273,14 +257,15 @@ export default function UpscAnalytics() {
                   </div>
                 ))}
               </div>
+            </Card>
             </motion.div>
           )}
 
           {/* Recent Activity */}
           {recentActivity.length > 0 && (
-            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}
-              style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', padding: 16 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Recent Activity</div>
+            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+              <Card>
+                <SectionHeader title="Recent Activity" />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {recentActivity.map((e, i) => (
                   <div key={e.id || i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--text-2)' }}>
@@ -290,15 +275,16 @@ export default function UpscAnalytics() {
                   </div>
                 ))}
               </div>
+            </Card>
             </motion.div>
           )}
 
           {totalQ === 0 && (
-            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <Card style={{ textAlign: 'center', padding: '60px 20px' }}>
               <Brain size={36} color="var(--text-3)" style={{ marginBottom: 12 }} />
               <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-2)', marginBottom: 4 }}>No data yet</div>
               <div style={{ fontSize: 12, color: 'var(--text-3)' }}>Start practicing to see your analytics.</div>
-            </div>
+            </Card>
           )}
         </motion.div>
       </div>
@@ -310,13 +296,14 @@ function KpiBox({ icon: Icon, value, label, color }) {
   return (
     <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      whileHover={{ y: -2 }}
-      style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', padding: '14px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-      <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-sm)', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      whileHover={{ y: -2 }}>
+      <Card padding="14px 6px" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-sm)', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Icon size={16} color={color} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color, lineHeight: 1.2 }}>{value}</div>
       <div style={{ fontSize: 9, color: 'var(--text-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{label}</div>
+      </Card>
     </motion.div>
   )
 }
