@@ -75,7 +75,7 @@ function NotesTab() {
   })
   const [selectedNote, setSelectedNote] = useState(null)
   const [notesLoading, setNotesLoading] = useState(true)
-  const [menuNoteId, setMenuNoteId] = useState(null)
+  const [searchFocused, setSearchFocused] = useState(false)
 
   const toggleBookmark = (id) => {
     setBookmarkedIds(prev => {
@@ -94,13 +94,6 @@ function NotesTab() {
       setNotesLoading(false)
     })
   }, [userId])
-
-  useEffect(() => {
-    if (!menuNoteId) return
-    const close = () => setMenuNoteId(null)
-    document.addEventListener('click', close)
-    return () => document.removeEventListener('click', close)
-  }, [menuNoteId])
 
   const saveNote = async () => {
     if (!content.trim() || !userId) return
@@ -148,52 +141,48 @@ function NotesTab() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      {/* Search + View toggle + New */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={14} color="var(--text-3)" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search notes..." style={{
-            width: '100%', padding: '8px 8px 8px 32px', borderRadius: 8, border: '1px solid var(--border)',
-            fontSize: 12, outline: 'none', fontFamily: 'inherit', background: 'var(--card-bg)', boxSizing: 'border-box',
-          }} />
+      {/* Sticky Search */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--page-bg)', paddingTop: 4, paddingBottom: 8 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <Search size={14} color="var(--text-3)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)}
+              placeholder="Search notes..." style={{
+              width: '100%', padding: '10px 10px 10px 36px', borderRadius: 12,
+              border: searchFocused ? '1.5px solid var(--primary)' : '1px solid var(--border)',
+              fontSize: 13, outline: 'none', fontFamily: 'inherit', background: 'var(--card-bg)',
+              boxSizing: 'border-box', transition: 'border 0.2s',
+            }} />
+          </div>
+          <motion.button onClick={() => setShowForm(!showForm)} whileTap={{ scale: 0.97 }} style={{
+            padding: '0 14px', borderRadius: 12, border: 'none', background: 'var(--primary)',
+            color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}>
+            <Plus size={14} /> New
+          </motion.button>
         </div>
-
-        <motion.button onClick={() => setShowForm(!showForm)} whileTap={{ scale: 0.97 }} style={{
-          padding: '0 14px', borderRadius: 12, border: 'none', background: 'var(--primary)',
-          color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-          display: 'flex', alignItems: 'center', gap: 4,
-        }}>
-          <Plus size={14} /> New Note
-        </motion.button>
       </div>
 
-      {/* Subject filters with counts */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 10, overflowX: 'auto', scrollbarWidth: 'none' }}>
-        <motion.button key="all" onClick={() => setSubjectFilter('all')} whileTap={{ scale: 0.97 }} style={{
-          padding: '6px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
-          fontSize: 11, fontWeight: 700, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 5,
-          background: subjectFilter === 'all' ? 'var(--primary)' : 'var(--surface-alt)',
-          color: subjectFilter === 'all' ? '#fff' : 'var(--text-3)',
-        }}>
-          All
-          <span style={{
-            fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99,
-            background: subjectFilter === 'all' ? 'rgba(255,255,255,0.2)' : 'var(--border)',
-          }}>{subjectCounts.all}</span>
-        </motion.button>
-        {upscSubjects.map(s => {
+      {/* Category filters with animated selection */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 12, overflowX: 'auto', scrollbarWidth: 'none', position: 'relative' }}>
+        {[{ id: 'all', name: 'All' }, ...upscSubjects].map(s => {
           const active = subjectFilter === s.id
           return (
-            <motion.button key={s.id} onClick={() => setSubjectFilter(s.id)} whileTap={{ scale: 0.97 }} style={{
-              padding: '6px 12px', borderRadius: 12, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
-              fontSize: 11, fontWeight: 700, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 5,
-              background: active ? s.color : 'var(--surface-alt)',
-              color: active ? '#fff' : 'var(--text-3)',
-            }}>
+            <motion.button key={s.id} onClick={() => setSubjectFilter(s.id)}
+              layout
+              whileTap={{ scale: 0.95 }}
+              style={{
+                padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+                fontSize: 11, fontWeight: 600, fontFamily: 'inherit', position: 'relative',
+                background: active ? s.color || 'var(--primary)' : 'var(--surface-alt)',
+                color: active ? '#fff' : 'var(--text-3)',
+                transition: 'background 0.25s',
+              }}>
               {s.name}
               <span style={{
-                fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99,
-                background: active ? 'rgba(255,255,255,0.2)' : 'var(--border)',
+                fontSize: 10, fontWeight: 600, marginLeft: 5, opacity: 0.7,
               }}>{subjectCounts[s.id]}</span>
             </motion.button>
           )
@@ -245,21 +234,53 @@ function NotesTab() {
               padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
               ...(i > 1 ? { marginTop: -(100 - i * 12), transform: `scale(${1 - (i * 0.03)})`, opacity: 1 - (i * 0.15) } : {}),
             }}>
-              <SkeletonBlock width="35%" height={10} radius={4} style={{ marginBottom: 8 }} />
-              <SkeletonBlock width="85%" height={14} radius={4} style={{ marginBottom: 6 }} />
-              <SkeletonBlock width="60%" height={10} radius={4} style={{ marginBottom: 6 }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                <SkeletonBlock width={50} height={10} radius={4} />
-                <SkeletonBlock width={50} height={10} radius={4} />
+              <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+                <SkeletonBlock width={60} height={8} radius={4} />
+                <SkeletonBlock width={80} height={8} radius={4} />
+              </div>
+              <SkeletonBlock width="85%" height={16} radius={4} style={{ marginBottom: 8 }} />
+              <SkeletonBlock width="60%" height={12} radius={4} style={{ marginBottom: 4 }} />
+              <SkeletonBlock width="70%" height={12} radius={4} style={{ marginBottom: 4 }} />
+              <SkeletonBlock width="40%" height={12} radius={4} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                <SkeletonBlock width={80} height={10} radius={4} />
+                <SkeletonBlock width={20} height={10} radius={4} />
               </div>
             </div>
           ))}
         </div>
       ) : filteredNotes.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <BookOpen size={32} color="var(--text-3)" style={{ marginBottom: 10 }} />
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-2)' }}>No notes yet</div>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 4 }}>Create a new note to get started</div>
+          <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--surface-alt)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+            <BookOpen size={22} color="var(--text-3)" />
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Your knowledge library starts here.</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.5, marginBottom: 20, maxWidth: 260, margin: '0 auto 20px' }}>
+            Create your first note, ask the AI Mentor, or import something from Current Affairs.
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 200, margin: '0 auto' }}>
+            <motion.button onClick={() => setShowForm(true)} whileTap={{ scale: 0.97 }} style={{
+              width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
+              background: 'var(--primary)', color: '#fff', fontSize: 12, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              <Plus size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} /> Create Note
+            </motion.button>
+            <motion.button onClick={() => navigate('/mentor')} whileTap={{ scale: 0.97 }} style={{
+              width: '100%', padding: '10px 0', borderRadius: 12, border: '1.5px solid var(--border)',
+              background: 'var(--card-bg)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              Ask AI Mentor
+            </motion.button>
+            <motion.button onClick={() => navigate('/current-affairs')} whileTap={{ scale: 0.97 }} style={{
+              width: '100%', padding: '10px 0', borderRadius: 12, border: '1.5px solid var(--border)',
+              background: 'var(--card-bg)', color: 'var(--text-2)', fontSize: 12, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              Import Current Affairs
+            </motion.button>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingBottom: 20 }}>
@@ -271,61 +292,44 @@ function NotesTab() {
               const stripped = raw.replace(/<[^>]*>/g, '').replace(/==/g, '').replace(/\*\*/g, '').replace(/\[image\]\([^)]*\)/g, '[image]')
               return stripped.slice(0, 100)
             })()
-            const menuOpen = menuNoteId === n.id
             return (
               <motion.div key={n.id} layoutId={`note-${n.id}`} onClick={() => setSelectedNote(n)}
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}
                 whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}
                 style={{
                   background: 'var(--card-bg)', borderRadius: 24, padding: 20,
-                  cursor: 'pointer', position: 'relative', display: 'flex', flexDirection: 'column', gap: 8,
+                  cursor: 'pointer', display: 'flex', flexDirection: 'column',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
                 }}>
-                {/* Subject chip + menu */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  {n.subject && (
+                {/* Top row: category chip + date */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  {n.subject ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                       <div style={{ width: 6, height: 6, borderRadius: '50%', background: subjectColor }} />
                       <span style={{ fontSize: 10, fontWeight: 600, color: subjectColor }}>
                         {subjectObj?.name || n.subject}
                       </span>
                     </div>
-                  )}
-                  <div style={{ position: 'relative' }}>
-                    <motion.button onClick={e => { e.stopPropagation(); setMenuNoteId(menuOpen ? null : n.id) }} whileTap={{ scale: 0.85 }}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', color: 'var(--text-3)' }}>
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
-                    </motion.button>
-                    <AnimatePresence>
-                      {menuOpen && (
-                        <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.92 }}
-                          transition={{ duration: 0.15 }}
-                          style={{ position: 'absolute', top: 24, right: 0, zIndex: 50, background: 'var(--card-bg)', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', border: '1px solid var(--border)', overflow: 'hidden', minWidth: 100 }}>
-                          <motion.button onClick={e => { e.stopPropagation(); setMenuNoteId(null); deleteNote(n.id) }} whileTap={{ scale: 0.97 }}
-                            style={{ width: '100%', padding: '8px 14px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 11, color: 'var(--error)', fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                            Delete
-                          </motion.button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-                {/* Title */}
-                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {n.title || 'Untitled'}
-                </div>
-                {/* Preview */}
-                <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {preview}
-                </div>
-                {/* Metadata row */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 4 }}>
+                  ) : <div />}
                   <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>
                     {new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                   </span>
+                </div>
+                {/* Title — max 2 lines */}
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  {n.title || 'Untitled'}
+                </div>
+                {/* Preview — max 3 lines */}
+                <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 10 }}>
+                  {preview}
+                </div>
+                {/* Bottom row: continue reading + bookmark */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 2 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)' }}>
+                    Continue reading →
+                  </span>
                   <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(n.id) }} whileTap={{ scale: 0.8 }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
                     <Bookmark size={14} color={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'none'} />
                   </motion.button>
                 </div>
