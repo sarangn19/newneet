@@ -102,6 +102,7 @@
 
 .shared-search-wrapper {
   position: relative;
+  width: 100%;
 }
 .shared-search-icon {
   position: absolute;
