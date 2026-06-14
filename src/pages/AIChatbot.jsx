@@ -267,7 +267,7 @@ export default function AIChatbot() {
 
       {/* ═══════ DISCOVERY MODE — empty chat ═══════ */}
       {!chatStarted && (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
           {/* Premium mode cards */}
           <div style={{ padding: '16px 14px 8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {MODES.map((m, i) => {
