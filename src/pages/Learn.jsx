@@ -415,27 +415,18 @@ function NotesTab() {
                       </span>
                     </div>
                   ) : <div />}
-                  <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>
-                    {new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                  </span>
+                  <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(n.id) }} whileTap={{ scale: 0.8 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                    <Bookmark size={13} color={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'none'} />
+                  </motion.button>
                 </div>
                 {/* Title — max 2 lines */}
-                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {n.title || 'Untitled'}
                 </div>
-                {/* Preview — max 3 lines */}
-                <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 10 }}>
-                  {preview}
-                </div>
-                {/* Bottom row: continue reading + bookmark */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 2 }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)' }}>
-                    Continue reading →
-                  </span>
-                  <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(n.id) }} whileTap={{ scale: 0.8 }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
-                    <Bookmark size={14} color={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'none'} />
-                  </motion.button>
+                {/* Date at bottom */}
+                <div style={{ marginTop: 'auto', paddingTop: 8, fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>
+                  {new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                 </div>
               </motion.div>
             )
