@@ -34,7 +34,7 @@ export default async function handler(req, res) {
             summary: (a.description || '').substring(0, 200),
             source: a.source?.name || 'News',
             link: a.url || '',
-            image: a.urlToImage || '',
+            image: a.urlToImage ? a.urlToImage.replace('http://', 'https://') : '',
             tags: [],
           }))
         }

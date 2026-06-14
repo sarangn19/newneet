@@ -373,12 +373,18 @@ export default function CurrentAffairs() {
                       <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>{a.date}</span>
                     </div>
                     {/* Image */}
-                    {a.image && (
-                      <div style={{ margin: '0 -20px 10px', height: 120, overflow: 'hidden', borderRadius: 0 }}>
+                    <div style={{ margin: '0 -20px 10px', height: 120, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, var(--surface-alt), transparent)' }}>
+                      {a.image ? (
                         <img src={a.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          onError={e => e.target.style.display = 'none'} />
-                      </div>
-                    )}
+                          onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = 'linear-gradient(135deg, var(--surface-alt), transparent)' }} />
+                      ) : (
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.3">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                      )}
+                    </div>
                     {/* Title — max 2 lines */}
                     <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {a.title}
@@ -447,12 +453,18 @@ export default function CurrentAffairs() {
               {/* Scrollable content */}
               <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px 20px' }}>
                 {/* Image */}
-                {selectedArticle.image && (
-                  <div style={{ margin: '0 -20px 12px', height: 180, overflow: 'hidden' }}>
+                <div style={{ margin: '0 -20px 12px', height: 180, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, var(--surface-alt), transparent)' }}>
+                  {selectedArticle.image ? (
                     <img src={selectedArticle.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={e => e.target.style.display = 'none'} />
-                  </div>
-                )}
+                      onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = 'linear-gradient(135deg, var(--surface-alt), transparent)' }} />
+                  ) : (
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.3">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                  )}
+                </div>
                 {/* Title + meta */}
                 <div style={{ marginBottom: 12 }}>
                   {selectedArticle.category && (
