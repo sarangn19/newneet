@@ -504,7 +504,7 @@ function NotesTab() {
                   <input value={editTitle} onChange={e => setEditTitle(e.target.value)} placeholder="Note title"
                     style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 14, fontWeight: 600, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', boxSizing: 'border-box' }} />
                   <textarea value={editContent} onChange={e => setEditContent(e.target.value)} placeholder="Note content"
-                    style={{ flex: 1, width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, lineHeight: 1.6, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', resize: 'none', boxSizing: 'border-box' }} />
+                    style={{ flex: 1, width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, lineHeight: 1.6, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', resize: 'none', boxSizing: 'border-box', minHeight: 120 }} />
                 </div>
               ) : (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.25 }}
