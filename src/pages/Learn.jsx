@@ -500,7 +500,7 @@ function NotesTab() {
               </motion.div>
               {/* Body */}
               {editing ? (
-                <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px 16px', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 200 }}>
                   <input value={editTitle} onChange={e => setEditTitle(e.target.value)} placeholder="Note title"
                     style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 14, fontWeight: 600, outline: 'none', fontFamily: 'inherit', background: 'var(--surface-alt)', color: 'var(--text)', boxSizing: 'border-box' }} />
                   <textarea value={editContent} onChange={e => setEditContent(e.target.value)} placeholder="Note content"
