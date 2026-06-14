@@ -317,23 +317,24 @@ export default function CurrentAffairs() {
           {loading ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', minWidth: 0 }}>
               {[1,2,3,4].map(i => (
-                <div key={i} style={{
-                  background: 'var(--card-bg)', borderRadius: 24, padding: 20,
-                  display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <SkeletonBlock width={60} height={10} radius={4} />
-                    <SkeletonBlock width={80} height={10} radius={4} />
+                  <div key={i} style={{
+                    background: 'var(--card-bg)', borderRadius: 24, padding: 20,
+                    display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0,
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <SkeletonBlock width={60} height={10} radius={4} />
+                      <SkeletonBlock width={80} height={10} radius={4} />
+                    </div>
+                    <SkeletonBlock width="100%" height={90} radius={8} style={{ marginBottom: 10 }} />
+                    <SkeletonBlock width="85%" height={16} radius={4} style={{ marginBottom: 8 }} />
+                    <SkeletonBlock width="60%" height={12} radius={4} style={{ marginBottom: 4 }} />
+                    <SkeletonBlock width="70%" height={12} radius={4} style={{ marginBottom: 10 }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 2 }}>
+                      <SkeletonBlock width={80} height={10} radius={4} />
+                      <SkeletonBlock width={20} height={10} radius={4} />
+                    </div>
                   </div>
-                  <SkeletonBlock width="85%" height={16} radius={4} style={{ marginBottom: 8 }} />
-                  <SkeletonBlock width="60%" height={12} radius={4} style={{ marginBottom: 4 }} />
-                  <SkeletonBlock width="70%" height={12} radius={4} style={{ marginBottom: 10 }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 2 }}>
-                    <SkeletonBlock width={80} height={10} radius={4} />
-                    <SkeletonBlock width={20} height={10} radius={4} />
-                  </div>
-                </div>
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -371,6 +372,13 @@ export default function CurrentAffairs() {
                       </div>
                       <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>{a.date}</span>
                     </div>
+                    {/* Image */}
+                    {a.image && (
+                      <div style={{ margin: '0 -20px 10px', height: 120, overflow: 'hidden', borderRadius: 0 }}>
+                        <img src={a.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={e => e.target.style.display = 'none'} />
+                      </div>
+                    )}
                     {/* Title — max 2 lines */}
                     <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {a.title}
@@ -438,6 +446,13 @@ export default function CurrentAffairs() {
 
               {/* Scrollable content */}
               <div style={{ flex: 1, overflowY: 'auto', padding: '12px 20px 20px' }}>
+                {/* Image */}
+                {selectedArticle.image && (
+                  <div style={{ margin: '0 -20px 12px', height: 180, overflow: 'hidden' }}>
+                    <img src={selectedArticle.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={e => e.target.style.display = 'none'} />
+                  </div>
+                )}
                 {/* Title + meta */}
                 <div style={{ marginBottom: 12 }}>
                   {selectedArticle.category && (
@@ -490,8 +505,8 @@ export default function CurrentAffairs() {
                   }}>
                     <Sparkles size={14} /> {mcqLoading ? 'Generating...' : 'Practice Related MCQs'}
                   </motion.button>
-                  {selectedArticle.url && (
-                    <a href={selectedArticle.url} target="_blank" rel="noopener noreferrer" style={{
+                  {selectedArticle.link && (
+                    <a href={selectedArticle.link} target="_blank" rel="noopener noreferrer" style={{
                       width: '100%', padding: '10px 0', borderRadius: 12, border: '1.5px solid var(--border)',
                       background: 'var(--card-bg)', color: 'var(--text-3)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, textDecoration: 'none',

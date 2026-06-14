@@ -34,6 +34,7 @@ export default async function handler(req, res) {
             summary: (a.description || '').substring(0, 200),
             source: a.source?.name || 'News',
             link: a.url || '',
+            image: a.urlToImage || '',
             tags: [],
           }))
         }
@@ -67,7 +68,7 @@ export default async function handler(req, res) {
           const pubDate = item.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i)?.[1] || ''
           const link = item.match(/<link[^>]*>([\s\S]*?)<\/link>/i)?.[1] || ''
           if (!title) continue
-          articles.push({ date: pubDate ? new Date(pubDate).toISOString().split('T')[0] : '', category: guessCategory(title, desc), title, summary: desc.substring(0, 200), source: feed.source, link, tags: [] })
+          articles.push({ date: pubDate ? new Date(pubDate).toISOString().split('T')[0] : '', category: guessCategory(title, desc), title, summary: desc.substring(0, 200), source: feed.source, link, image: '', tags: [] })
         }
       } catch {}
     }
@@ -91,13 +92,13 @@ export default async function handler(req, res) {
 
 function getMockArticles() {
   return [
-    { date: '2026-05-17', category: 'Economy', title: "India's GDP growth projected at 7.2% for FY26", summary: 'IMF projects India\'s GDP growth at 7.2% for FY 2025-26, making India the fastest-growing major economy.', source: 'Economic Survey', link: '' },
-    { date: '2026-05-16', category: 'Polity', title: 'Supreme Court upholds right to privacy as fundamental right', summary: 'Supreme Court reaffirmed that right to privacy is an intrinsic part of Article 21.', source: 'SC India', link: '' },
-    { date: '2026-05-15', category: 'Environment', title: 'India pledges net-zero emissions by 2070', summary: 'At the COP Summit, India announced an updated target to achieve net-zero carbon emissions by 2070.', source: 'MoEFCC', link: '' },
-    { date: '2026-05-14', category: 'Science', title: 'ISRO successfully launches GSLV-Mk III', summary: 'ISRO\'s GSLV-Mk III successfully placed a next-gen communication satellite in geostationary orbit.', source: 'ISRO', link: '' },
-    { date: '2026-05-13', category: 'Polity', title: 'One Nation One Election bill introduced in Parliament', summary: 'Government introduced Constitution Amendment Bill for simultaneous elections.', source: 'Lok Sabha', link: '' },
-    { date: '2026-05-12', category: 'International', title: 'India assumes presidency of UN Security Council', summary: 'India began month-long presidency of UN Security Council.', source: 'MEA', link: '' },
-    { date: '2026-05-11', category: 'Economy', title: 'RBI keeps repo rate unchanged at 6.50%', summary: 'MPC voted to maintain repo rate citing inflation concerns.', source: 'RBI', link: '' },
-    { date: '2026-05-10', category: 'Environment', title: "India's forest cover increases by 2,261 sq km", summary: 'India State of Forest Report 2025 shows increase in forest cover.', source: 'FSI', link: '' },
+    { date: '2026-05-17', category: 'Economy', title: "India's GDP growth projected at 7.2% for FY26", summary: 'IMF projects India\'s GDP growth at 7.2% for FY 2025-26, making India the fastest-growing major economy.', source: 'Economic Survey', link: '', image: '' },
+    { date: '2026-05-16', category: 'Polity', title: 'Supreme Court upholds right to privacy as fundamental right', summary: 'Supreme Court reaffirmed that right to privacy is an intrinsic part of Article 21.', source: 'SC India', link: '', image: '' },
+    { date: '2026-05-15', category: 'Environment', title: 'India pledges net-zero emissions by 2070', summary: 'At the COP Summit, India announced an updated target to achieve net-zero carbon emissions by 2070.', source: 'MoEFCC', link: '', image: '' },
+    { date: '2026-05-14', category: 'Science', title: 'ISRO successfully launches GSLV-Mk III', summary: 'ISRO\'s GSLV-Mk III successfully placed a next-gen communication satellite in geostationary orbit.', source: 'ISRO', link: '', image: '' },
+    { date: '2026-05-13', category: 'Polity', title: 'One Nation One Election bill introduced in Parliament', summary: 'Government introduced Constitution Amendment Bill for simultaneous elections.', source: 'Lok Sabha', link: '', image: '' },
+    { date: '2026-05-12', category: 'International', title: 'India assumes presidency of UN Security Council', summary: 'India began month-long presidency of UN Security Council.', source: 'MEA', link: '', image: '' },
+    { date: '2026-05-11', category: 'Economy', title: 'RBI keeps repo rate unchanged at 6.50%', summary: 'MPC voted to maintain repo rate citing inflation concerns.', source: 'RBI', link: '', image: '' },
+    { date: '2026-05-10', category: 'Environment', title: "India's forest cover increases by 2,261 sq km", summary: 'India State of Forest Report 2025 shows increase in forest cover.', source: 'FSI', link: '', image: '' },
   ]
 }
