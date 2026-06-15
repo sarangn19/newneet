@@ -226,7 +226,7 @@ export default function UpscHome() {
               <h1 style={{ fontSize: 16, fontWeight: 200, color: '#000', lineHeight: 1.2 }}>
                 Hello<br /><span style={{ fontWeight: 800 }}>{user?.name?.split(' ')[0] || 'Aspirant'}</span>
               </h1>
-              <div style={{ width: 64, height: 64, borderRadius: 60, background: '#fff', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: '#525252' }}>
+              <div onClick={() => navigate('/profile')} style={{ width: 64, height: 64, borderRadius: 60, background: '#fff', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: '#525252', cursor: 'pointer' }}>
                 {user?.name?.[0] || 'U'}
               </div>
             </div>
@@ -242,7 +242,7 @@ export default function UpscHome() {
 
           {/* ─── DRAGGABLE REVISION SHEET ─── */}
           <motion.div
-            style={{ y: sheetY, position: 'absolute', top: 0, left: 0, right: 0, height: '100%', zIndex: 20, background: '#F0F0F0', borderRadius: '32px 32px 0 0', boxShadow: '0px 0px 24.4px rgba(0,0,0,0.15)' }}
+            style={{ y: sheetY, position: 'absolute', top: 0, left: 0, right: 0, height: '100%', zIndex: 20, background: '#FFFFFF', borderRadius: '32px 32px 0 0', boxShadow: '0px 0px 24.4px rgba(0,0,0,0.15)' }}
             drag="y"
             dragConstraints={{ top: openY, bottom: closedY }}
             dragElastic={0.1}
@@ -262,7 +262,7 @@ export default function UpscHome() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 32 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
               <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
             </div>
 
@@ -289,17 +289,20 @@ export default function UpscHome() {
                 return (
                   <motion.div key={t.id}
                     onClick={() => openRevision(t)}
+                    initial={false}
                     animate={{
                       height: sheetOpen ? 178 : 134,
                       marginTop: i === 0 ? 0 : sheetOpen ? 19 : closedMargin,
+                      scale: sheetOpen ? 1 : 1 - i * 0.02,
+                      opacity: sheetOpen ? 1 : 1 - i * 0.05,
                     }}
                     transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     style={{
                       width: '100%', borderRadius: 16, background: '#FFFFFF',
-                      boxShadow: '0px 1px 30.2px rgba(0,0,0,0.08)',
+                      boxShadow: `0px ${1 + i}px ${30.2 + i * 4}px rgba(0,0,0,${0.08 + i * 0.02})`,
                       padding: '24px 16px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                      cursor: 'pointer',
+                      cursor: 'pointer', transformOrigin: 'center top',
                       position: 'relative', zIndex: i + 1,
                     }}
                   >
