@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import useStore from '../store/useStore'
 import { useRecommendations } from '../lib/useRecommendations'
 import { usePerformanceAlerts } from '../lib/usePerformanceAlerts'
@@ -159,6 +159,15 @@ export default function UpscHome() {
   const insightAction = remainingFeed[0]?.name || 'the next topic'
 
   const [sheetOpen, setSheetOpen] = useState(false)
+  const sheetY = useMotionValue(0)
+  const closedY = 0
+  const openY = -450
+
+  const toggleSheet = () => {
+    const target = sheetOpen ? closedY : openY
+    animate(sheetY, target, { type: 'spring', damping: 25, stiffness: 200 })
+    setSheetOpen(!sheetOpen)
+  }
 
   return (
     <div style={{ background: '#FFFFFF', minHeight: '100%', overflow: 'hidden', position: 'relative' }}>
@@ -207,26 +216,24 @@ export default function UpscHome() {
             )}
           </div>
 
-          {/* ─── DRAGGABLE REVISION SHEET (anchored to bottom) ─── */}
+          {/* ─── DRAGGABLE REVISION SHEET ─── */}
           <motion.div
+            style={{ y: sheetY, position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20, background: '#F6F6F6', borderRadius: '44px 44px 0 0', boxShadow: '0px 0px 7px rgba(0,0,0,0.12)' }}
             drag="y"
-            dragConstraints={{ top: -500, bottom: 0 }}
+            dragConstraints={{ top: openY, bottom: closedY }}
             dragElastic={0.1}
             onDragEnd={(_, info) => {
-              if (info.offset.y < -60) setSheetOpen(true)
-              else setSheetOpen(false)
-            }}
-            animate={{ y: sheetOpen ? -450 : 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20,
-              background: '#F6F6F6',
-              borderRadius: '44px 44px 0 0',
-              boxShadow: '0px 0px 7px rgba(0,0,0,0.12)',
+              if (info.offset.y < -100) {
+                animate(sheetY, openY, { type: 'spring', stiffness: 200 })
+                setSheetOpen(true)
+              } else {
+                animate(sheetY, closedY, { type: 'spring', stiffness: 200 })
+                setSheetOpen(false)
+              }
             }}
           >
             {/* Grip handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, cursor: 'grab' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, cursor: 'grab' }} onClick={toggleSheet}>
               <div style={{ width: 32, height: 4, background: '#D4D4D4', borderRadius: 99 }} />
             </div>
 
