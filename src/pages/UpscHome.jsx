@@ -248,14 +248,9 @@ export default function UpscHome() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 32 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 500, color: sheetOpen ? '#FFFFFF' : '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
-              <div style={{ fontSize: 13, color: sheetOpen ? 'rgba(255,255,255,0.7)' : '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
+              <motion.h2 style={{ fontSize: 20, fontWeight: 500, margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }} animate={{ color: sheetOpen ? '#FFFFFF' : '#000' }} transition={{ type: 'spring', stiffness: 200 }}>Revision</motion.h2>
+              <motion.div style={{ fontSize: 13, fontWeight: 500 }} animate={{ color: sheetOpen ? 'rgba(255,255,255,0.7)' : '#838383' }} transition={{ type: 'spring', stiffness: 200 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</motion.div>
             </div>
-
-            {/* Shadow overlay (open state) */}
-            {sheetOpen && (
-              <div style={{ position: 'absolute', left: 7, right: 7, top: 120 + displayTopics.length * 197, height: 200, background: '#EBEBEB', boxShadow: '0px 0px 24.4px rgba(0,0,0,0.25)', borderRadius: 0, zIndex: 0 }} />
-            )}
 
             {/* List — cascading stack (closed) / spread (open) */}
             <div style={{ padding: '0 18px', display: 'flex', flexDirection: 'column' }}>
@@ -277,15 +272,20 @@ export default function UpscHome() {
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjCode = subj?.id?.toUpperCase() || 'GS'
                 return (
-                  <div key={t.id}
+                  <motion.div key={t.id}
                     onClick={() => openRevision(t)}
+                    layout
+                    animate={{
+                      height: sheetOpen ? 178 : 148,
+                      marginTop: i === 0 ? 0 : sheetOpen ? 19 : -115,
+                    }}
+                    transition={{ type: 'spring', stiffness: 200 }}
                     style={{
-                      width: '100%', height: sheetOpen ? 178 : 148, borderRadius: 24, background: '#FFFFFF',
+                      width: '100%', borderRadius: 24, background: '#FFFFFF',
                       boxShadow: '0px 0px 16.9px rgba(0,0,0,0.15)',
                       padding: '20px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                       cursor: 'pointer',
-                      marginTop: i === 0 ? 0 : sheetOpen ? 19 : -115,
                       position: 'relative', zIndex: displayTopics.length - i,
                     }}
                   >
@@ -301,7 +301,7 @@ export default function UpscHome() {
                         <ChevronRight size={18} color="#000" />
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )
               })}
             </div>
