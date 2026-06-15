@@ -11,6 +11,13 @@ import { calcPriority as calculatePriorityScore, generateDailyMix as getRevision
 import { ChevronRight, AlertTriangle, X, Loader, Lightbulb, CheckCircle, FileText, TrendingUp } from 'lucide-react'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 
+const fallbackSubjects = [
+  { id: 'fb1', name: 'Indian Freedom Struggle', subjectId: 'gs1' },
+  { id: 'fb2', name: 'Judiciary & Legal Framework', subjectId: 'gs1' },
+  { id: 'fb3', name: 'Indian Culture & Heritage', subjectId: 'gs1' },
+  { id: 'fb4', name: 'Modern Indian History', subjectId: 'gs1' },
+]
+
 export default function UpscHome() {
   const navigate = useNavigate()
   const { user, topicScores, saveTopicScore, recordQuestionAttempt, startSession, endSession, updateStats, revisionSchedule, revisionSeenQuestions, markTopicReviewed, revisionMastery, setRevisionMastery, recordSeenQuestion } = useStore()
@@ -32,6 +39,7 @@ export default function UpscHome() {
   }, [allTopics, topicScores, revisionSchedule])
 
   const remainingFeed = useMemo(() => dailyMix.filter(t => !feedDone.has(t.id)), [dailyMix, feedDone])
+  const displayTopics = useMemo(() => remainingFeed.length > 0 ? remainingFeed : fallbackSubjects, [remainingFeed])
 
   const greeting = () => {
     const h = new Date().getHours()
@@ -220,7 +228,7 @@ export default function UpscHome() {
 
           {/* ─── DRAGGABLE REVISION SHEET ─── */}
           <motion.div
-            style={{ y: sheetY, position: 'absolute', left: 0, right: 0, height: '100%', zIndex: 20, background: '#F6F6F6', borderRadius: '44px 44px 0 0', boxShadow: '0px 0px 7px rgba(0,0,0,0.12)' }}
+            style={{ y: sheetY, position: 'absolute', top: 0, left: 0, right: 0, height: '100%', zIndex: 20, background: '#F6F6F6', borderRadius: '44px 44px 0 0', boxShadow: '0px 0px 7px rgba(0,0,0,0.12)' }}
             drag="y"
             dragConstraints={{ top: openY, bottom: closedY }}
             dragElastic={0.1}
@@ -241,7 +249,7 @@ export default function UpscHome() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 24 }}>
               <h2 style={{ fontSize: 20, fontWeight: 600, color: '#000', margin: 0 }}>Revision</h2>
-              <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{remainingFeed.length} left</div>
+              <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
             </div>
 
             {/* List */}
@@ -258,19 +266,7 @@ export default function UpscHome() {
                 </div>
               )}
 
-              {dailyMix.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                  <FileText size={32} color="#a3a3a3" style={{ marginBottom: 10 }} />
-                  <div style={{ fontSize: 16, fontWeight: 800, color: '#000' }}>No topics yet</div>
-                  <div style={{ fontSize: 12, color: '#737373', marginTop: 3 }}>Practice some questions to get started.</div>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/learn')}
-                    style={{ marginTop: 14, padding: '8px 20px', borderRadius: 10, border: 'none', background: '#000', color: '#fff', fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
-                    Get Started
-                  </motion.button>
-                </div>
-              )}
-
-              {remainingFeed.map((t) => {
+              {displayTopics.map((t) => {
                 const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
