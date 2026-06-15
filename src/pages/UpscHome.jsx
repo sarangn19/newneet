@@ -234,10 +234,10 @@ export default function UpscHome() {
             dragElastic={0.1}
             onDragEnd={(_, info) => {
               if (info.offset.y < -100) {
-                animate(sheetY, openY, { type: 'spring', stiffness: 200 });
+                animate(sheetY, openY, { type: 'spring', stiffness: 200, damping: 25 });
                 setSheetOpen(true);
               } else {
-                animate(sheetY, closedY, { type: 'spring', stiffness: 200 });
+                animate(sheetY, closedY, { type: 'spring', stiffness: 200, damping: 25 });
                 setSheetOpen(false);
               }
             }}
@@ -248,8 +248,8 @@ export default function UpscHome() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 32 }}>
-              <motion.h2 style={{ fontSize: 20, fontWeight: 500, margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }} animate={{ color: sheetOpen ? '#FFFFFF' : '#000' }} transition={{ type: 'spring', stiffness: 200 }}>Revision</motion.h2>
-              <motion.div style={{ fontSize: 13, fontWeight: 500 }} animate={{ color: sheetOpen ? 'rgba(255,255,255,0.7)' : '#838383' }} transition={{ type: 'spring', stiffness: 200 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</motion.div>
+              <h2 style={{ fontSize: 20, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
+              <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
             </div>
 
             {/* List — cascading stack (closed) / spread (open) */}
@@ -274,12 +274,11 @@ export default function UpscHome() {
                 return (
                   <motion.div key={t.id}
                     onClick={() => openRevision(t)}
-                    layout
                     animate={{
                       height: sheetOpen ? 178 : 148,
                       marginTop: i === 0 ? 0 : sheetOpen ? 19 : -115,
                     }}
-                    transition={{ type: 'spring', stiffness: 200 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     style={{
                       width: '100%', borderRadius: 24, background: '#FFFFFF',
                       boxShadow: '0px 0px 16.9px rgba(0,0,0,0.15)',
