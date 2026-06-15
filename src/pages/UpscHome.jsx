@@ -180,7 +180,7 @@ export default function UpscHome() {
   }
 
   return (
-    <div style={{ background: '#FFFFFF', minHeight: '100%', overflow: 'hidden', position: 'relative' }}>
+    <div style={{ background: '#FFFFFF', minHeight: '100%', overflow: 'hidden', position: 'relative', fontFamily: "'Stack Sans Headline', sans-serif" }}>
       {!pageReady ? (
         <>
           <div style={{ padding: '52px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
