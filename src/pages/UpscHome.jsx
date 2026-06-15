@@ -273,17 +273,18 @@ export default function UpscHome() {
                 </div>
               )}
 
-              {displayTopics.map((t, i) => {
+              {displayTopics.slice(0, sheetOpen ? displayTopics.length : 3).map((t, i) => {
                 const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjCode = subj?.id?.toUpperCase() || 'GS'
+                const closedMargin = i === 1 ? -125 : i === 2 ? -113 : -124
                 return (
                   <motion.div key={t.id}
                     onClick={() => openRevision(t)}
                     animate={{
                       height: sheetOpen ? 178 : 156,
-                      marginTop: i === 0 ? 0 : sheetOpen ? 19 : -124,
+                      marginTop: i === 0 ? 0 : sheetOpen ? 19 : closedMargin,
                     }}
                     transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     style={{
