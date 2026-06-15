@@ -293,7 +293,7 @@ export default function UpscHome() {
                       padding: '20px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                       cursor: 'pointer',
-                      position: 'relative', zIndex: displayTopics.length - i,
+                      position: 'relative', zIndex: i + 1,
                     }}
                   >
                     <div>
