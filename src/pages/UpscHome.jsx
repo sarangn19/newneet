@@ -247,12 +247,17 @@ export default function UpscHome() {
               <div style={{ width: 32, height: 4, background: '#D4D4D4', borderRadius: 99 }} />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 24 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 600, color: '#000', margin: 0 }}>Revision</h2>
-              <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 32 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 500, color: sheetOpen ? '#FFFFFF' : '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
+              <div style={{ fontSize: 13, color: sheetOpen ? 'rgba(255,255,255,0.7)' : '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
             </div>
 
-            {/* List — cascading stack */}
+            {/* Shadow overlay (open state) */}
+            {sheetOpen && (
+              <div style={{ position: 'absolute', left: 7, right: 7, top: 120 + displayTopics.length * 197, height: 200, background: '#EBEBEB', boxShadow: '0px 0px 24.4px rgba(0,0,0,0.25)', borderRadius: 0, zIndex: 0 }} />
+            )}
+
+            {/* List — cascading stack (closed) / spread (open) */}
             <div style={{ padding: '0 18px', display: 'flex', flexDirection: 'column' }}>
               {dailyMix.length > 0 && remainingFeed.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '40px 20px' }}>
@@ -275,11 +280,12 @@ export default function UpscHome() {
                   <div key={t.id}
                     onClick={() => openRevision(t)}
                     style={{
-                      width: '100%', height: 148, borderRadius: 24, background: '#FFFFFF',
-                      boxShadow: '0px 0px 16.9px rgba(0,0,0,0.08)',
+                      width: '100%', height: sheetOpen ? 178 : 148, borderRadius: 24, background: '#FFFFFF',
+                      boxShadow: '0px 0px 16.9px rgba(0,0,0,0.15)',
                       padding: '20px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                      cursor: 'pointer', marginTop: i === 0 ? 0 : -115,
+                      cursor: 'pointer',
+                      marginTop: i === 0 ? 0 : sheetOpen ? 19 : -115,
                       position: 'relative', zIndex: displayTopics.length - i,
                     }}
                   >
