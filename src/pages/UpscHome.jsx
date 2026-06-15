@@ -285,7 +285,7 @@ export default function UpscHome() {
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjCode = subj?.id?.toUpperCase() || 'GS'
-                const closedMargin = i === 1 ? -103 : i === 2 ? -91 : -102
+                const closedMargin = i === 0 ? 0 : -110
                 return (
                   <motion.div key={t.id}
                     onClick={() => openRevision(t)}
