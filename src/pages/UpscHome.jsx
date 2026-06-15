@@ -215,7 +215,7 @@ export default function UpscHome() {
 
           {/* ─── FADE GRADIENT ABOVE SHEET ─── */}
           <div style={{
-            position: 'absolute', left: 0, right: 0, bottom: 0, height: 300,
+            position: 'absolute', left: 0, right: 0, bottom: 0, height: 150,
             background: 'linear-gradient(to top, #fff 0%, rgba(255,255,255,0) 100%)',
             pointerEvents: 'none', zIndex: 25,
           }} />
