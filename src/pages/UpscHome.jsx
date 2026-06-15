@@ -173,7 +173,7 @@ export default function UpscHome() {
           </div>
         </>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <div style={{ height: '100vh', position: 'relative', overflow: 'hidden' }}>
           {/* ─── GRADIENT BACKGROUND ─── */}
           <div style={{
             position: 'absolute', inset: 0,
@@ -181,9 +181,8 @@ export default function UpscHome() {
             opacity: 0.2, pointerEvents: 'none',
           }} />
 
-
-          {/* ─── TOP CONTENT (Header + AI Mentor) ─── */}
-          <div style={{ position: 'relative', zIndex: 10, padding: '52px 24px 0', flex: 1, overflowY: 'auto', paddingBottom: 120 }}>
+          {/* ─── TOP CONTENT (Header + AI Mentor, non-scrollable) ─── */}
+          <div style={{ position: 'relative', zIndex: 10, padding: '52px 24px 0', height: 'calc(100vh - 140px)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <span style={{ color: '#737373', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>UPSC Mentor</span>
@@ -208,29 +207,26 @@ export default function UpscHome() {
             )}
           </div>
 
-          {/* ─── DRAGGABLE REVISION SHEET ─── */}
+          {/* ─── DRAGGABLE REVISION SHEET (anchored to bottom) ─── */}
           <motion.div
             drag="y"
-            dragConstraints={{ top: -450, bottom: 0 }}
+            dragConstraints={{ top: -500, bottom: 0 }}
             dragElastic={0.1}
             onDragEnd={(_, info) => {
               if (info.offset.y < -60) setSheetOpen(true)
               else setSheetOpen(false)
             }}
-            animate={{ y: sheetOpen ? -380 : 0 }}
+            animate={{ y: sheetOpen ? -450 : 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             style={{
-              position: 'relative', zIndex: 20,
+              position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20,
               background: '#F6F6F6',
               borderRadius: '44px 44px 0 0',
               boxShadow: '0px 0px 7px rgba(0,0,0,0.12)',
             }}
           >
             {/* Grip handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, cursor: 'grab' }}
-              onPointerDown={(e) => { const el = e.currentTarget.closest('[data-drag]'); if (el) el.style.cursor = 'grabbing' }}
-              onPointerUp={(e) => { const el = e.currentTarget.closest('[data-drag]'); if (el) el.style.cursor = 'grab' }}
-            >
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, cursor: 'grab' }}>
               <div style={{ width: 32, height: 4, background: '#D4D4D4', borderRadius: 99 }} />
             </div>
 
@@ -266,7 +262,7 @@ export default function UpscHome() {
                 </div>
               )}
 
-              {remainingFeed.map((t, i) => {
+              {remainingFeed.map((t) => {
                 const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
@@ -311,6 +307,7 @@ export default function UpscHome() {
             </div>
           </motion.div>
         </div>
+
       )}
 
       {/* ─── BOTTOM NAV ─── */}
