@@ -291,8 +291,8 @@ export default function UpscHome() {
                     onClick={() => openRevision(t)}
                     initial={false}
                     animate={{
-                      height: sheetOpen ? 178 : 134,
-                      marginTop: i === 0 ? 0 : sheetOpen ? 19 : closedMargin,
+                      height: 134,
+                      marginTop: i === 0 ? 0 : sheetOpen ? 12 : closedMargin,
                       scale: sheetOpen ? 1 : 1 - i * 0.02,
                       opacity: sheetOpen ? 1 : 1 - i * 0.05,
                     }}
