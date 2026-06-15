@@ -213,6 +213,13 @@ export default function UpscHome() {
             opacity: 0.2, pointerEvents: 'none',
           }} />
 
+          {/* ─── WHITE GRADIENT AT BOTTOM ─── */}
+          <div style={{
+            position: 'absolute', left: 0, right: 0, bottom: 0, height: 160,
+            background: 'linear-gradient(to top, #F0F0F0 0%, rgba(255,255,255,0) 100%)',
+            pointerEvents: 'none', zIndex: 5,
+          }} />
+
           {/* ─── TOP CONTENT (normal flow) ─── */}
           <div style={{ padding: '56px 24px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 64 }}>
