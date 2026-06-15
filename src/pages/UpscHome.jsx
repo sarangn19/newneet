@@ -215,8 +215,8 @@ export default function UpscHome() {
 
           {/* ─── FADE GRADIENT ABOVE SHEET ─── */}
           <div style={{
-            position: 'absolute', left: 0, right: 0, top: 380, height: 100,
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, #F0F0F0 100%)',
+            position: 'absolute', left: 0, right: 0, bottom: 0, height: 300,
+            background: 'linear-gradient(to top, #fff 0%, rgba(255,255,255,0) 100%)',
             pointerEvents: 'none', zIndex: 25,
           }} />
 
@@ -280,7 +280,7 @@ export default function UpscHome() {
                 </div>
               )}
 
-              {displayTopics.slice(0, sheetOpen ? displayTopics.length : 3).map((t, i) => {
+              {displayTopics.map((t, i) => {
                 const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
