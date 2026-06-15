@@ -180,11 +180,7 @@ export default function UpscHome() {
             background: 'linear-gradient(165.65deg, #ED661D 1.18%, #4B46DC 30.46%, rgba(255,255,255,0) 76.76%)',
             opacity: 0.2, pointerEvents: 'none',
           }} />
-          <div style={{
-            position: 'absolute', width: 491, height: 400, left: -14, top: -104,
-            background: 'linear-gradient(180deg, #000 0%, rgba(102,102,102,0) 100%)',
-            opacity: 0.5, pointerEvents: 'none',
-          }} />
+
 
           {/* ─── TOP CONTENT (Header + AI Mentor) ─── */}
           <div style={{ position: 'relative', zIndex: 10, padding: '52px 24px 0', flex: 1, overflowY: 'auto', paddingBottom: 120 }}>
