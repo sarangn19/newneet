@@ -41,13 +41,6 @@ export default function UpscHome() {
   const remainingFeed = useMemo(() => dailyMix.filter(t => !feedDone.has(t.id)), [dailyMix, feedDone])
   const displayTopics = useMemo(() => remainingFeed.length > 0 ? remainingFeed : fallbackSubjects, [remainingFeed])
 
-  const greeting = () => {
-    const h = new Date().getHours()
-    if (h < 12) return 'Good morning'
-    if (h < 17) return 'Good afternoon'
-    return 'Good evening'
-  }
-
   const alerts = usePerformanceAlerts('upsc')
   const [revisionPopupTopic, setRevisionPopupTopic] = useState(null)
   const [revisionContent, setRevisionContent] = useState(null)
@@ -147,24 +140,32 @@ export default function UpscHome() {
     }
   }
 
-  const weakestTopic = useMemo(() => {
-    let weakest = null; let lowest = 101
-    Object.entries(topicScores).forEach(([id, ts]) => {
-      if (ts.total > 0) {
-        const acc = Math.round((ts.correct / ts.total) * 100)
-        if (acc < lowest) { lowest = acc; weakest = { id, name: allTopics.find(t => t.id === id)?.name || id, accuracy: acc, subjectId: ts.subjectId || '' } }
-      }
-    })
-    return weakest
-  }, [topicScores, allTopics])
-
   const todayDone = useMemo(() =>
     Object.entries(revisionSchedule).filter(([_, v]) => v.lastReviewed === todayStr).length,
   [revisionSchedule, todayStr])
 
   const insightAlert = alerts[0]
-  const insightSubject = weakestTopic?.name || 'your studies'
-  const insightAction = remainingFeed[0]?.name || 'the next topic'
+  const insightMessage = useMemo(() => {
+    const a = insightAlert
+    if (!a) return null
+    const topic = a.topicId && allTopics.find(t => t.id === a.topicId)
+    const nextTopic = remainingFeed[0]?.name
+    switch (a.type) {
+      case 'critical':
+      case 'weak':
+        return `Focus on ${topic?.name || 'your weakest topic'} (${Math.min(100, a.topicId ? Math.round((topicScores[a.topicId]?.correct / topicScores[a.topicId]?.total) * 100) : 0)}% accuracy). Revise ${nextTopic || 'your next topic'} today.`
+      case 'declining':
+        return `Your accuracy is slipping. Revise ${nextTopic || 'something'} to get back on track.`
+      case 'streak':
+        return `Do 1 question today to keep your streak.`
+      case 'inactive':
+        return `No study session in a while. Start with ${nextTopic || 'a quick topic review'} to rebuild momentum.`
+      case 'consistency':
+        return `Aim for 20+ questions daily to build consistency.`
+      default:
+        return a.message
+    }
+  }, [insightAlert, allTopics, remainingFeed, topicScores])
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const sheetY = useMotionValue(450);
@@ -204,9 +205,8 @@ export default function UpscHome() {
           <div style={{ padding: '52px 24px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <span style={{ color: '#737373', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>UPSC Mentor</span>
-                <h1 style={{ fontSize: 20, fontWeight: 600, color: '#000', letterSpacing: '-0.02em', lineHeight: 1.1, marginTop: 4 }}>
-                  {greeting()}, <span style={{ fontWeight: 800 }}>{user?.name?.split(' ')[0] || 'Aspirant'}</span>
+                <h1 style={{ fontSize: 20, fontWeight: 600, color: '#000', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                  Hello, <span style={{ fontWeight: 800 }}>{user?.name?.split(' ')[0] || 'Aspirant'}</span>
                 </h1>
               </div>
               <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#E5E5E5', overflow: 'hidden', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#525252' }}>
@@ -214,14 +214,10 @@ export default function UpscHome() {
               </div>
             </div>
 
-            {/* AI Mentor insight */}
-            {insightAlert && (
-              <div style={{ marginTop: 20, padding: '24px 16px 16px', background: '#fff', borderRadius: 16, boxShadow: '0 1px 30.2px rgba(0,0,0,0.08)' }}>
-                <div style={{ fontSize: 14, fontWeight: 200, color: '#000', opacity: 0.36, marginBottom: 4 }}>AI Mentor</div>
-                <div style={{ fontSize: 15, fontWeight: 200, color: '#000', lineHeight: 1.3 }}>
-                  Your <span style={{ fontWeight: 400 }}>{insightSubject}</span> needs attention.<br />
-                  <span style={{ fontWeight: 600 }}>Revise {insightAction} today.</span>
-                </div>
+            {/* AI insight */}
+            {insightMessage && (
+              <div style={{ marginTop: 12, fontSize: 13, fontWeight: 200, color: '#737373', lineHeight: 1.4 }}>
+                {insightMessage}
               </div>
             )}
           </div>
