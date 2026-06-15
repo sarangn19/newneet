@@ -228,7 +228,7 @@ export default function UpscHome() {
 
           {/* ─── DRAGGABLE REVISION SHEET ─── */}
           <motion.div
-            style={{ y: sheetY, position: 'absolute', top: 0, left: 0, right: 0, height: '100%', zIndex: 20, background: '#F6F6F6', borderRadius: '44px 44px 0 0', boxShadow: '0px 0px 7px rgba(0,0,0,0.12)' }}
+            style={{ y: sheetY, position: 'absolute', top: 0, left: 0, right: 0, height: '100%', zIndex: 20, background: '#F0F0F0', borderRadius: '32px 32px 0 0', boxShadow: '0px 0px 24.4px rgba(0,0,0,0.15)' }}
             drag="y"
             dragConstraints={{ top: openY, bottom: closedY }}
             dragElastic={0.1}
@@ -252,8 +252,8 @@ export default function UpscHome() {
               <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
             </div>
 
-            {/* List */}
-            <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* List — cascading stack */}
+            <div style={{ padding: '0 18px', display: 'flex', flexDirection: 'column' }}>
               {dailyMix.length > 0 && remainingFeed.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                   <CheckCircle size={32} color="#22c55e" style={{ marginBottom: 10 }} />
@@ -266,22 +266,34 @@ export default function UpscHome() {
                 </div>
               )}
 
-              {displayTopics.map((t) => {
+              {displayTopics.map((t, i) => {
                 const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjCode = subj?.id?.toUpperCase() || 'GS'
                 return (
-                  <div key={t.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, background: '#fff', border: '1px solid #e5e5e5', borderRadius: 16, cursor: 'pointer' }} onClick={() => openRevision(t)}>
+                  <div key={t.id}
+                    onClick={() => openRevision(t)}
+                    style={{
+                      width: '100%', height: 148, borderRadius: 24, background: '#FFFFFF',
+                      boxShadow: '0px 0px 16.9px rgba(0,0,0,0.08)',
+                      padding: '20px 16px',
+                      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                      cursor: 'pointer', marginTop: i === 0 ? 0 : -115,
+                      position: 'relative', zIndex: displayTopics.length - i,
+                    }}
+                  >
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>{t.name}</div>
-                      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                        <span style={{ padding: '2px 8px', background: '#F5F5F5', borderRadius: 25, fontSize: 10, fontWeight: 700, color: '#838383' }}>{subjCode}</span>
-                        <span style={{ padding: '2px 8px', background: '#F4F4F4', borderRadius: 25, fontSize: 10, fontWeight: 700, color: '#838383' }}>{badgeLabel}</span>
+                      <div style={{ fontSize: 16, fontWeight: 500, color: '#000', fontFamily: "'Stack Sans Headline', sans-serif" }}>{t.name}</div>
+                      <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+                        <span style={{ padding: '2px 10px', background: '#F5F5F5', borderRadius: 25, fontSize: 10, fontWeight: 700, color: '#838383' }}>{subjCode}</span>
+                        <span style={{ padding: '2px 10px', background: '#F4F4F4', borderRadius: 25, fontSize: 10, fontWeight: 700, color: '#838383' }}>{badgeLabel}</span>
                       </div>
                     </div>
-                    <div style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F6F6', borderRadius: '50%' }}>
-                      <ChevronRight size={18} color="#000" />
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <div style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F6F6', borderRadius: '50%' }}>
+                        <ChevronRight size={18} color="#000" />
+                      </div>
                     </div>
                   </div>
                 )
