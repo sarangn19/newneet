@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import useStore from '../store/useStore'
 import { useRecommendations } from '../lib/useRecommendations'
@@ -8,7 +8,7 @@ import { generateRevisionContent } from '../lib/revisionAI'
 import { upscMCQs } from '../data/upsc/questions'
 import { upscSubjects } from '../data/upsc/subjects'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
-import { Home, BookOpen, User, ChevronRight, AlertTriangle, X, Loader, Lightbulb, CheckCircle, Search, FileText, TrendingUp } from 'lucide-react'
+import { ChevronRight, AlertTriangle, X, Loader, Lightbulb, CheckCircle, FileText, TrendingUp } from 'lucide-react'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 
 export default function UpscHome() {
@@ -192,12 +192,12 @@ export default function UpscHome() {
             opacity: 0.2, pointerEvents: 'none',
           }} />
 
-          {/* ─── TOP CONTENT (Header + AI Mentor, non-scrollable) ─── */}
-          <div style={{ position: 'relative', zIndex: 10, padding: '52px 24px 0', height: 'calc(100vh - 140px)', overflow: 'hidden' }}>
+          {/* ─── TOP CONTENT (normal flow) ─── */}
+          <div style={{ padding: '52px 24px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <span style={{ color: '#737373', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>UPSC Mentor</span>
-                <h1 style={{ fontSize: 32, fontWeight: 600, color: '#000', letterSpacing: '-0.02em', lineHeight: 1.1, marginTop: 4 }}>
+                <h1 style={{ fontSize: 20, fontWeight: 600, color: '#000', letterSpacing: '-0.02em', lineHeight: 1.1, marginTop: 4 }}>
                   {greeting()}, <span style={{ fontWeight: 800 }}>{user?.name?.split(' ')[0] || 'Aspirant'}</span>
                 </h1>
               </div>
@@ -209,8 +209,8 @@ export default function UpscHome() {
             {/* AI Mentor insight */}
             {insightAlert && (
               <div style={{ marginTop: 20, padding: '24px 16px 16px', background: '#fff', borderRadius: 16, boxShadow: '0 1px 30.2px rgba(0,0,0,0.08)' }}>
-                <div style={{ fontSize: 20, fontWeight: 200, color: '#000', opacity: 0.36, marginBottom: 4 }}>AI Mentor</div>
-                <div style={{ fontSize: 20, fontWeight: 200, color: '#000', lineHeight: 1.3 }}>
+                <div style={{ fontSize: 14, fontWeight: 200, color: '#000', opacity: 0.36, marginBottom: 4 }}>AI Mentor</div>
+                <div style={{ fontSize: 15, fontWeight: 200, color: '#000', lineHeight: 1.3 }}>
                   Your <span style={{ fontWeight: 400 }}>{insightSubject}</span> needs attention.<br />
                   <span style={{ fontWeight: 600 }}>Revise {insightAction} today.</span>
                 </div>
@@ -240,7 +240,7 @@ export default function UpscHome() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 24 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 600, color: '#000', margin: 0 }}>Revision</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 600, color: '#000', margin: 0 }}>Revision</h2>
               <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{remainingFeed.length} left</div>
             </div>
 
@@ -295,29 +295,6 @@ export default function UpscHome() {
         </div>
 
       )}
-
-      {/* ─── BOTTOM NAV ─── */}
-      <nav style={{
-        position: 'fixed', bottom: 16, left: 24, right: 24,
-        background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)',
-        borderRadius: 32, padding: '12px 20px',
-        display: 'flex', justifyContent: 'space-around', alignItems: 'center',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.08)', border: '1px solid rgba(255,255,255,0.3)',
-        zIndex: 40,
-      }}>
-        <button onClick={() => navigate('/')} style={{ padding: 8, background: 'none', border: 'none', cursor: 'pointer', color: '#000' }}>
-          <Home size={22} />
-        </button>
-        <button onClick={() => navigate('/learn')} style={{ padding: 8, background: 'none', border: 'none', cursor: 'pointer', color: '#a3a3a3' }}>
-          <BookOpen size={22} />
-        </button>
-        <button onClick={() => navigate('/pyq-search')} style={{ padding: 8, background: 'none', border: 'none', cursor: 'pointer', color: '#a3a3a3' }}>
-          <Search size={22} />
-        </button>
-        <button onClick={() => navigate('/profile')} style={{ padding: 8, background: 'none', border: 'none', cursor: 'pointer', color: '#a3a3a3' }}>
-          <User size={22} />
-        </button>
-      </nav>
 
       {/* ─── REVISION POPUP ─── */}
       <AnimatePresence>
