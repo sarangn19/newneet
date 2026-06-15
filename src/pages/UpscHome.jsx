@@ -285,34 +285,32 @@ export default function UpscHome() {
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjCode = subj?.id?.toUpperCase() || 'GS'
-                const closedMargin = i === 1 ? -125 : i === 2 ? -113 : -124
+                const closedMargin = i === 1 ? -103 : i === 2 ? -91 : -102
                 return (
                   <motion.div key={t.id}
                     onClick={() => openRevision(t)}
                     animate={{
-                      height: sheetOpen ? 178 : 156,
+                      height: sheetOpen ? 178 : 134,
                       marginTop: i === 0 ? 0 : sheetOpen ? 19 : closedMargin,
                     }}
                     transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     style={{
-                      width: '100%', borderRadius: 24, background: '#FFFFFF',
-                      boxShadow: '0px 0px 16.9px rgba(0,0,0,0.25)',
-                      padding: '20px 16px',
+                      width: '100%', borderRadius: 16, background: '#FFFFFF',
+                      boxShadow: '0px 1px 30.2px rgba(0,0,0,0.08)',
+                      padding: '24px 16px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                       cursor: 'pointer',
                       position: 'relative', zIndex: i + 1,
                     }}
                   >
-                    <div>
-                      <div style={{ fontSize: 16, fontWeight: 500, color: '#000', fontFamily: "'Stack Sans Headline', sans-serif" }}>{t.name}</div>
-                      <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
-                        <span style={{ padding: '2px 10px', background: '#F5F5F5', borderRadius: 25, fontSize: 10, fontWeight: 700, color: '#838383' }}>{subjCode}</span>
-                        <span style={{ padding: '2px 10px', background: '#F4F4F4', borderRadius: 25, fontSize: 10, fontWeight: 700, color: '#838383' }}>{badgeLabel}</span>
+                    <div style={{ fontSize: 20, fontWeight: 200, color: '#000', lineHeight: '26px' }}>{t.name}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0, gap: 64 }}>
+                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <span style={{ padding: '0 12px', background: '#F5F5F5', borderRadius: 25, fontSize: 14, fontWeight: 500, lineHeight: '26px', color: '#838383', height: 26 }}>{subjCode}</span>
+                        <span style={{ padding: '0 12px', background: '#F4F4F4', borderRadius: 25, fontSize: 14, fontWeight: 500, lineHeight: '26px', color: '#838383', height: 26 }}>{badgeLabel}</span>
                       </div>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <div style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F6F6', borderRadius: '50%' }}>
-                        <ChevronRight size={18} color="#000" />
+                      <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F6F6', borderRadius: 41 }}>
+                        <ChevronRight size={20} color="#000" />
                       </div>
                     </div>
                   </motion.div>
