@@ -318,89 +318,104 @@ export default function UpscHome() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => { setRevisionPopupTopic(null); setRevisionContent(null) }}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 1000 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 1000 }}
           >
             <motion.div
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 32, mass: 1 }}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 35, mass: 1 }}
               onClick={e => e.stopPropagation()}
-              style={{ width: '100%', maxWidth: 440, maxHeight: '92vh', background: '#fff', borderRadius: '20px 20px 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 -8px 40px rgba(0,0,0,0.2)' }}
+              style={{ width: '100%', maxWidth: 440, maxHeight: '90vh', background: '#fff', borderRadius: '32px 32px 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 -10px 40px rgba(0,0,0,0.25)' }}
             >
-              <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', borderBottom: '1px solid #e5e5e5', flexShrink: 0 }}>
+              {/* Header */}
+              <div style={{ padding: '24px 24px 16px', display: 'flex', alignItems: 'flex-start', gap: 12, flexShrink: 0 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#6366f1' }}>{revisionPopupTopic.subjectName}</div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: '#000', marginTop: 1 }}>{revisionPopupTopic.name}</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: '#6366f1', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 2 }}>{revisionPopupTopic.subjectName}</div>
+                  <div style={{ fontSize: 20, fontWeight: 600, color: '#000', lineHeight: 1.2 }}>{revisionPopupTopic.name}</div>
                 </div>
                 <motion.button whileTap={{ scale: 0.9 }}
                   onClick={() => { setRevisionPopupTopic(null); setRevisionContent(null) }}
-                  style={{ background: '#f5f5f5', border: 'none', borderRadius: 12, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-                  <X size={16} color="#a3a3a3" />
+                  style={{ background: '#e5e5e5', border: 'none', borderRadius: 12, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+                  <X size={16} color="#525252" />
                 </motion.button>
               </div>
 
-              <div style={{ padding: 14, overflowY: 'auto', flex: 1 }}>
+              {/* Content scroll area */}
+              <div style={{ padding: '0 24px 24px', overflowY: 'auto', flex: 1 }}>
+                {/* Stats row */}
                 {(() => {
                   const ts = topicScores[revisionPopupTopic.id]
                   const acc = ts?.total > 0 ? Math.round((ts.correct / ts.total) * 100) : 0
                   return (
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                      <div style={{ flex: 1, background: acc >= 60 ? '#f0fdf4' : '#fef2f2', borderRadius: 10, padding: 10, textAlign: 'center' }}>
-                        <div style={{ fontSize: 20, fontWeight: 800, color: acc >= 60 ? '#16a34a' : '#dc2626' }}>{acc}%</div>
-                        <div style={{ fontSize: 10, color: '#737373' }}>Accuracy</div>
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                      <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: '12px 8px', textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: acc >= 60 ? '#16a34a' : '#dc2626' }}>{acc}%</div>
+                        <div style={{ fontSize: 10, color: '#838383', marginTop: 2 }}>Accuracy</div>
                       </div>
-                      <div style={{ flex: 1, background: '#f5f5f5', borderRadius: 10, padding: 10, textAlign: 'center' }}>
-                        <div style={{ fontSize: 20, fontWeight: 800, color: '#000' }}>{ts?.total || 0}</div>
-                        <div style={{ fontSize: 10, color: '#737373' }}>Questions</div>
+                      <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: '12px 8px', textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: '#000' }}>{ts?.total || 0}</div>
+                        <div style={{ fontSize: 10, color: '#838383', marginTop: 2 }}>Questions</div>
                       </div>
-                      <div style={{ flex: 1, background: '#eef2ff', borderRadius: 10, padding: 10, textAlign: 'center' }}>
-                        <div style={{ fontSize: 20, fontWeight: 800, color: '#6366f1' }}>{ts?.correct || 0}</div>
-                        <div style={{ fontSize: 10, color: '#737373' }}>Correct</div>
+                      <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: '12px 8px', textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                        <div style={{ fontSize: 22, fontWeight: 700, color: '#6366f1' }}>{ts?.correct || 0}</div>
+                        <div style={{ fontSize: 10, color: '#838383', marginTop: 2 }}>Correct</div>
                       </div>
                     </div>
                   )
                 })()}
 
+                {/* Content or Loading */}
                 {!practiceQ.length || practiceDone ? (
                   revisionLoading ? (
-                    <div style={{ padding: '24px 0', textAlign: 'center' }}>
-                      <Loader size={20} color="#6366f1" style={{ animation: 'spin 1s linear infinite' }} />
-                      <div style={{ fontSize: 12, color: '#a3a3a3', marginTop: 8 }}>Generating personalized content...</div>
+                    <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                      <Loader size={24} color="#6366f1" style={{ animation: 'spin 1s linear infinite' }} />
+                      <div style={{ fontSize: 14, color: '#838383', marginTop: 12, fontWeight: 500 }}>Generating personalized content...</div>
                     </div>
                   ) : revisionContent ? (
-                    <div>
-                      <div style={{ marginBottom: 10 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                          <Lightbulb size={14} color="#6366f1" />
-                          <span style={{ fontSize: 12, fontWeight: 600, color: '#6366f1' }}>Key Concepts</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                      {/* Key Concepts */}
+                      <div style={{ background: '#fff', borderRadius: 16, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                          <div style={{ width: 28, height: 28, borderRadius: 8, background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Lightbulb size={14} color="#6366f1" />
+                          </div>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>Key Concepts</span>
                         </div>
                         {revisionContent.keyPoints?.slice(0, 5).map((p, i) => (
-                          <div key={i} style={{ padding: '6px 0 6px 20px', position: 'relative', fontSize: 11, color: '#000', lineHeight: 1.5, borderBottom: '1px solid #e5e5e5' }}>
-                            <span style={{ position: 'absolute', left: 0, top: 6, width: 14, height: 14, borderRadius: '50%', background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: '#6366f1' }}>{i + 1}</span>
+                          <div key={i} style={{ padding: '8px 0 8px 24px', position: 'relative', fontSize: 12, color: '#000', lineHeight: 1.5, borderBottom: i < revisionContent.keyPoints.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
+                            <span style={{ position: 'absolute', left: 0, top: 8, width: 16, height: 16, borderRadius: '50%', background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: '#6366f1' }}>{i + 1}</span>
                             <span dangerouslySetInnerHTML={{ __html: p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                           </div>
                         ))}
                       </div>
+
+                      {/* Common Mistakes */}
                       {revisionContent.commonMistakes?.length > 0 && (
-                        <div style={{ marginBottom: 10, background: '#fef2f2', borderRadius: 10, padding: 10 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                            <AlertTriangle size={12} color="#dc2626" />
-                            <span style={{ fontSize: 11, fontWeight: 600, color: '#dc2626' }}>Common Mistakes</span>
+                        <div style={{ background: '#fef2f2', borderRadius: 16, padding: 16, border: '1px solid #fecaca' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                            <div style={{ width: 28, height: 28, borderRadius: 8, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <AlertTriangle size={14} color="#dc2626" />
+                            </div>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#dc2626' }}>Common Mistakes</span>
                           </div>
                           {revisionContent.commonMistakes.slice(0, 3).map((m, i) => (
-                            <div key={i} style={{ fontSize: 11, color: '#dc2626', padding: '3px 0', lineHeight: 1.5 }}>{m}</div>
+                            <div key={i} style={{ fontSize: 12, color: '#991b1b', padding: '4px 0', lineHeight: 1.5, borderBottom: i < Math.min(revisionContent.commonMistakes.length, 3) - 1 ? '1px solid #fecaca' : 'none' }}>{m}</div>
                           ))}
                         </div>
                       )}
+
+                      {/* Memory Aids */}
                       {revisionContent.mnemonics?.length > 0 && (
-                        <div style={{ background: '#eef2ff', borderRadius: 10, padding: 10, marginBottom: 10 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                            <TrendingUp size={12} color="#6366f1" />
-                            <span style={{ fontSize: 11, fontWeight: 600, color: '#6366f1' }}>Memory Aids</span>
+                        <div style={{ background: '#fff', borderRadius: 16, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                            <div style={{ width: 28, height: 28, borderRadius: 8, background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <TrendingUp size={14} color="#6366f1" />
+                            </div>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>Memory Aids</span>
                           </div>
                           {revisionContent.mnemonics.map((m, i) => (
-                            <div key={i} style={{ fontSize: 11, color: '#525252', padding: '2px 0', fontStyle: 'italic', lineHeight: 1.5 }}>{m}</div>
+                            <div key={i} style={{ fontSize: 12, color: '#525252', padding: '4px 0', fontStyle: 'italic', lineHeight: 1.5, borderBottom: i < revisionContent.mnemonics.length - 1 ? '1px solid #f0f0f0' : 'none' }}>{m}</div>
                           ))}
                         </div>
                       )}
@@ -408,17 +423,23 @@ export default function UpscHome() {
                   ) : null
                 ) : null}
 
+                {/* Practice questions */}
                 {practiceQ.length > 0 && !practiceDone && (
-                  <div style={{ borderTop: revisionContent && !practiceDone ? '1px solid #e5e5e5' : 'none', paddingTop: revisionContent ? 12 : 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#000' }}>Quick Practice</div>
-                      <div style={{ fontSize: 10, color: '#a3a3a3' }}>{practiceIdx + 1}/{practiceQ.length}</div>
+                  <div style={{ marginTop: 14, background: '#fff', borderRadius: 16, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FileText size={14} color="#525252" />
+                        </div>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>Quick Practice</span>
+                      </div>
+                      <div style={{ fontSize: 11, color: '#838383', fontWeight: 500 }}>{practiceIdx + 1}/{practiceQ.length}</div>
                     </div>
-                    <div style={{ height: 3, background: '#f5f5f5', borderRadius: 99, marginBottom: 10, overflow: 'hidden' }}>
+                    <div style={{ height: 4, background: '#f0f0f0', borderRadius: 99, marginBottom: 14, overflow: 'hidden' }}>
                       <div style={{ width: `${((practiceIdx + (practiceSubmitted ? 1 : 0)) / practiceQ.length) * 100}%`, height: '100%', background: '#6366f1', borderRadius: 99 }} />
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: '#000', marginBottom: 8, lineHeight: 1.5 }}>{practiceQ[practiceIdx].q}</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 10 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#000', marginBottom: 12, lineHeight: 1.5 }}>{practiceQ[practiceIdx].q}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
                       {practiceQ[practiceIdx].options.map((opt, oi) => {
                         const isAns = practiceQ[practiceIdx].ans === oi
                         const isSel = practiceSelected === oi
@@ -426,17 +447,17 @@ export default function UpscHome() {
                         if (practiceSubmitted) {
                           if (isAns) { bg = '#f0fdf4'; border = '#22c55e'; color = '#16a34a' }
                           else if (isSel && !isAns) { bg = '#fef2f2'; border = '#ef4444'; color = '#dc2626' }
-                          else { bg = '#f5f5f5'; border = '#e5e5e5'; color = '#a3a3a3' }
+                          else { bg = '#f9f9f9'; border = '#e5e5e5'; color = '#a3a3a3' }
                         } else if (isSel) { bg = '#eef2ff'; border = '#6366f1'; color = '#6366f1' }
                         return (
                           <motion.div key={oi} onClick={() => handlePracticeAnswer(oi)} whileTap={practiceSubmitted ? {} : { scale: 1.01 }}
                             style={{
-                              padding: '8px 10px', borderRadius: 8, border: `1.5px solid ${border}`, cursor: practiceSubmitted ? 'default' : 'pointer',
-                              background: bg, fontSize: 11, color, display: 'flex', alignItems: 'center', gap: 8, transition: '0.1s',
+                              padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${border}`, cursor: practiceSubmitted ? 'default' : 'pointer',
+                              background: bg, fontSize: 12, color, display: 'flex', alignItems: 'center', gap: 10, transition: '0.1s',
                             }}>
                             <div style={{
-                              width: 16, height: 16, borderRadius: '50%', border: `1.5px solid ${border}`, flexShrink: 0,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700,
+                              width: 18, height: 18, borderRadius: '50%', border: `1.5px solid ${border}`, flexShrink: 0,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700,
                               background: practiceSubmitted && isAns ? '#22c55e' : isSel ? '#6366f1' : 'transparent',
                               color: practiceSubmitted && isAns ? '#fff' : isSel ? '#fff' : border,
                               borderColor: practiceSubmitted && isAns ? '#22c55e' : isSel ? '#6366f1' : border,
@@ -451,32 +472,33 @@ export default function UpscHome() {
                     {!practiceSubmitted ? (
                       <motion.button onClick={submitPractice} whileTap={{ scale: 0.97 }}
                         style={{
-                          width: '100%', padding: '8px 0', borderRadius: 12, border: 'none',
+                          width: '100%', padding: '10px 0', borderRadius: 12, border: 'none',
                           background: practiceSelected !== null ? '#000' : '#e5e5e5',
                           color: practiceSelected !== null ? '#fff' : '#a3a3a3',
-                          fontSize: 11, fontWeight: 600, fontFamily: 'inherit', cursor: practiceSelected !== null ? 'pointer' : 'default',
+                          fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: practiceSelected !== null ? 'pointer' : 'default',
                         }}>
                         Check Answer
                       </motion.button>
                     ) : (
                       <motion.button onClick={nextPractice} whileTap={{ scale: 0.97 }}
-                        style={{ width: '100%', padding: '8px 0', borderRadius: 12, border: 'none', background: '#000', color: '#fff', fontSize: 11, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
+                        style={{ width: '100%', padding: '10px 0', borderRadius: 12, border: 'none', background: '#000', color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
                         {practiceIdx < practiceQ.length - 1 ? 'Next Question' : 'See Results'}
                       </motion.button>
                     )}
                   </div>
                 )}
 
+                {/* Practice complete */}
                 {practiceDone && (
-                  <div style={{ textAlign: 'center', padding: '8px 0' }}>
-                    <CheckCircle size={28} color="#22c55e" style={{ marginBottom: 8 }} />
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#000' }}>Practice Complete!</div>
-                    <div style={{ fontSize: 12, color: '#737373', marginTop: 4, marginBottom: 10 }}>
+                  <div style={{ textAlign: 'center', padding: '24px 0', background: '#fff', borderRadius: 16, marginTop: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                    <CheckCircle size={36} color="#22c55e" style={{ marginBottom: 10 }} />
+                    <div style={{ fontSize: 18, fontWeight: 700, color: '#000' }}>Practice Complete!</div>
+                    <div style={{ fontSize: 13, color: '#838383', marginTop: 6, marginBottom: 16 }}>
                       {practiceAnswers.filter(a => a.correct).length}/{practiceAnswers.length + 1} correct (scores saved)
                     </div>
                     <motion.button onClick={() => { setRevisionPopupTopic(null); setRevisionContent(null) }}
                       whileTap={{ scale: 0.97 }}
-                      style={{ padding: '8px 20px', borderRadius: 12, border: 'none', background: '#000', color: '#fff', fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
+                      style={{ padding: '10px 24px', borderRadius: 12, border: 'none', background: '#000', color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
                       Done
                     </motion.button>
                   </div>
