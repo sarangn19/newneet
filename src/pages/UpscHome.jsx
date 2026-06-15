@@ -213,11 +213,11 @@ export default function UpscHome() {
             opacity: 0.2, pointerEvents: 'none',
           }} />
 
-          {/* ─── WHITE GRADIENT AT BOTTOM ─── */}
+          {/* ─── FADE GRADIENT ABOVE SHEET ─── */}
           <div style={{
-            position: 'absolute', left: 0, right: 0, bottom: 0, height: 160,
-            background: 'linear-gradient(to top, #F0F0F0 0%, rgba(255,255,255,0) 100%)',
-            pointerEvents: 'none', zIndex: 5,
+            position: 'absolute', left: 0, right: 0, top: 380, height: 100,
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, #F0F0F0 100%)',
+            pointerEvents: 'none', zIndex: 25,
           }} />
 
           {/* ─── TOP CONTENT (normal flow) ─── */}
