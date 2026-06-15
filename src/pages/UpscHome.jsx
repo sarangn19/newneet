@@ -145,27 +145,39 @@ export default function UpscHome() {
   [revisionSchedule, todayStr])
 
   const insightAlert = alerts[0]
+  const weakestTopic = useMemo(() => {
+    let weakest = null; let lowest = 101
+    Object.entries(topicScores).forEach(([id, ts]) => {
+      if (ts.total > 0) {
+        const acc = Math.round((ts.correct / ts.total) * 100)
+        if (acc < lowest) { lowest = acc; weakest = { id, name: allTopics.find(t => t.id === id)?.name || id, accuracy: acc, subjectId: ts.subjectId || '' } }
+      }
+    })
+    return weakest
+  }, [topicScores, allTopics])
+  const insightSubject = weakestTopic?.name || 'your studies'
+  const insightAction = remainingFeed[0]?.name || 'the next topic'
   const insightMessage = useMemo(() => {
     const a = insightAlert
     if (!a) return null
-    const topic = a.topicId && allTopics.find(t => t.id === a.topicId)
-    const nextTopic = remainingFeed[0]?.name
     switch (a.type) {
       case 'critical':
-      case 'weak':
-        return `Focus on ${topic?.name || 'your weakest topic'} (${Math.min(100, a.topicId ? Math.round((topicScores[a.topicId]?.correct / topicScores[a.topicId]?.total) * 100) : 0)}% accuracy). Revise ${nextTopic || 'your next topic'} today.`
+      case 'weak': {
+        const topicName = a.topicId && allTopics.find(t => t.id === a.topicId)?.name
+        return `Your ${topicName || 'studies'} need improvement. Revise ${insightAction} today.`
+      }
       case 'declining':
-        return `Your accuracy is slipping. Revise ${nextTopic || 'something'} to get back on track.`
+        return `Your overall accuracy has declined. Revise ${insightAction} today.`
       case 'streak':
-        return `Do 1 question today to keep your streak.`
+        return `Your streak is at risk. Answer 1 question today.`
       case 'inactive':
-        return `No study session in a while. Start with ${nextTopic || 'a quick topic review'} to rebuild momentum.`
+        return `You haven't studied in a while. Revise ${insightAction} today.`
       case 'consistency':
-        return `Aim for 20+ questions daily to build consistency.`
+        return `Your consistency is low. Aim for 20+ questions daily.`
       default:
         return a.message
     }
-  }, [insightAlert, allTopics, remainingFeed, topicScores])
+  }, [insightAlert, allTopics, insightAction])
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const sheetY = useMotionValue(450);
@@ -202,22 +214,21 @@ export default function UpscHome() {
           }} />
 
           {/* ─── TOP CONTENT (normal flow) ─── */}
-          <div style={{ padding: '52px 24px 0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <h1 style={{ fontSize: 20, fontWeight: 600, color: '#000', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                  Hello, <span style={{ fontWeight: 800 }}>{user?.name?.split(' ')[0] || 'Aspirant'}</span>
-                </h1>
-              </div>
-              <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#E5E5E5', overflow: 'hidden', border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#525252' }}>
+          <div style={{ padding: '56px 24px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 64 }}>
+              <h1 style={{ fontSize: 16, fontWeight: 200, color: '#000', lineHeight: '26px' }}>
+                Hello, <span style={{ fontWeight: 800 }}>{user?.name?.split(' ')[0] || 'Aspirant'}</span>
+              </h1>
+              <div style={{ width: 64, height: 64, borderRadius: 60, background: '#fff', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: '#525252' }}>
                 {user?.name?.[0] || 'U'}
               </div>
             </div>
 
-            {/* AI insight */}
+            {/* AI Mentor card */}
             {insightMessage && (
-              <div style={{ marginTop: 12, fontSize: 13, fontWeight: 200, color: '#737373', lineHeight: 1.4 }}>
-                {insightMessage}
+              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6, borderRadius: 12, background: '#fff' }}>
+                <div style={{ fontSize: 20, fontWeight: 200, lineHeight: '26px', color: '#000', opacity: 0.36 }}>AI Mentor</div>
+                <div style={{ fontSize: 20, fontWeight: 200, lineHeight: '26px', color: '#000' }}>{insightMessage}</div>
               </div>
             )}
           </div>
