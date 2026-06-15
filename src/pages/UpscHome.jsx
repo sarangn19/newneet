@@ -282,13 +282,13 @@ export default function UpscHome() {
                   <motion.div key={t.id}
                     onClick={() => openRevision(t)}
                     animate={{
-                      height: sheetOpen ? 178 : 148,
-                      marginTop: i === 0 ? 0 : sheetOpen ? 19 : -115,
+                      height: sheetOpen ? 178 : 156,
+                      marginTop: i === 0 ? 0 : sheetOpen ? 19 : -124,
                     }}
                     transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     style={{
                       width: '100%', borderRadius: 24, background: '#FFFFFF',
-                      boxShadow: '0px 0px 16.9px rgba(0,0,0,0.15)',
+                      boxShadow: '0px 0px 16.9px rgba(0,0,0,0.25)',
                       padding: '20px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                       cursor: 'pointer',
