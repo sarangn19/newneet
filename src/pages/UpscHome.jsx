@@ -158,8 +158,10 @@ export default function UpscHome() {
   const insightSubject = weakestTopic?.name || 'your studies'
   const insightAction = remainingFeed[0]?.name || 'the next topic'
 
+  const [sheetOpen, setSheetOpen] = useState(false)
+
   return (
-    <div style={{ background: '#FFFFFF', minHeight: '100%', overflowX: 'hidden', position: 'relative' }}>
+    <div style={{ background: '#FFFFFF', minHeight: '100%', overflow: 'hidden', position: 'relative' }}>
       {!pageReady ? (
         <>
           <div style={{ padding: '52px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -171,7 +173,7 @@ export default function UpscHome() {
           </div>
         </>
       ) : (
-        <>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           {/* ─── GRADIENT BACKGROUND ─── */}
           <div style={{
             position: 'absolute', inset: 0,
@@ -184,8 +186,8 @@ export default function UpscHome() {
             opacity: 0.5, pointerEvents: 'none',
           }} />
 
-          {/* ─── HEADER ─── */}
-          <div style={{ position: 'relative', zIndex: 10, padding: '52px 24px 8px' }}>
+          {/* ─── TOP CONTENT (Header + AI Mentor) ─── */}
+          <div style={{ position: 'relative', zIndex: 10, padding: '52px 24px 0', flex: 1, overflowY: 'auto', paddingBottom: 120 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <span style={{ color: '#737373', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>UPSC Mentor</span>
@@ -197,27 +199,10 @@ export default function UpscHome() {
                 {user?.name?.[0] || 'U'}
               </div>
             </div>
-          </div>
-
-          {/* ─── BOTTOM SHEET ─── */}
-          <div style={{
-            position: 'relative', marginTop: 12,
-            background: '#F6F6F6', borderRadius: '44px 44px 0 0',
-            boxShadow: '0px 0px 7px rgba(0,0,0,0.12)',
-            minHeight: 'calc(100vh - 180px)',
-            paddingBottom: 90,
-          }}>
-            {/* Grip handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16 }}>
-              <div style={{ width: 32, height: 4, background: '#D4D4D4', borderRadius: 99 }} />
-            </div>
-
-            {/* Revision heading */}
-            <h2 style={{ fontSize: 24, fontWeight: 600, color: '#000', padding: '16px 24px 0', margin: 0 }}>Revision</h2>
 
             {/* AI Mentor insight */}
             {insightAlert && (
-              <div style={{ margin: '12px 24px 0', padding: '24px 16px 16px', background: '#fff', borderRadius: 16, boxShadow: '0 1px 30.2px rgba(0,0,0,0.08)' }}>
+              <div style={{ marginTop: 20, padding: '24px 16px 16px', background: '#fff', borderRadius: 16, boxShadow: '0 1px 30.2px rgba(0,0,0,0.08)' }}>
                 <div style={{ fontSize: 20, fontWeight: 200, color: '#000', opacity: 0.36, marginBottom: 4 }}>AI Mentor</div>
                 <div style={{ fontSize: 20, fontWeight: 200, color: '#000', lineHeight: 1.3 }}>
                   Your <span style={{ fontWeight: 400 }}>{insightSubject}</span> needs attention.<br />
@@ -225,9 +210,42 @@ export default function UpscHome() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* ─── DRAGGABLE REVISION SHEET ─── */}
+          <motion.div
+            drag="y"
+            dragConstraints={{ top: -450, bottom: 0 }}
+            dragElastic={0.1}
+            onDragEnd={(_, info) => {
+              if (info.offset.y < -60) setSheetOpen(true)
+              else setSheetOpen(false)
+            }}
+            animate={{ y: sheetOpen ? -380 : 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            style={{
+              position: 'relative', zIndex: 20,
+              background: '#F6F6F6',
+              borderRadius: '44px 44px 0 0',
+              boxShadow: '0px 0px 7px rgba(0,0,0,0.12)',
+            }}
+          >
+            {/* Grip handle */}
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, cursor: 'grab' }}
+              onPointerDown={(e) => { const el = e.currentTarget.closest('[data-drag]'); if (el) el.style.cursor = 'grabbing' }}
+              onPointerUp={(e) => { const el = e.currentTarget.closest('[data-drag]'); if (el) el.style.cursor = 'grab' }}
+            >
+              <div style={{ width: 32, height: 4, background: '#D4D4D4', borderRadius: 99 }} />
+            </div>
+
+            {/* Revision heading */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 24px 0' }}>
+              <h2 style={{ fontSize: 24, fontWeight: 600, color: '#000', margin: 0 }}>Revision</h2>
+              <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{remainingFeed.length} left</div>
+            </div>
 
             {/* Revision cards */}
-            <div style={{ padding: '12px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ padding: '12px 24px 90px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {dailyMix.length > 0 && remainingFeed.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                   <CheckCircle size={32} color="#22c55e" style={{ marginBottom: 10 }} />
@@ -252,7 +270,7 @@ export default function UpscHome() {
                 </div>
               )}
 
-              {remainingFeed.map((t) => {
+              {remainingFeed.map((t, i) => {
                 const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
@@ -295,8 +313,8 @@ export default function UpscHome() {
                 )
               })}
             </div>
-          </div>
-        </>
+          </motion.div>
+        </div>
       )}
 
       {/* ─── BOTTOM NAV ─── */}
