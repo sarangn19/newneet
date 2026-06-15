@@ -303,11 +303,11 @@ export default function UpscHome() {
                       position: 'relative', zIndex: i + 1,
                     }}
                   >
-                    <div style={{ fontSize: 20, fontWeight: 200, color: '#000', lineHeight: '26px' }}>{t.name}</div>
+                    <div style={{ fontSize: 17, fontWeight: 200, color: '#000', lineHeight: '24px' }}>{t.name}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0, gap: 64 }}>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                        <span style={{ padding: '0 12px', background: '#F5F5F5', borderRadius: 25, fontSize: 14, fontWeight: 500, lineHeight: '26px', color: '#838383', height: 26 }}>{subjCode}</span>
-                        <span style={{ padding: '0 12px', background: '#F4F4F4', borderRadius: 25, fontSize: 14, fontWeight: 500, lineHeight: '26px', color: '#838383', height: 26 }}>{badgeLabel}</span>
+                        <span style={{ padding: '0 10px', background: '#F5F5F5', borderRadius: 25, fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#838383', height: 22 }}>{subjCode}</span>
+                        <span style={{ padding: '0 10px', background: '#F4F4F4', borderRadius: 25, fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#838383', height: 22 }}>{badgeLabel}</span>
                       </div>
                       <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F6F6', borderRadius: 41 }}>
                         <ChevronRight size={20} color="#000" />
