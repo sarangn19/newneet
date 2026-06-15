@@ -158,15 +158,17 @@ export default function UpscHome() {
   const insightSubject = weakestTopic?.name || 'your studies'
   const insightAction = remainingFeed[0]?.name || 'the next topic'
 
-  const [sheetOpen, setSheetOpen] = useState(false)
-  const sheetY = useMotionValue(0)
-  const closedY = 0
-  const openY = -450
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const sheetY = useMotionValue(450);
+
+  const drawerHeight = 500;
+  const closedY = 450;
+  const openY = 50;
 
   const toggleSheet = () => {
-    const target = sheetOpen ? closedY : openY
-    animate(sheetY, target, { type: 'spring', damping: 25, stiffness: 200 })
-    setSheetOpen(!sheetOpen)
+    const target = sheetOpen ? closedY : openY;
+    animate(sheetY, target, { type: 'spring', damping: 25, stiffness: 200 });
+    setSheetOpen(!sheetOpen);
   }
 
   return (
@@ -218,33 +220,32 @@ export default function UpscHome() {
 
           {/* ─── DRAGGABLE REVISION SHEET ─── */}
           <motion.div
-            style={{ y: sheetY, position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20, background: '#F6F6F6', borderRadius: '44px 44px 0 0', boxShadow: '0px 0px 7px rgba(0,0,0,0.12)' }}
+            style={{ y: sheetY, position: 'absolute', left: 0, right: 0, height: '100%', zIndex: 20, background: '#F6F6F6', borderRadius: '44px 44px 0 0', boxShadow: '0px 0px 7px rgba(0,0,0,0.12)' }}
             drag="y"
             dragConstraints={{ top: openY, bottom: closedY }}
             dragElastic={0.1}
             onDragEnd={(_, info) => {
               if (info.offset.y < -100) {
-                animate(sheetY, openY, { type: 'spring', stiffness: 200 })
-                setSheetOpen(true)
+                animate(sheetY, openY, { type: 'spring', stiffness: 200 });
+                setSheetOpen(true);
               } else {
-                animate(sheetY, closedY, { type: 'spring', stiffness: 200 })
-                setSheetOpen(false)
+                animate(sheetY, closedY, { type: 'spring', stiffness: 200 });
+                setSheetOpen(false);
               }
             }}
           >
-            {/* Grip handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 16, cursor: 'grab' }} onClick={toggleSheet}>
+            {/* Handle */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }} onClick={toggleSheet}>
               <div style={{ width: 32, height: 4, background: '#D4D4D4', borderRadius: 99 }} />
             </div>
 
-            {/* Revision heading */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 24px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 24 }}>
               <h2 style={{ fontSize: 24, fontWeight: 600, color: '#000', margin: 0 }}>Revision</h2>
               <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{remainingFeed.length} left</div>
             </div>
 
-            {/* Revision cards */}
-            <div style={{ padding: '12px 24px 90px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* List */}
+            <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {dailyMix.length > 0 && remainingFeed.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                   <CheckCircle size={32} color="#22c55e" style={{ marginBottom: 10 }} />
@@ -275,40 +276,18 @@ export default function UpscHome() {
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjCode = subj?.id?.toUpperCase() || 'GS'
                 return (
-                  <motion.div key={t.id}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => openRevision(t)}
-                    style={{
-                      background: '#FFFFFF', borderRadius: 16,
-                      boxShadow: '0 1px 30.2px rgba(0,0,0,0.08)',
-                      padding: '24px 16px 16px',
-                      display: 'flex', flexDirection: 'column', gap: 16,
-                      cursor: 'pointer',
-                    }}>
-                    <div style={{ fontSize: 20, fontWeight: 200, color: '#000', lineHeight: 1.3 }}>{t.name}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 64 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{
-                          padding: '0 12px', height: 26, lineHeight: '26px',
-                          background: '#F5F5F5', borderRadius: 25,
-                          fontSize: 14, fontWeight: 500, color: '#838383',
-                        }}>{subjCode}</span>
-                        <span style={{
-                          padding: '0 12px', height: 26, lineHeight: '26px',
-                          background: '#F4F4F4', borderRadius: 25,
-                          fontSize: 14, fontWeight: 500, color: '#838383',
-                        }}>{badgeLabel}</span>
-                      </div>
-                      <div style={{
-                        width: 44, height: 44, borderRadius: 41,
-                        background: '#F6F6F6',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        flexShrink: 0,
-                      }}>
-                        <ChevronRight size={18} color="#000" />
+                  <div key={t.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, background: '#fff', border: '1px solid #e5e5e5', borderRadius: 16, cursor: 'pointer' }} onClick={() => openRevision(t)}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>{t.name}</div>
+                      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                        <span style={{ padding: '2px 8px', background: '#F5F5F5', borderRadius: 25, fontSize: 10, fontWeight: 700, color: '#838383' }}>{subjCode}</span>
+                        <span style={{ padding: '2px 8px', background: '#F4F4F4', borderRadius: 25, fontSize: 10, fontWeight: 700, color: '#838383' }}>{badgeLabel}</span>
                       </div>
                     </div>
-                  </motion.div>
+                    <div style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F6F6', borderRadius: '50%' }}>
+                      <ChevronRight size={18} color="#000" />
+                    </div>
+                  </div>
                 )
               })}
             </div>
