@@ -39,27 +39,32 @@ export default function Learn() {
 
         {/* Study Mode Switcher — Apple segmented control */}
         <div ref={segContainerRef} style={{
-          display: 'flex', background: 'transparent', borderRadius: 12, padding: 0,
-          position: 'relative', gap: 8,
+          display: 'flex', background: 'var(--surface-alt)', borderRadius: 8, padding: 2,
+          position: 'relative',
         }}>
+          <motion.div
+            animate={{ left: segIndicator.left, width: segIndicator.width }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            style={{
+              position: 'absolute', top: 2, bottom: 2, borderRadius: 6,
+              background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+            }}
+          />
           {TABS.map(t => {
             const Icon = t.icon
             const active = tab === t.id
             return (
               <motion.button key={t.id} data-seg={t.id} onClick={() => setTab(t.id)}
-                whileTap={{ scale: 0.98 }}
-                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
                 style={{
-                  flex: 1, padding: '12px 16px', borderRadius: 12, border: '1.5px solid', cursor: 'pointer',
-                  fontFamily: 'inherit', fontSize: 15, fontWeight: active ? 600 : 500,
-                  color: active ? 'var(--text)' : 'var(--text-2)',
-                  background: active ? 'var(--card-bg)' : 'transparent',
-                  borderColor: active ? 'var(--border)' : 'var(--border)',
-                  position: 'relative', zIndex: 1,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  transition: 'all 0.2s', WebkitTapHighlightColor: 'transparent',
+                  flex: 1, padding: '6px 0', borderRadius: 6, border: 'none', cursor: 'pointer',
+                  fontFamily: 'inherit', fontSize: 12, fontWeight: active ? 600 : 500,
+                  color: active ? '#000' : '#666',
+                  background: 'transparent', position: 'relative', zIndex: 1,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                  transition: 'color 0.15s', WebkitTapHighlightColor: 'transparent',
                 }}>
-                <Icon size={16} strokeWidth={active ? 2.5 : 2} color={active ? 'var(--text)' : 'var(--text-2)'} />
+                <Icon size={12} strokeWidth={active ? 2.5 : 2} />
                 {t.label}
               </motion.button>
             )
@@ -198,7 +203,7 @@ function NotesTab() {
               onFocus={() => { setSearchFocused(true); setSearchRecentOpen(true) }}
               onBlur={() => { setSearchFocused(false); setTimeout(() => setSearchRecentOpen(false), 200) }}
               placeholder="Search notes..."
-              size="lg"
+              size="md"
             />
 
             {/* Recent searches */}
@@ -208,11 +213,11 @@ function NotesTab() {
                   transition={{ duration: 0.2 }}
                   style={{
                     position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 30,
-                    background: 'var(--card-bg)', borderRadius: 14, marginTop: 6,
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.03)',
+                    background: '#fff', borderRadius: 12, marginTop: 6,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)',
                     overflow: 'hidden',
                   }}>
-                  <div style={{ padding: '10px 14px 4px', fontSize: 11, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ padding: '8px 12px 4px', fontSize: 11, fontWeight: 600, color: '#666', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Recent
                   </div>
                   {searchHistory.map((term, i) => (
@@ -220,11 +225,11 @@ function NotesTab() {
                       initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
                       whileTap={{ scale: 0.98 }}
                       style={{
-                        width: '100%', padding: '8px 14px', border: 'none', background: 'transparent',
-                        cursor: 'pointer', fontFamily: 'inherit', fontSize: 15, color: 'var(--text)',
-                        display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left',
+                        width: '100%', padding: '8px 12px', border: 'none', background: 'transparent',
+                        cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, color: '#333',
+                        display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left',
                       }}>
-                      <Search size={14} color="var(--text-3)" />
+                      <Search size={12} color="#999" />
                       {term}
                     </motion.button>
                   ))}
@@ -237,14 +242,13 @@ function NotesTab() {
           <motion.button onClick={() => setShowForm(!showForm)}
             whileTap={{ scale: 0.98 }}
             style={{
-              height: 56, padding: '0 20px', borderRadius: 14, border: 'none',
+              height: 48, padding: '0 20px', borderRadius: 10, border: 'none',
               background: 'var(--primary)', color: '#fff',
-              fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               display: 'flex', alignItems: 'center', gap: 6,
-              boxShadow: '0 2px 8px rgba(63,125,255,0.2)',
-              transition: 'box-shadow 0.2s',
+              boxShadow: '0 2px 8px rgba(63,125,255,0.25)',
             }}>
-            <Plus size={18} strokeWidth={2.5} />
+            <Plus size={16} strokeWidth={2.5} />
             New
           </motion.button>
         </div>
@@ -382,20 +386,22 @@ function NotesTab() {
             return (
               <motion.div key={n.id} layoutId={`note-${n.id}`} onClick={() => setSelectedNote(n)}
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}
-                whileHover={cardHover} whileTap={{ scale: 0.98 }}
+                whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}
                 style={{
-                  ...cardStyle, padding: 16,
+                  background: '#fff', borderRadius: 12, padding: 16,
                   cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                  border: '1px solid #e5e7eb',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02)',
                 }}>
                 {/* Top row: bookmark */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
                   <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(n.id) }} whileTap={{ scale: 0.8 }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-                    <Bookmark size={16} color={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'var(--text-2)'} fill={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'none'} />
+                    <Bookmark size={16} color={bookmarkedIds.has(n.id) ? 'var(--primary)' : '#999'} fill={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'none'} />
                   </motion.button>
                 </div>
                 {/* Title */}
-                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#333', lineHeight: 1.35, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {n.title || 'Untitled'}
                 </div>
                 {/* Category chip */}
@@ -408,7 +414,7 @@ function NotesTab() {
                   </div>
                 )}
                 {/* Date at bottom */}
-                <div style={{ marginTop: 'auto', fontSize: 12, color: 'var(--text-2)', fontWeight: 500 }}>
+                <div style={{ marginTop: 'auto', fontSize: 11, color: '#666', fontWeight: 500 }}>
                   {new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                 </div>
               </motion.div>
@@ -1143,9 +1149,9 @@ function PracticeMCQTab() {
             })()}
 
             {/* Subject multi-select */}
-            <motion.div style={{ ...cardStyle, padding: 14, marginBottom: 10 }} whileHover={cardHover}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>Select Subjects</div>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            <motion.div style={{ ...cardStyle, padding: 16, marginBottom: 12 }} whileHover={cardHover}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#333', marginBottom: 8 }}>Select Subjects</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {upscSubjects.map(s => {
                   const active = selectedSubjects.includes(s.id)
                   return (
@@ -1160,16 +1166,18 @@ function PracticeMCQTab() {
                         return !oldSubCh.includes(chId)
                       }))
                     }} whileTap={{ scale: 0.97 }} style={{
-                      padding: '8px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
-                      fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
-                      display: 'flex', alignItems: 'center', gap: 5,
-                      background: active ? s.color : 'var(--surface-alt)',
-                      color: active ? '#fff' : 'var(--text-2)',
+                      padding: '8px 14px', borderRadius: 8, border: active ? 'none' : '1px solid #e5e7eb', cursor: 'pointer',
+                      fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      background: active ? s.color : '#fff',
+                      color: active ? '#fff' : '#333',
+                      boxShadow: active ? 'none' : '0 1px 2px rgba(0,0,0,0.04)',
                     }}>
                       {s.name}
                       <span style={{
-                        fontSize: 9, fontWeight: 600, padding: '1px 5px', borderRadius: 99,
-                        background: active ? 'rgba(255,255,255,0.2)' : 'var(--border)',
+                        fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 99,
+                        background: active ? 'rgba(255,255,255,0.25)' : '#f3f4f6',
+                        color: active ? '#fff' : '#666',
                       }}>{subjectQuestionCounts[s.id] || 0}Q</span>
                     </motion.button>
                   )
@@ -1213,51 +1221,36 @@ function PracticeMCQTab() {
                     <motion.div key={ch.id} onClick={() => toggleChapter(ch.id)}
                       whileTap={{ scale: 0.98 }}
                       style={{
-                        ...cardStyle, padding: '10px 12px',
-                        cursor: 'pointer', marginBottom: 4,
-                        border: sel ? '2px solid var(--primary)' : '1px solid var(--border)',
+                        background: '#fff', padding: '12px 14px',
+                        cursor: 'pointer', marginBottom: 6,
+                        border: sel ? '2px solid var(--primary)' : '1px solid #e5e7eb',
+                        borderRadius: 8,
                         display: 'flex', alignItems: 'center', gap: 10,
-                        boxShadow: sel ? '0 2px 8px var(--shadow-active)' : cardStyle.boxShadow,
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                       }}>
                       <div style={{
-                        width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-                        background: sel ? 'var(--primary)' : 'var(--surface-alt)',
+                        width: 28, height: 28, borderRadius: 6, flexShrink: 0,
+                        background: sel ? 'var(--primary)' : '#f3f4f6',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 11, fontWeight: 800, color: sel ? '#fff' : 'var(--text-2)',
+                        fontSize: 11, fontWeight: 700, color: sel ? '#fff' : '#666',
                       }}>
                         {ch.qCount}
                       </div>
-                      <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#333', display: 'flex', alignItems: 'center', gap: 6 }}>
                         {ch.name}
                         {ret.daysSince !== null && (
-                          <span style={{ fontSize: 9, color: retColor, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: 11, color: retColor, fontWeight: 500, whiteSpace: 'nowrap' }}>
                             · {ret.daysSince === 0 ? 'today' : ret.daysSince === 1 ? '1d ago' : `${ret.daysSince}d ago`}
                           </span>
                         )}
                       </div>
                       <div style={{
-                        width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                        background: sel ? 'var(--primary)' : 'var(--surface-alt)',
-                        border: `2px solid ${sel ? 'var(--primary)' : 'var(--border)'}`,
+                        width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+                        background: sel ? 'var(--primary)' : '#fff',
+                        border: `1.5px solid ${sel ? 'var(--primary)' : '#e5e7eb'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
-                        {sel && <Check size={14} color="#fff" />}
-                      </div>
-                      <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {ch.name}
-                        {ret.daysSince !== null && (
-                          <span style={{ fontSize: 9, color: retColor, fontWeight: 500, whiteSpace: 'nowrap' }}>
-                            · {ret.daysSince === 0 ? 'today' : ret.daysSince === 1 ? '1d ago' : `${ret.daysSince}d ago`}
-                          </span>
-                        )}
-                      </div>
-                      <div style={{
-                        width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                        background: sel ? 'var(--primary)' : 'var(--surface-alt)',
-                        border: `2px solid ${sel ? 'var(--primary)' : 'var(--border)'}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                        {sel && <Check size={14} color="#fff" />}
+                        {sel && <Check size={12} color="#fff" />}
                       </div>
                     </motion.div>
                   )
@@ -1270,10 +1263,11 @@ function PracticeMCQTab() {
 
       {/* Fixed bottom bar */}
       <motion.div initial={{ y: 60 }} animate={{ y: 0 }} style={{
-        position: 'fixed', bottom: 56, left: 0, right: 0, zIndex: 50,
-        background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 16px',
+        position: 'fixed', bottom: 56, left: 16, right: 16, zIndex: 100,
+        background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 24px',
         display: 'flex', alignItems: 'center', gap: 12,
         boxShadow: '0 -2px 12px rgba(0,0,0,0.3)',
+        borderRadius: 16,
       }}>
         <div style={{ flex: 1, fontSize: 12, color: 'var(--text-2)' }}>
           <strong style={{ fontSize: 14, color: 'var(--text)' }}>{selectedChapters.length}</strong> chapters · <strong style={{ fontSize: 14, color: 'var(--text)' }}>{selectedQuestions.length}</strong> questions
@@ -1281,10 +1275,14 @@ function PracticeMCQTab() {
         <motion.button onClick={() => setShowStartModal(true)}
           disabled={selectedChapters.length === 0}
           whileTap={{ scale: 0.97 }} style={{
-            padding: '10px 24px', borderRadius: 12, border: 'none',
-            background: selectedChapters.length > 0 ? 'var(--primary)' : 'var(--border)',
-            color: '#fff', fontSize: 13, fontWeight: 700, cursor: selectedChapters.length > 0 ? 'pointer' : 'default',
+            padding: '12px 24px', borderRadius: 10, border: '2px solid',
+            background: selectedChapters.length > 0 ? 'var(--primary)' : '#fff',
+            color: selectedChapters.length > 0 ? '#fff' : '#333',
+            fontSize: 14, fontWeight: 700, cursor: selectedChapters.length > 0 ? 'pointer' : 'not-allowed',
             fontFamily: 'inherit', whiteSpace: 'nowrap',
+            borderColor: selectedChapters.length > 0 ? 'var(--primary)' : '#333',
+            boxShadow: selectedChapters.length > 0 ? '0 4px 12px rgba(63,125,255,0.4)' : '0 2px 4px rgba(0,0,0,0.1)',
+            position: 'relative', zIndex: 60,
           }}>
           Start Practice
         </motion.button>
@@ -1532,12 +1530,12 @@ function FlashcardsTab() {
       <AnimatePresence mode="wait">
         <motion.div key="setup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
           <div style={{ paddingBottom: 72 }}>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search chapters..." />
+            <SearchInput value={search} onChange={setSearch} placeholder="Search chapters..." size="md" />
 
             {/* Subject pills — multi-select */}
-            <motion.div style={{ ...cardStyle, padding: 14, marginBottom: 10 }} whileHover={cardHover}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>Subjects</div>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            <motion.div style={{ ...cardStyle, padding: 16, marginBottom: 12 }} whileHover={cardHover}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#333', marginBottom: 8 }}>Subjects</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {upscSubjects.map(s => {
                   const isActive = selectedSubjects.includes(s.id)
                   return (
@@ -1545,17 +1543,19 @@ function FlashcardsTab() {
                       if (isActive && selectedSubjects.length === 1) return
                       setSelectedSubjects(prev => prev.includes(s.id) ? prev.filter(id => id !== s.id) : [...prev, s.id])
                     }} whileTap={{ scale: 0.97 }} style={{
-                      padding: '8px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
-                      fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
-                      display: 'flex', alignItems: 'center', gap: 5,
-                      background: isActive ? s.color : 'var(--surface-alt)',
-                      color: isActive ? '#fff' : 'var(--text-2)',
+                      padding: '8px 14px', borderRadius: 8, border: isActive ? 'none' : '1px solid #e5e7eb', cursor: 'pointer',
+                      fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      background: isActive ? s.color : '#fff',
+                      color: isActive ? '#fff' : '#333',
+                      boxShadow: isActive ? 'none' : '0 1px 2px rgba(0,0,0,0.04)',
                     }}>
                       {isActive && <CheckCircle size={12} />}
                       {s.name}
                       <span style={{
-                        fontSize: 9, fontWeight: 600, padding: '1px 5px', borderRadius: 99,
-                        background: isActive ? 'rgba(255,255,255,0.2)' : 'var(--border)',
+                        fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 99,
+                        background: isActive ? 'rgba(255,255,255,0.25)' : '#f3f4f6',
+                        color: isActive ? '#fff' : '#666',
                       }}>{subjectQuestionCounts[s.id] || 0}Q</span>
                     </motion.button>
                   )
@@ -1577,30 +1577,31 @@ function FlashcardsTab() {
                         <motion.div key={ch.id} onClick={() => toggleChapter(ch.id)}
                           whileTap={{ scale: 0.98 }}
                           style={{
-                            ...cardStyle, padding: '10px 12px',
-                            cursor: 'pointer', marginBottom: 4,
-                            border: sel ? '2px solid var(--primary)' : '1px solid var(--border)',
+                            background: '#fff', padding: '12px 14px',
+                            cursor: 'pointer', marginBottom: 6,
+                            border: sel ? '2px solid var(--primary)' : '1px solid #e5e7eb',
+                            borderRadius: 8,
                             display: 'flex', alignItems: 'center', gap: 10,
-                            boxShadow: sel ? '0 2px 8px var(--shadow-active)' : cardStyle.boxShadow,
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                           }}>
                           <div style={{
-                            width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-                            background: sel ? 'var(--primary)' : 'var(--surface-alt)',
+                            width: 28, height: 28, borderRadius: 6, flexShrink: 0,
+                            background: sel ? 'var(--primary)' : '#f3f4f6',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 11, fontWeight: 800, color: sel ? '#fff' : 'var(--text-2)',
+                            fontSize: 11, fontWeight: 700, color: sel ? '#fff' : '#666',
                           }}>
                             {ch.qCount}
                           </div>
-                          <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                          <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#333' }}>
                             {ch.name}
                           </div>
                           <div style={{
-                            width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                            background: sel ? 'var(--primary)' : 'var(--surface-alt)',
-                            border: `2px solid ${sel ? 'var(--primary)' : 'var(--border)'}`,
+                            width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+                            background: sel ? 'var(--primary)' : '#fff',
+                            border: `1.5px solid ${sel ? 'var(--primary)' : '#e5e7eb'}`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                           }}>
-                            {sel && <Check size={14} color="#fff" />}
+                            {sel && <Check size={12} color="#fff" />}
                           </div>
                         </motion.div>
                       )
@@ -1621,10 +1622,11 @@ function FlashcardsTab() {
 
       {/* Fixed bottom bar */}
       <motion.div initial={{ y: 60 }} animate={{ y: 0 }} style={{
-        position: 'fixed', bottom: 56, left: 0, right: 0, zIndex: 50,
-        background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 16px',
+        position: 'fixed', bottom: 56, left: 16, right: 16, zIndex: 100,
+        background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 24px',
         display: 'flex', alignItems: 'center', gap: 12,
         boxShadow: '0 -2px 12px rgba(0,0,0,0.3)',
+        borderRadius: 16,
       }}>
         <div style={{ flex: 1, fontSize: 12, color: 'var(--text-2)' }}>
           <strong style={{ fontSize: 14, color: 'var(--text)' }}>{selectedChapters.length || subjectsWithChapters.flatMap(s => s.chapters).length}</strong> chapters · <strong style={{ fontSize: 14, color: 'var(--text)' }}>{totalFCards}</strong> cards

@@ -22,14 +22,14 @@ export const colors = {
 }
 
 export const card = {
-  background: colors.cardBg,
-  borderRadius: 16,
-  border: `1px solid ${colors.border}`,
-  boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.02)',
+  background: '#fff',
+  borderRadius: 12,
+  border: '1px solid #e5e7eb',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02)',
 }
 
 export const cardHover = {
-  y: -2,
+  y: -1,
   boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
 }
 
@@ -40,9 +40,9 @@ export const spring = {
 }
 
 export const spacing = {
-  header: '48px 16px 10px',
-  container: '12px 14px',
-  cardBody: 14,
+  header: '48px 16px 12px',
+  container: '16px',
+  cardBody: 16,
   cardBodySmall: 12,
 }
 
@@ -58,18 +58,19 @@ export const font = {
 
 export const btn = {
   primary: {
-    padding: '11px 0', borderRadius: 10, border: 'none',
+    padding: '12px 20px', borderRadius: 10, border: 'none',
     background: colors.primary, color: colors.white,
-    fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+    fontSize: 14, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+    boxShadow: '0 2px 8px rgba(63,125,255,0.25)',
   },
   secondary: {
-    padding: '11px 0', borderRadius: 10, border: `1.5px solid ${colors.border}`,
-    background: colors.white, color: colors.textSecondary,
-    fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
+    padding: '12px 20px', borderRadius: 10, border: '1.5px solid #e5e7eb',
+    background: '#fff', color: '#333',
+    fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
   },
   small: {
-    padding: '6px 12px', borderRadius: 8, border: 'none',
+    padding: '8px 16px', borderRadius: 8, border: 'none',
     background: colors.primary, color: colors.white,
-    fontSize: 11, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', whiteSpace: 'nowrap',
+    fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', whiteSpace: 'nowrap',
   },
 }
