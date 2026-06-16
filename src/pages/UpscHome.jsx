@@ -47,6 +47,7 @@ export default function UpscHome() {
   const qrStartTime = useRef(null)
   const recentTopics = useRef([])
   const qrHistory = useRef({})
+  const lastQrTopic = useRef(null)
 
   const pickNextTopic = () => {
     const scored = allTopics
@@ -74,6 +75,7 @@ export default function UpscHome() {
     const topic = pickNextTopic()
     if (!topic) { setSessionDone(true); return }
     usedTopicIds.current.add(topic.id)
+    lastQrTopic.current = topic
     recentTopics.current = [...recentTopics.current.slice(-3), topic.id]
     setQuestionLoading(true)
     setQrSelected(null)
