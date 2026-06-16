@@ -62,12 +62,18 @@ function parseJSON(text) {
   return null
 }
 
-export async function generateAIRQuestion(topic, topicScores) {
+export async function generateAIRQuestion(topic, topicScores, recentHistory = {}) {
   const score = topicScores?.[topic.id]
   const accuracy = score?.total > 0 ? Math.round((score.correct / score.total) * 100) : null
   const isWeak = accuracy !== null && accuracy < 60
   const isUnattempted = accuracy === null
   const isStrong = accuracy !== null && accuracy >= 80
+
+  const topicHistory = recentHistory[topic.id] || []
+  const mistakes = topicHistory.filter(h => !h.isCorrect)
+  const recentMistakesStr = mistakes.length > 0
+    ? `\n\nThe student recently got these questions wrong on this topic:\n${mistakes.map(m => `- "${m.q}" (correct answer: ${m.explanation})`).join('\n')}\nGenerate a question that targets the SAME concept they got wrong, from a different angle.`
+    : ''
 
   const systemPrompt =
 `You are a UPSC CSE question generator. Generate EXACTLY ONE multiple choice question about "${topic.name}" for UPSC exam preparation.
@@ -92,7 +98,7 @@ The ans field is the 0-based index of the correct option. Make the question test
 
 Student's accuracy on this topic: ${accuracy !== null ? accuracy + '%' : 'not attempted yet'}
 Difficulty target: ${difficulty}
-Instruction: ${focus}
+Instruction: ${focus}${recentMistakesStr}
 
 Requirements:
 - Question must be specifically about ${topic.name}

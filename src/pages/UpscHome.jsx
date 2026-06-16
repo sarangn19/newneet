@@ -46,6 +46,7 @@ export default function UpscHome() {
   const usedTopicIds = useRef(new Set())
   const qrStartTime = useRef(null)
   const recentTopics = useRef([])
+  const qrHistory = useRef({})
 
   const pickNextTopic = () => {
     const scored = allTopics
@@ -79,7 +80,7 @@ export default function UpscHome() {
     setQrSubmitted(false)
     setQrCorrect(false)
     qrStartTime.current = Date.now()
-    const q = await generateAIRQuestion(topic, topicScores)
+    const q = await generateAIRQuestion(topic, topicScores, qrHistory.current)
     setCurrentQuestion(q)
     setQuestionLoading(false)
   }
@@ -345,9 +346,12 @@ export default function UpscHome() {
                             setQrSubmitted(true)
                             setQrCorrect(correct)
                             const timeSpent = qrStartTime.current ? Math.round((Date.now() - qrStartTime.current) / 1000) : 0
-                            recordQuestionAttempt(currentQuestion.topicId, correct, timeSpent, '')
-                            recordSeenQuestionLocal(currentQuestion.topicId, currentQuestion.q, correct)
-                            saveTopicScore(currentQuestion.topicId, correct ? 1 : 0, 1)
+                            const tid = currentQuestion.topicId
+                            const prev = qrHistory.current[tid] || []
+                            qrHistory.current[tid] = [...prev.slice(-4), { q: currentQuestion.q, isCorrect: correct, explanation: currentQuestion.explanation }]
+                            recordQuestionAttempt(tid, correct, timeSpent, '')
+                            recordSeenQuestionLocal(tid, currentQuestion.q, correct)
+                            saveTopicScore(tid, correct ? 1 : 0, 1)
                             updateStats(correct ? 1 : 0, 1, '')
                           }}
                           style={{
