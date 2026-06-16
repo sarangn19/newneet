@@ -54,13 +54,13 @@ export default function Navbar() {
             }}
           >
             <div style={{
-              display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4,
-              padding: '6px 8px',
-              background: 'var(--nav-bg)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              borderRadius: 99,
-              boxShadow: 'var(--shadow-float)',
+              display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+              padding: '16px 20px',
+              width: 388, height: 76,
+              background: 'linear-gradient(90deg, #8A38F5 0%, #8F217D 100%)',
+              border: '3px solid #FFFFFF',
+              boxShadow: '0px 0px 115px rgba(0,0,0,0.3)',
+              borderRadius: 78,
               pointerEvents: 'auto',
             }}>
               {tabs.map((tab, i) => {
@@ -68,41 +68,18 @@ export default function Navbar() {
                 return (
                   <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
                     textDecoration: 'none', WebkitTapHighlightColor: 'transparent', fontFamily: 'inherit',
-                    position: 'relative',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {({ isActive }) => (
-                      <motion.div layout={isActive} transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 6,
-                          padding: isActive ? '8px 16px 8px 12px' : '8px 12px',
-                          borderRadius: 99,
-                          cursor: 'pointer',
-                          position: 'relative',
-                          background: isActive ? 'var(--primary)' : 'transparent',
-                        }}>
-                        {isActive && (
-                          <motion.div layoutId="navBg" style={{
-                            position: 'absolute', inset: 0, borderRadius: 99,
-                            background: 'var(--primary)',
-                          }} transition={{ type: 'spring', stiffness: 400, damping: 30 }} />
-                        )}
-                        <IconComp
-                          size={18}
-                          strokeWidth={isActive ? 2.5 : 1.8}
-                          color={isActive ? '#FFFFFF' : 'var(--text-3)'}
-                          style={{ position: 'relative', zIndex: 1 }}
+                      <div style={{
+                        width: 44, height: 44, borderRadius: 86,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: isActive ? '#FFFFFF' : 'transparent',
+                      }}>
+                        <IconComp size={20}
+                          color={isActive ? '#000000' : '#FFFFFF'}
                         />
-                        {isActive && (
-                          <motion.span initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }}
-                            transition={{ duration: 0.15, ease: 'easeOut' }}
-                            style={{
-                              fontSize: 12, fontWeight: 600, color: '#FFFFFF',
-                              position: 'relative', zIndex: 1, whiteSpace: 'nowrap',
-                            }}>
-                            {tab.label}
-                          </motion.span>
-                        )}
-                      </motion.div>
+                      </div>
                     )}
                   </NavLink>
                 );
