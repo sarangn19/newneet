@@ -19,6 +19,7 @@ import Auth from './pages/Auth'
 import CurrentAffairs from './pages/CurrentAffairs'
 import AIChatbot from './pages/AIChatbot'
 import PrelimsTest from './pages/PrelimsTest'
+import AdaptivePractice from './pages/AdaptivePractice'
 import NoteEditor from './pages/NoteEditor'
 import Notes from './pages/Notes'
 import AdminDashboard from './pages/AdminDashboard'
@@ -106,6 +107,7 @@ function AnimatedRoutes() {
           <Route path="/current-affairs"             element={<CurrentAffairs />} />
           <Route path="/ai-chatbot"                   element={<AIChatbot />} />
           <Route path="/prelims-test"                 element={<PrelimsTest />} />
+          <Route path="/adaptive-practice"            element={<AdaptivePractice />} />
           <Route path="/notes"                        element={<Notes />} />
           <Route path="/superadmin"                  element={<SuperAdminDashboard />} />
           <Route path="/note/:noteId"                 element={<NoteEditor />} />

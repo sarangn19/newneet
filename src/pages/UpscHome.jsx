@@ -47,7 +47,6 @@ export default function UpscHome() {
   const qrStartTime = useRef(null)
   const recentTopics = useRef([])
   const qrHistory = useRef({})
-  const lastQrTopic = useRef(null)
 
   const pickNextTopic = () => {
     const scored = allTopics
@@ -75,7 +74,6 @@ export default function UpscHome() {
     const topic = pickNextTopic()
     if (!topic) { setSessionDone(true); return }
     usedTopicIds.current.add(topic.id)
-    lastQrTopic.current = topic
     recentTopics.current = [...recentTopics.current.slice(-3), topic.id]
     setQuestionLoading(true)
     setQrSelected(null)
@@ -432,7 +430,7 @@ export default function UpscHome() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
                       <motion.button
                         whileTap={{ scale: 0.97 }}
-                        onClick={() => { lastQrTopic.current && openRevision(lastQrTopic.current) }}
+                        onClick={() => { navigate('/adaptive-practice') }}
                         style={{
                           padding: '10px 24px', borderRadius: 10,
                           border: 'none', background: 'var(--primary)', color: '#fff',
