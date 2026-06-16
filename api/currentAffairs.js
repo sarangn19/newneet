@@ -13,81 +13,86 @@ function guessCategory(title, summary) {
 }
 
 export default async function handler(req, res) {
-  let articles = []
+  try {
+    let articles = []
 
-  // Try NewsAPI first
-  if (NEWS_API_KEY) {
-    try {
-      const today = new Date()
-      const weekAgo = new Date(today)
-      weekAgo.setDate(weekAgo.getDate() - 7)
-      const fromDate = weekAgo.toISOString().split('T')[0]
-      const url = `https://newsapi.org/v2/everything?q=India&language=en&from=${fromDate}&sortBy=publishedAt&pageSize=30&apiKey=${NEWS_API_KEY}`
-      const resp = await fetch(url)
-      if (resp.ok) {
-        const data = await resp.json()
-        if (data.articles && data.articles.length > 0) {
-          articles = data.articles.map(a => ({
-            date: a.publishedAt ? a.publishedAt.split('T')[0] : today.toISOString().split('T')[0],
-            category: guessCategory(a.title || '', a.description || ''),
-            title: a.title || '',
-            summary: (a.description || '').substring(0, 200),
-            source: a.source?.name || 'News',
-            link: a.url || '',
-            image: a.urlToImage ? a.urlToImage.replace('http://', 'https://') : '',
-            tags: [],
-          }))
-        }
-      }
-    } catch (e) {
-      console.warn('NewsAPI failed:', e)
-    }
-  }
-
-  // Fallback: RSS feeds
-  if (articles.length < 5) {
-    const feeds = [
-      { url: 'https://www.thehindu.com/news/national/feeder/default.rss', source: 'The Hindu' },
-      { url: 'https://pib.gov.in/RssMain.aspx', source: 'PIB' },
-      { url: 'https://indianexpress.com/feed/', source: 'Indian Express' },
-    ]
-    for (const feed of feeds) {
+    // Try NewsAPI first
+    if (NEWS_API_KEY) {
       try {
-        const ctrl = new AbortController()
-        const tid = setTimeout(() => ctrl.abort(), 4000)
-        const resp = await fetch(feed.url, { signal: ctrl.signal })
-        clearTimeout(tid)
-        if (!resp.ok) continue
-        const xml = await resp.text()
-        const itemRegex = /<item>[\s\S]*?<\/item>/gi
-        let match
-        while ((match = itemRegex.exec(xml)) !== null) {
-          const item = match[0]
-          const title = (item.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '').replace(/<[^>]+>/g, '').trim()
-          const desc = (item.match(/<description[^>]*>([\s\S]*?)<\/description>/i)?.[1] || '').replace(/<[^>]+>/g, '').trim()
-          const pubDate = item.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i)?.[1] || ''
-          const link = item.match(/<link[^>]*>([\s\S]*?)<\/link>/i)?.[1] || ''
-          if (!title) continue
-          articles.push({ date: pubDate ? new Date(pubDate).toISOString().split('T')[0] : '', category: guessCategory(title, desc), title, summary: desc.substring(0, 200), source: feed.source, link, image: '', tags: [] })
+        const today = new Date()
+        const weekAgo = new Date(today)
+        weekAgo.setDate(weekAgo.getDate() - 7)
+        const fromDate = weekAgo.toISOString().split('T')[0]
+        const url = `https://newsapi.org/v2/everything?q=India&language=en&from=${fromDate}&sortBy=publishedAt&pageSize=30&apiKey=${NEWS_API_KEY}`
+        const resp = await fetch(url)
+        if (resp.ok) {
+          const data = await resp.json()
+          if (data.articles && data.articles.length > 0) {
+            articles = data.articles.map(a => ({
+              date: a.publishedAt ? a.publishedAt.split('T')[0] : today.toISOString().split('T')[0],
+              category: guessCategory(a.title || '', a.description || ''),
+              title: a.title || '',
+              summary: (a.description || '').substring(0, 200),
+              source: a.source?.name || 'News',
+              link: a.url || '',
+              image: a.urlToImage ? a.urlToImage.replace('http://', 'https://') : '',
+              tags: [],
+            }))
+          }
         }
-      } catch {}
+      } catch (e) {
+        console.warn('NewsAPI failed:', e)
+      }
     }
-  }
 
-  // Deduplicate
-  const seen = new Set()
-  const deduped = articles.filter(a => {
-    const key = (a.title || '').toLowerCase().slice(0, 40)
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
+    // Fallback: RSS feeds
+    if (articles.length < 5) {
+      const feeds = [
+        { url: 'https://www.thehindu.com/news/national/feeder/default.rss', source: 'The Hindu' },
+        { url: 'https://pib.gov.in/RssMain.aspx', source: 'PIB' },
+        { url: 'https://indianexpress.com/feed/', source: 'Indian Express' },
+      ]
+      for (const feed of feeds) {
+        try {
+          const ctrl = new AbortController()
+          const tid = setTimeout(() => ctrl.abort(), 4000)
+          const resp = await fetch(feed.url, { signal: ctrl.signal })
+          clearTimeout(tid)
+          if (!resp.ok) continue
+          const xml = await resp.text()
+          const itemRegex = /<item>[\s\S]*?<\/item>/gi
+          let match
+          while ((match = itemRegex.exec(xml)) !== null) {
+            const item = match[0]
+            const title = (item.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '').replace(/<[^>]+>/g, '').trim()
+            const desc = (item.match(/<description[^>]*>([\s\S]*?)<\/description>/i)?.[1] || '').replace(/<[^>]+>/g, '').trim()
+            const pubDate = item.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i)?.[1] || ''
+            const link = item.match(/<link[^>]*>([\s\S]*?)<\/link>/i)?.[1] || ''
+            if (!title) continue
+            articles.push({ date: pubDate ? new Date(pubDate).toISOString().split('T')[0] : '', category: guessCategory(title, desc), title, summary: desc.substring(0, 200), source: feed.source, link, image: '', tags: [] })
+          }
+        } catch {}
+      }
+    }
 
-  if (deduped.length < 3) {
+    // Deduplicate
+    const seen = new Set()
+    const deduped = articles.filter(a => {
+      const key = (a.title || '').toLowerCase().slice(0, 40)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+
+    if (deduped.length < 3) {
+      return res.json({ source: 'mock', articles: getMockArticles() })
+    }
+
+    return res.json({ source: deduped.length >= 5 && NEWS_API_KEY ? 'newsapi' : 'rss', articles: deduped.slice(0, 30) })
+  } catch (error) {
+    console.error('Current Affairs API error:', error)
     return res.json({ source: 'mock', articles: getMockArticles() })
   }
-
-  return res.json({ source: deduped.length >= 5 && NEWS_API_KEY ? 'newsapi' : 'rss', articles: deduped.slice(0, 30) })
 }
 
 function getMockArticles() {

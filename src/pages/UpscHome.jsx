@@ -8,7 +8,7 @@ import { upscSubjects } from '../data/upsc/subjects'
 import { upscMCQs } from '../data/upsc/questions'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
 import { generateAIRQuestion } from '../lib/generateQuestionAI'
-import { Flame, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingUp, Search, FileText } from 'lucide-react'
+import { Flame, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingUp, FileText } from 'lucide-react'
 import { useSequentialReveal, easePreset, skeletonBreath } from '../hooks/useSequentialReveal'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 
@@ -244,11 +244,7 @@ export default function UpscHome() {
 
           <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.1 }}
             style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" onClick={() => navigate('/pyq-search')} style={{ padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <Search size={14} color="var(--primary)" />
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)' }}>PYQs</span>
-            </motion.button>
-            <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)' }}>
+              <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)' }}>
               <Flame size={14} color="#f97316" />
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{streak}</span>
             </motion.button>

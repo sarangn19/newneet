@@ -23,8 +23,9 @@ export const colors = {
 
 export const card = {
   background: colors.cardBg,
-  borderRadius: 'var(--radius-xl)',
+  borderRadius: 16,
   border: `1px solid ${colors.border}`,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.02)',
 }
 
 export const cardHover = {

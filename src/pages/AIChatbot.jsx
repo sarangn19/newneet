@@ -75,8 +75,12 @@ export default function AIChatbot() {
   }, [messages])
 
   useEffect(() => {
-    if (!userId) return
-    supabase.from('chat_history').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10).then(({ data }) => {
+    if (!userId || userId === 'demo-user') return
+    supabase.from('chat_history').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10).then(({ data, error }) => {
+      if (error) {
+        console.warn('Failed to load chat history:', error)
+        return
+      }
       if (data) setHistory(data)
     })
   }, [userId])

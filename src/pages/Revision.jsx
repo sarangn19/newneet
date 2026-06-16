@@ -182,21 +182,23 @@ export default function Revision() {
                   key={step}
                   onClick={() => navigate(`/subject/${topic.subjectId}/chapter/${topic.id}`)}
                   whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.02, borderColor: 'var(--primary)' }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
                     borderRadius: 'var(--radius-sm)', border: '1.5px solid', cursor: 'pointer',
                     borderColor: isActive ? 'var(--primary)' : 'var(--border)',
                     background: isActive ? 'var(--primary-light)' : 'var(--card-bg)',
+                    transition: 'all 0.2s ease',
                   }}
                 >
                   <div style={{
                     width: 32, height: 32, borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'var(--primary-light)',
+                    background: isActive ? 'var(--primary-light)' : 'var(--surface-alt)',
                   }}>
-                    <Icon size={16} color="var(--primary)" />
+                    <Icon size={16} color={isActive ? 'var(--primary)' : 'var(--text-2)'} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>{stepLabels[i]}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: isActive ? 'var(--text)' : 'var(--text-2)' }}>{stepLabels[i]}</div>
                     <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 1 }}>Step {i + 1} of 3</div>
                   </div>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'var(--text-3)' }}>

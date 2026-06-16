@@ -39,32 +39,27 @@ export default function Learn() {
 
         {/* Study Mode Switcher — Apple segmented control */}
         <div ref={segContainerRef} style={{
-          display: 'flex', background: 'var(--surface-alt)', borderRadius: 12, padding: 3,
-          position: 'relative',
+          display: 'flex', background: 'transparent', borderRadius: 12, padding: 0,
+          position: 'relative', gap: 8,
         }}>
-          <motion.div
-            animate={{ left: segIndicator.left, width: segIndicator.width }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            style={{
-              position: 'absolute', top: 3, bottom: 3, borderRadius: 10,
-              background: 'var(--card-bg)', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.02)',
-            }}
-          />
           {TABS.map(t => {
             const Icon = t.icon
             const active = tab === t.id
             return (
               <motion.button key={t.id} data-seg={t.id} onClick={() => setTab(t.id)}
                 whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02 }}
                 style={{
-                  flex: 1, padding: '10px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
+                  flex: 1, padding: '12px 16px', borderRadius: 12, border: '1.5px solid', cursor: 'pointer',
                   fontFamily: 'inherit', fontSize: 15, fontWeight: active ? 600 : 500,
-                  color: active ? 'var(--text)' : 'var(--text-3)',
-                  background: 'transparent', position: 'relative', zIndex: 1,
+                  color: active ? 'var(--text)' : 'var(--text-2)',
+                  background: active ? 'var(--card-bg)' : 'transparent',
+                  borderColor: active ? 'var(--border)' : 'var(--border)',
+                  position: 'relative', zIndex: 1,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  transition: 'color 0.2s', WebkitTapHighlightColor: 'transparent',
+                  transition: 'all 0.2s', WebkitTapHighlightColor: 'transparent',
                 }}>
-                <Icon size={16} strokeWidth={active ? 2.5 : 1.5} />
+                <Icon size={16} strokeWidth={active ? 2.5 : 2} color={active ? 'var(--text)' : 'var(--text-2)'} />
                 {t.label}
               </motion.button>
             )
@@ -73,9 +68,11 @@ export default function Learn() {
       </div>
 
       <div style={{ padding: spacing.container }}>
-        {tab === 'notes' && <NotesTab />}
-        {tab === 'mcq' && <PracticeMCQTab />}
-        {tab === 'flashcards' && <FlashcardsTab />}
+        <AnimatePresence mode="wait">
+          {tab === 'notes' && <motion.div key="notes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}><NotesTab /></motion.div>}
+          {tab === 'mcq' && <motion.div key="mcq" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}><PracticeMCQTab /></motion.div>}
+          {tab === 'flashcards' && <motion.div key="flashcards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}><FlashcardsTab /></motion.div>}
+        </AnimatePresence>
       </div>
     </motion.div>
   )
@@ -382,41 +379,36 @@ function NotesTab() {
           {filteredNotes.map((n, index) => {
             const subjectObj = upscSubjects.find(s => s.id === n.subject)
             const subjectColor = subjectObj?.color || 'var(--text-3)'
-            const preview = (() => {
-              const raw = n.content || ''
-              const stripped = raw.replace(/<[^>]*>/g, '').replace(/==/g, '').replace(/\*\*/g, '').replace(/\[image\]\([^)]*\)/g, '[image]')
-              return stripped.slice(0, 100)
-            })()
             return (
               <motion.div key={n.id} layoutId={`note-${n.id}`} onClick={() => setSelectedNote(n)}
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}
-                whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}
+                whileHover={cardHover} whileTap={{ scale: 0.98 }}
                 style={{
-                  background: 'var(--card-bg)', borderRadius: 'var(--radius-xl)', padding: 20,
+                  ...cardStyle, padding: 16,
                   cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)',
                 }}>
-                {/* Top row: category chip + date */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  {n.subject ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: subjectColor }} />
-                      <span style={{ fontSize: 10, fontWeight: 600, color: subjectColor }}>
-                        {subjectObj?.name || n.subject}
-                      </span>
-                    </div>
-                  ) : <div />}
+                {/* Top row: bookmark */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
                   <motion.button onClick={e => { e.stopPropagation(); toggleBookmark(n.id) }} whileTap={{ scale: 0.8 }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-                    <Bookmark size={13} color={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'var(--text-3)'} fill={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'none'} />
+                    <Bookmark size={16} color={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'var(--text-2)'} fill={bookmarkedIds.has(n.id) ? 'var(--primary)' : 'none'} />
                   </motion.button>
                 </div>
-                {/* Title — max 2 lines */}
-                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1 }}>
+                {/* Title */}
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {n.title || 'Untitled'}
                 </div>
+                {/* Category chip */}
+                {n.subject && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: subjectColor }} />
+                    <span style={{ fontSize: 11, fontWeight: 600, color: subjectColor }}>
+                      {subjectObj?.name || n.subject}
+                    </span>
+                  </div>
+                )}
                 {/* Date at bottom */}
-                <div style={{ marginTop: 'auto', paddingTop: 8, fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>
+                <div style={{ marginTop: 'auto', fontSize: 12, color: 'var(--text-2)', fontWeight: 500 }}>
                   {new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                 </div>
               </motion.div>
@@ -1221,11 +1213,11 @@ function PracticeMCQTab() {
                     <motion.div key={ch.id} onClick={() => toggleChapter(ch.id)}
                       whileTap={{ scale: 0.98 }}
                       style={{
-                        background: 'var(--card-bg)', borderRadius: 12, padding: '10px 12px',
+                        ...cardStyle, padding: '10px 12px',
                         cursor: 'pointer', marginBottom: 4,
-                        border: sel ? '2px solid var(--primary)' : '2px solid transparent',
+                        border: sel ? '2px solid var(--primary)' : '1px solid var(--border)',
                         display: 'flex', alignItems: 'center', gap: 10,
-                        boxShadow: sel ? '0 2px 8px var(--shadow-active)' : '0 1px 3px rgba(0,0,0,0.05)',
+                        boxShadow: sel ? '0 2px 8px var(--shadow-active)' : cardStyle.boxShadow,
                       }}>
                       <div style={{
                         width: 30, height: 30, borderRadius: 8, flexShrink: 0,
@@ -1585,11 +1577,11 @@ function FlashcardsTab() {
                         <motion.div key={ch.id} onClick={() => toggleChapter(ch.id)}
                           whileTap={{ scale: 0.98 }}
                           style={{
-                            background: 'var(--card-bg)', borderRadius: 12, padding: '10px 12px',
+                            ...cardStyle, padding: '10px 12px',
                             cursor: 'pointer', marginBottom: 4,
-                            border: sel ? '2px solid var(--primary)' : '2px solid transparent',
+                            border: sel ? '2px solid var(--primary)' : '1px solid var(--border)',
                             display: 'flex', alignItems: 'center', gap: 10,
-                            boxShadow: sel ? '0 2px 8px var(--shadow-active)' : '0 1px 3px rgba(0,0,0,0.05)',
+                            boxShadow: sel ? '0 2px 8px var(--shadow-active)' : cardStyle.boxShadow,
                           }}>
                           <div style={{
                             width: 30, height: 30, borderRadius: 8, flexShrink: 0,
