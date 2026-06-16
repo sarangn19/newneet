@@ -378,35 +378,18 @@ export default function UpscHome() {
                           </div>
                         )}
 
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <motion.button
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => {
-                              const t = allTopics.find(x => x.id === currentQuestion.topicId)
-                              if (t) openRevision(t)
-                            }}
-                            style={{
-                              flex: 1, padding: '10px 0', borderRadius: 10,
-                              border: '1.5px solid var(--primary)', background: 'transparent',
-                              color: 'var(--primary)', fontSize: 13, fontWeight: 600,
-                              fontFamily: 'inherit', cursor: 'pointer',
-                            }}
-                          >
-                            Practice More
-                          </motion.button>
-                          <motion.button
-                            whileTap={{ scale: 0.97 }}
-                            onClick={advanceQuestion}
-                            style={{
-                              flex: 1, padding: '10px 0', borderRadius: 10,
-                              border: 'none', background: 'var(--primary)', color: '#fff',
-                              fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            {sessionCount < 4 ? 'Next \u2192' : 'Finish'}
-                          </motion.button>
-                        </div>
+                        <motion.button
+                          whileTap={{ scale: 0.97 }}
+                          onClick={advanceQuestion}
+                          style={{
+                            width: '100%', padding: '10px 0', borderRadius: 10,
+                            border: 'none', background: 'var(--primary)', color: '#fff',
+                            fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {sessionCount < 4 ? 'Next \u2192' : 'Finish'}
+                        </motion.button>
                       </div>
                     )}
                   </>
@@ -423,29 +406,16 @@ export default function UpscHome() {
                     </div>
                     <motion.button
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => {
-                        const scored = allTopics.map(t => ({...t, ...calculatePriorityScore(t.id, topicScores, revisionSchedule)})).sort((a,b) => b.score - a.score)
-                        if (scored[0]) openRevision(scored[0])
-                      }}
+                      onClick={() => { beginSession(); loadQuestion() }}
                       style={{
                         padding: '10px 24px', borderRadius: 10,
                         border: 'none', background: 'var(--primary)', color: '#fff',
                         fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
-                        cursor: 'pointer',
+                        cursor: 'pointer', marginTop: 4,
                       }}
                     >
-                      Practice in Depth →
+                      Generate More Questions
                     </motion.button>
-                    <button
-                      onClick={() => { beginSession(); loadQuestion() }}
-                      style={{
-                        background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 12, color: 'var(--text-3)', fontFamily: 'inherit',
-                        fontWeight: 500, textDecoration: 'underline',
-                      }}
-                    >
-                      New Questions
-                    </button>
                   </div>
                 )}
               </div>
