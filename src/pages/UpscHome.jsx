@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import useStore from '../store/useStore'
 import { useRecommendations } from '../lib/useRecommendations'
@@ -180,11 +180,18 @@ export default function UpscHome() {
   }, [insightAlert, allTopics, insightAction])
 
   const [sheetOpen, setSheetOpen] = useState(false);
-  const sheetY = useMotionValue(450);
+  const [vh, setVh] = useState(window.innerHeight)
 
-  const drawerHeight = 500;
-  const closedY = 450;
-  const openY = 50;
+  useEffect(() => {
+    const onResize = () => setVh(window.innerHeight)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  const sheetY = useMotionValue(vh * 0.56);
+
+  const closedY = Math.round(vh * 0.56);
+  const openY = Math.round(vh * 0.08);
 
   const toggleSheet = () => {
     const target = sheetOpen ? closedY : openY;

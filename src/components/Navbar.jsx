@@ -50,13 +50,13 @@ export default function Navbar() {
             style={{
               position: 'fixed', bottom: 20, left: 0, right: 0, zIndex: 100,
               display: 'flex', justifyContent: 'center', alignItems: 'center',
+              padding: '0 16px',
               pointerEvents: 'none',
-            }}
-          >
+            }}>
             <div style={{
               display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
               padding: 16,
-              width: 388, height: 76,
+              width: '100%', maxWidth: 388, height: 76,
               background: 'linear-gradient(90deg, #8A38F5 0%, #269ADE 100%)',
               boxShadow: '0px 0px 115px rgba(0,0,0,0.3)',
               borderRadius: 78,
