@@ -55,10 +55,9 @@ export default function Navbar() {
           >
             <div style={{
               display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-              padding: '16px 20px',
+              padding: 16,
               width: 388, height: 76,
-              background: 'linear-gradient(90deg, #8A38F5 0%, #8F217D 100%)',
-              border: '3px solid #FFFFFF',
+              background: 'linear-gradient(90deg, #8A38F5 0%, #269ADE 100%)',
               boxShadow: '0px 0px 115px rgba(0,0,0,0.3)',
               borderRadius: 78,
               pointerEvents: 'auto',
@@ -69,17 +68,27 @@ export default function Navbar() {
                   <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
                     textDecoration: 'none', WebkitTapHighlightColor: 'transparent', fontFamily: 'inherit',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    position: 'relative', width: 44, height: 44, borderRadius: 86,
                   }}>
                     {({ isActive }) => (
-                      <div style={{
-                        width: 44, height: 44, borderRadius: 86,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: isActive ? '#FFFFFF' : 'transparent',
-                      }}>
-                        <IconComp size={20}
-                          color={isActive ? '#000000' : '#FFFFFF'}
-                        />
-                      </div>
+                      <>
+                        {isActive && (
+                          <div style={{
+                            position: 'absolute', width: 60.9, height: 60.9,
+                            top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                            background: '#FFFFFF', borderRadius: '50%',
+                          }} />
+                        )}
+                        <div style={{
+                          width: 44, height: 44, borderRadius: 86,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          position: 'relative', zIndex: 1,
+                        }}>
+                          <IconComp size={20}
+                            color={isActive ? '#000000' : '#FFFFFF'}
+                          />
+                        </div>
+                      </>
                     )}
                   </NavLink>
                 );
