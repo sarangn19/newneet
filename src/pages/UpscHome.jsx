@@ -8,7 +8,7 @@ import { generateRevisionContent } from '../lib/revisionAI'
 import { upscMCQs } from '../data/upsc/questions'
 import { upscSubjects } from '../data/upsc/subjects'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
-import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, TrendingUp, Clock, Search, FileText, Zap, Target } from 'lucide-react'
+import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, TrendingUp, Clock, Search, FileText } from 'lucide-react'
 import { useSequentialReveal, easePreset, skeletonBreath } from '../hooks/useSequentialReveal'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 
@@ -240,12 +240,9 @@ export default function UpscHome() {
                 const t = remainingFeed[idx]
                 const isCenter = offset === 0
                 const pi = isCenter ? priorityInfo : calculatePriorityScore(t.id, topicScores, revisionSchedule)
-                const reason = pi?.weakness >= 0.6 ? `Weak G�� ${t.accuracy || 0}% accuracy` : pi?.forgetting >= 0.8 ? 'Over 2 weeks since review' : pi?.forgetting >= 0.5 ? 'Due for review' : pi?.importance >= 0.6 ? 'High-yield topic' : 'Keep fresh'
-                const accentColor = pi?.weakness >= 0.6 ? '#ef4444' : pi?.forgetting >= 0.5 ? '#f59e0b' : 'var(--primary)'
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'
                 const badgeBg = pi?.weakness >= 0.6 ? 'var(--error-light)' : pi?.forgetting >= 0.5 ? 'var(--warning-light)' : 'var(--primary-light)'
                 const badgeColor = pi?.weakness >= 0.6 ? 'var(--error)' : pi?.forgetting >= 0.5 ? 'var(--warning)' : 'var(--primary)'
-                const level = getMastery(t.id, revisionMastery)
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjGradient = subj?.gradient || 'linear-gradient(135deg, var(--primary-dark), var(--primary))'
                 return (
@@ -291,24 +288,7 @@ export default function UpscHome() {
                         {/* Topic name */}
                         <div style={{ fontSize: isCenter ? 18 : 16, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginTop: 5, letterSpacing: '-0.02em' }}>{t.name}</div>
 
-                        {/* Meta line */}
-                        <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 5, fontWeight: 500 }}>
-                          GS I -+ L{level}/4 -+ {reason}
-                        </div>
 
-                        {/* Stats row */}
-                        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
-                          {t.total > 0 && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <Target size={11} color="var(--primary)" />
-                              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)' }}>{t.accuracy}%</span>
-                            </div>
-                          )}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <Clock size={11} color="var(--text-3)" />
-                            <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{level === 1 ? '3m' : '5m'}</span>
-                          </div>
-                        </div>
 
                         {/* Action */}
                         <div style={{ marginTop: 16 }}>
