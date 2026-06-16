@@ -87,14 +87,14 @@ export default function Notes() {
           </div>
         ) : (
           notes.map(n => (
-            <Card key={n.id} style={{ marginBottom: 10, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <Card key={n.id} onClick={() => navigate('/note/' + n.id)} style={{ marginBottom: 10, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#111827', marginBottom: 4 }}>{n.title || 'Note'}</div>
-                <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{n.content}</div>
-                <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 6 }}>{new Date(n.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>{n.title || 'Note'}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{n.content}</div>
+                <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 6 }}>{new Date(n.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
               </div>
-              <button onClick={() => deleteNote(n.id)} style={{
-                background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, color: '#D1D5DB',
+              <button onClick={(e) => { e.stopPropagation(); deleteNote(n.id) }} style={{
+                background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, color: 'var(--text-3)',
               }}><Trash2 size={15} /></button>
             </Card>
           ))

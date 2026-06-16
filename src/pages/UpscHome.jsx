@@ -483,8 +483,10 @@ export default function UpscHome() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 28, delay: idx * 0.05 }}
+                    onClick={() => openRevision(t)}
+                    whileTap={{ scale: 0.97 }}
                     style={{
-                      width: 213, flexShrink: 0,
+                      width: 213, flexShrink: 0, cursor: 'pointer',
                       background: 'var(--card-bg)',
                       border: '1px solid var(--border)',
                       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
@@ -538,11 +540,10 @@ export default function UpscHome() {
                         </div>
                         <motion.div
                           whileTap={{ scale: 0.85 }}
-                          onClick={(e) => { e.stopPropagation(); openRevision(t) }}
                           style={{
                             width: 36, height: 36, background: 'var(--surface-alt)',
                             borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: 'pointer',
+                            cursor: 'pointer', pointerEvents: 'none',
                           }}
                         >
                           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
