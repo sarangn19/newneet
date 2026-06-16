@@ -363,18 +363,35 @@ export default function UpscHome() {
                           </div>
                         )}
 
-                        <motion.button
-                          whileTap={{ scale: 0.97 }}
-                          onClick={advanceQuestion}
-                          style={{
-                            width: '100%', padding: '10px 0', borderRadius: 10,
-                            border: 'none', background: 'var(--primary)', color: '#fff',
-                            fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {sessionCount < 4 ? 'Next Question \u2192' : 'Finish'}
-                        </motion.button>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <motion.button
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => {
+                              const t = allTopics.find(x => x.id === currentQuestion.topicId)
+                              if (t) openRevision(t)
+                            }}
+                            style={{
+                              flex: 1, padding: '10px 0', borderRadius: 10,
+                              border: '1.5px solid var(--primary)', background: 'transparent',
+                              color: 'var(--primary)', fontSize: 13, fontWeight: 600,
+                              fontFamily: 'inherit', cursor: 'pointer',
+                            }}
+                          >
+                            Practice More
+                          </motion.button>
+                          <motion.button
+                            whileTap={{ scale: 0.97 }}
+                            onClick={advanceQuestion}
+                            style={{
+                              flex: 1, padding: '10px 0', borderRadius: 10,
+                              border: 'none', background: 'var(--primary)', color: '#fff',
+                              fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {sessionCount < 4 ? 'Next \u2192' : 'Finish'}
+                          </motion.button>
+                        </div>
                       </div>
                     )}
                   </>

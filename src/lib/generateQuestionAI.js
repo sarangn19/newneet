@@ -90,16 +90,46 @@ Requirements:
     return { ...parsed, topicId: topic.id, topicName: topic.name, subjectName: topic.subjectName }
   }
 
-  return {
+  return FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)](topic)
+}
+
+const FALLBACKS = [
+  (t) => ({
     q: `Which of the following best describes the principle of 'Separation of Powers' in the Indian Constitution?`,
     options: ['Complete separation between the three organs of government',
               'Functional distinction with a system of checks and balances',
               'Absolute supremacy of the legislature over the other organs',
               'Concentration of all governmental powers in the executive'],
     ans: 1,
-    explanation: 'The Indian Constitution provides for separation of powers with functional distinction but incorporates checks and balances, unlike the US system of strict separation. Each organ has its defined role but can check the others through mechanisms like judicial review and legislative oversight.',
-    topicId: topic.id,
-    topicName: topic.name,
-    subjectName: topic.subjectName,
-  }
-}
+    explanation: 'The Indian Constitution provides for separation of powers with functional distinction but incorporates checks and balances, unlike the US system of strict separation.',
+    topicId: t.id, topicName: t.name, subjectName: t.subjectName,
+  }),
+  (t) => ({
+    q: `The Indus Valley Civilization was primarily a:`,
+    options: ['Rural civilization', 'Urban civilization', 'Pastoral civilization', 'Maritime civilization'],
+    ans: 1,
+    explanation: 'The IVC was an urban civilization characterized by well-planned cities like Mohenjo-Daro and Harappa with advanced drainage systems and grid layouts.',
+    topicId: t.id, topicName: t.name, subjectName: t.subjectName,
+  }),
+  (t) => ({
+    q: `Which of the following is NOT a fundamental right under the Indian Constitution?`,
+    options: ['Right to Equality', 'Right to Freedom', 'Right to Property', 'Right to Constitutional Remedies'],
+    ans: 2,
+    explanation: 'Right to Property was originally a fundamental right but was removed by the 44th Amendment Act, 1978. It is now a legal right under Article 300A.',
+    topicId: t.id, topicName: t.name, subjectName: t.subjectName,
+  }),
+  (t) => ({
+    q: `The concept of 'Basic Structure' of the Constitution was propounded in which landmark case?`,
+    options: ['A.K. Gopalan v. State of Madras', 'Kesavananda Bharati v. State of Kerala', 'Golaknath v. State of Punjab', 'Minerva Mills v. Union of India'],
+    ans: 1,
+    explanation: 'The Basic Structure doctrine was established in Kesavananda Bharati (1973), holding that Parliament cannot amend the fundamental structure of the Constitution.',
+    topicId: t.id, topicName: t.name, subjectName: t.subjectName,
+  }),
+  (t) => ({
+    q: `Which of the following gases is primarily responsible for the greenhouse effect?`,
+    options: ['Oxygen', 'Nitrogen', 'Carbon dioxide', 'Hydrogen'],
+    ans: 2,
+    explanation: 'Carbon dioxide is the primary greenhouse gas emitted through human activities. It traps heat in the atmosphere, contributing to global warming.',
+    topicId: t.id, topicName: t.name, subjectName: t.subjectName,
+  }),
+]
