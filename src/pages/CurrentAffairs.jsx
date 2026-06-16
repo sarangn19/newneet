@@ -401,7 +401,7 @@ export default function CurrentAffairs() {
                   </div>
 
                   {/* Summary */}
-                  <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
+                  <div style={{ fontSize: 15, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
                     {selectedArticle.summary || 'Full article content would appear here. Fetch the complete story from the source link below.'}
                   </div>
 

@@ -32,7 +32,7 @@ export default async function handler(req, res) {
               date: a.publishedAt ? a.publishedAt.split('T')[0] : today.toISOString().split('T')[0],
               category: guessCategory(a.title || '', a.description || ''),
               title: a.title || '',
-              summary: (a.description || '').substring(0, 200),
+              summary: (a.description || '').substring(0, 1000),
               source: a.source?.name || 'News',
               link: a.url || '',
               image: a.urlToImage ? a.urlToImage.replace('http://', 'https://') : '',
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
             const pubDate = item.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i)?.[1] || ''
             const link = item.match(/<link[^>]*>([\s\S]*?)<\/link>/i)?.[1] || ''
             if (!title) continue
-            articles.push({ date: pubDate ? new Date(pubDate).toISOString().split('T')[0] : '', category: guessCategory(title, desc), title, summary: desc.substring(0, 200), source: feed.source, link, image: '', tags: [] })
+            articles.push({ date: pubDate ? new Date(pubDate).toISOString().split('T')[0] : '', category: guessCategory(title, desc), title, summary: desc.substring(0, 1000), source: feed.source, link, image: '', tags: [] })
           }
         } catch {}
       }
