@@ -223,7 +223,7 @@ export default function UpscHome() {
           {/* ─── TOP CONTENT (normal flow) ─── */}
           <div style={{ padding: '56px 24px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 64 }}>
-              <h1 style={{ fontSize: 16, fontWeight: 200, color: '#000', lineHeight: 1.2 }}>
+              <h1 style={{ fontSize: 16, fontWeight: 200, color: '#000', lineHeight: '26px' }}>
                 Hello<br /><span style={{ fontWeight: 800 }}>{user?.name?.split(' ')[0] || 'Aspirant'}</span>
               </h1>
               <div onClick={() => navigate('/profile')} style={{ width: 64, height: 64, borderRadius: 60, background: '#fff', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: '#525252', cursor: 'pointer' }}>
