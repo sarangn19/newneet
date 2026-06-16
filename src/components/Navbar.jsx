@@ -48,18 +48,18 @@ export default function Navbar() {
             exit={{ y: 30, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 24 }}
             style={{
-              position: 'fixed', bottom: 20, left: 0, right: 0, zIndex: 100,
+              position: 'fixed', bottom: 28, left: 0, right: 0, zIndex: 100,
               display: 'flex', justifyContent: 'center', alignItems: 'center',
               padding: '0 16px',
               pointerEvents: 'none',
             }}>
             <div style={{
               display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-              padding: 16,
-              width: '100%', maxWidth: 388, height: 76,
+              padding: 12,
+              width: '100%', maxWidth: 360, height: 64,
               background: '#FFFFFF',
               boxShadow: '0px 4px 24px rgba(0,0,0,0.08)',
-              borderRadius: 78,
+              borderRadius: 64,
               pointerEvents: 'auto',
             }}>
               {tabs.map((tab, i) => {

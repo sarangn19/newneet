@@ -242,13 +242,13 @@ function NotesTab() {
           <motion.button onClick={() => setShowForm(!showForm)}
             whileTap={{ scale: 0.98 }}
             style={{
-              height: 48, padding: '0 20px', borderRadius: 10, border: 'none',
+              height: 40, padding: '0 16px', borderRadius: 8, border: 'none',
               background: 'var(--primary)', color: '#fff',
-              fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-              display: 'flex', alignItems: 'center', gap: 6,
-              boxShadow: '0 2px 8px rgba(63,125,255,0.25)',
+              fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+              display: 'flex', alignItems: 'center', gap: 4,
+              boxShadow: '0 2px 6px rgba(63,125,255,0.2)',
             }}>
-            <Plus size={16} strokeWidth={2.5} />
+            <Plus size={14} strokeWidth={2.5} />
             New
           </motion.button>
         </div>
@@ -1053,9 +1053,9 @@ function PracticeMCQTab() {
 
   return (
     <>
-      <AnimatePresence mode="wait">
-        <motion.div key="setup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-          <div style={{ paddingBottom: 72 }}>
+      <AnimatePresence>
+        <motion.div key="setup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ paddingBottom: 140 }}>
             <SearchInput value={search} onChange={setSearch} placeholder="Search chapters..." />
 
             {/* Cognitive Twin Profile */}
@@ -1149,8 +1149,8 @@ function PracticeMCQTab() {
             })()}
 
             {/* Subject multi-select */}
-            <motion.div style={{ ...cardStyle, padding: 16, marginBottom: 12 }} whileHover={cardHover}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#333', marginBottom: 8 }}>Select Subjects</div>
+            <motion.div style={{ ...cardStyle, padding: 16, marginBottom: 12, marginTop: 12 }} whileHover={cardHover}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#333', marginBottom: 8 }}>Subjects</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {upscSubjects.map(s => {
                   const active = selectedSubjects.includes(s.id)
@@ -1173,6 +1173,7 @@ function PracticeMCQTab() {
                       color: active ? '#fff' : '#333',
                       boxShadow: active ? 'none' : '0 1px 2px rgba(0,0,0,0.04)',
                     }}>
+                      {active && <CheckCircle size={12} />}
                       {s.name}
                       <span style={{
                         fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 99,
@@ -1263,7 +1264,7 @@ function PracticeMCQTab() {
 
       {/* Fixed bottom bar */}
       <motion.div initial={{ y: 60 }} animate={{ y: 0 }} style={{
-        position: 'fixed', bottom: 56, left: 16, right: 16, zIndex: 100,
+        position: 'fixed', bottom: 116, left: 16, right: 16, zIndex: 100,
         background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 24px',
         display: 'flex', alignItems: 'center', gap: 12,
         boxShadow: '0 -2px 12px rgba(0,0,0,0.3)',
@@ -1527,13 +1528,13 @@ function FlashcardsTab() {
 
   return (
     <>
-      <AnimatePresence mode="wait">
-        <motion.div key="setup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-          <div style={{ paddingBottom: 72 }}>
+      <AnimatePresence>
+        <motion.div key="setup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ paddingBottom: 140 }}>
             <SearchInput value={search} onChange={setSearch} placeholder="Search chapters..." size="md" />
 
             {/* Subject pills — multi-select */}
-            <motion.div style={{ ...cardStyle, padding: 16, marginBottom: 12 }} whileHover={cardHover}>
+            <motion.div style={{ ...cardStyle, padding: 16, marginBottom: 12, marginTop: 12 }} whileHover={cardHover}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#333', marginBottom: 8 }}>Subjects</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {upscSubjects.map(s => {
@@ -1622,7 +1623,7 @@ function FlashcardsTab() {
 
       {/* Fixed bottom bar */}
       <motion.div initial={{ y: 60 }} animate={{ y: 0 }} style={{
-        position: 'fixed', bottom: 56, left: 16, right: 16, zIndex: 100,
+        position: 'fixed', bottom: 116, left: 16, right: 16, zIndex: 100,
         background: 'var(--card-bg)', borderTop: '1px solid var(--border)', padding: '10px 24px',
         display: 'flex', alignItems: 'center', gap: 12,
         boxShadow: '0 -2px 12px rgba(0,0,0,0.3)',

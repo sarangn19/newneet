@@ -239,14 +239,6 @@ export default function CurrentAffairs() {
 
       {/* Header */}
       <div style={{ background: 'var(--card-bg)', padding: '48px 16px 10px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
-          <motion.button whileTap={{scale:0.96}} onClick={loadNews} style={{
-            width: 34, height: 34, borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
-            background: 'var(--surface-alt)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <RefreshCw size={16} color="var(--text-2)" className={loading ? 'spin' : ''} />
-          </motion.button>
-        </div>
         {/* Search */}
         <SearchInput value={search} onChange={setSearch} placeholder="Search articles..." />
       </div>
