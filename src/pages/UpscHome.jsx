@@ -216,7 +216,7 @@ export default function UpscHome() {
           {/* ─── FADE GRADIENT ABOVE SHEET ─── */}
           <div style={{
             position: 'absolute', left: 0, right: 0, bottom: 0, height: 150,
-            background: 'linear-gradient(to top, #fff 0%, rgba(255,255,255,0) 100%)',
+            background: 'linear-gradient(to top, #F6F6F6 0%, rgba(255,255,255,0) 100%)',
             pointerEvents: 'none', zIndex: 25,
           }} />
 
@@ -242,7 +242,7 @@ export default function UpscHome() {
 
           {/* ─── DRAGGABLE REVISION SHEET ─── */}
           <motion.div
-            style={{ y: sheetY, position: 'absolute', top: 0, left: 0, right: 0, height: '100%', zIndex: 20, background: '#FFFFFF', borderRadius: '32px 32px 0 0', boxShadow: '0px 0px 24.4px rgba(0,0,0,0.15)' }}
+            style={{ y: sheetY, position: 'absolute', top: 0, left: 0, right: 0, height: '100%', zIndex: 20, background: '#F6F6F6', borderRadius: '32px 32px 0 0', boxShadow: '0px 0px 24.4px rgba(0,0,0,0.15)' }}
             drag="y"
             dragConstraints={{ top: openY, bottom: closedY }}
             dragElastic={0.1}
@@ -262,7 +262,7 @@ export default function UpscHome() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 20 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
               <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
             </div>
 
@@ -285,31 +285,32 @@ export default function UpscHome() {
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjCode = subj?.id?.toUpperCase() || 'GS'
-                const closedMargin = i === 0 ? 0 : i === 1 ? -125 : i === 2 ? -113 : -101
+                const closedMargin = i === 0 ? 0 : -94
                 return (
                   <motion.div key={t.id}
                     onClick={() => openRevision(t)}
                     initial={false}
                     animate={{
-                      height: sheetOpen ? 134 : 156,
+                      height: 134,
                       marginTop: i === 0 ? 0 : sheetOpen ? 6 : closedMargin,
                       scale: sheetOpen ? 1 : 1 - i * 0.02,
                       opacity: sheetOpen ? 1 : 1 - i * 0.05,
                     }}
                     transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     style={{
-                      width: '100%', borderRadius: 24, background: '#FFFFFF',
+                      width: '100%', borderRadius: 16, background: '#FFFFFF',
+                      boxShadow: '0px 1px 30.2px rgba(0,0,0,0.08)',
                       padding: '24px 16px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                       cursor: 'pointer', transformOrigin: 'center top',
                       position: 'relative', zIndex: i + 1,
                     }}
                   >
-                    <div style={{ fontSize: 16, fontWeight: 200, color: '#000', lineHeight: '24px' }}>{t.name}</div>
+                    <div style={{ fontSize: 20, fontWeight: 200, color: '#000', lineHeight: '26px' }}>{t.name}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0, gap: 64 }}>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                        <span style={{ padding: '0 10px', background: '#F5F5F5', borderRadius: 25, fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#838383', height: 22 }}>{subjCode}</span>
-                        <span style={{ padding: '0 10px', background: '#F4F4F4', borderRadius: 25, fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#838383', height: 22 }}>{badgeLabel}</span>
+                        <span style={{ padding: '0 12px', background: '#F5F5F5', borderRadius: 25, fontSize: 14, fontWeight: 500, lineHeight: '26px', color: '#838383', height: 26 }}>{subjCode}</span>
+                        <span style={{ padding: '0 12px', background: '#F4F4F4', borderRadius: 25, fontSize: 14, fontWeight: 500, lineHeight: '26px', color: '#838383', height: 26 }}>{badgeLabel}</span>
                       </div>
                       <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F6F6', borderRadius: 41 }}>
                         <ChevronRight size={20} color="#000" />
