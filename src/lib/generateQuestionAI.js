@@ -31,20 +31,29 @@ async function callGroq(systemPrompt, userPrompt) {
 
 async function callGemini(systemPrompt, userPrompt) {
   await waitForGeminiSlot()
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: systemPrompt + '\n\n' + userPrompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
-      }),
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: systemPrompt + '\n\n' + userPrompt }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
+        }),
+      }
+    )
+    if (res.ok) {
+      const data = await res.json()
+      return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null
     }
-  )
-  if (!res.ok) return null
-  const data = await res.json()
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null
+    if (res.status === 429 && attempt === 0) {
+      await new Promise(r => setTimeout(r, 2000))
+      continue
+    }
+    return null
+  }
+  return null
 }
 
 function parseJSON(text) {

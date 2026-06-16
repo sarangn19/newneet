@@ -44,6 +44,7 @@ export default function UpscHome() {
   const [qrSubmitted, setQrSubmitted] = useState(false)
   const [qrCorrect, setQrCorrect] = useState(false)
   const usedTopicIds = useRef(new Set())
+  const qrStartTime = useRef(null)
 
   const pickNextTopic = () => {
     const scored = allTopics
@@ -66,6 +67,7 @@ export default function UpscHome() {
     setQrSelected(null)
     setQrSubmitted(false)
     setQrCorrect(false)
+    qrStartTime.current = Date.now()
     const q = await generateAIRQuestion(topic, topicScores)
     setCurrentQuestion(q)
     setQuestionLoading(false)
@@ -328,8 +330,14 @@ export default function UpscHome() {
                           whileTap={{ scale: 0.97 }}
                           onClick={() => {
                             if (qrSelected === null) return
+                            const correct = qrSelected === currentQuestion.ans
                             setQrSubmitted(true)
-                            setQrCorrect(qrSelected === currentQuestion.ans)
+                            setQrCorrect(correct)
+                            const timeSpent = qrStartTime.current ? Math.round((Date.now() - qrStartTime.current) / 1000) : 0
+                            recordQuestionAttempt(currentQuestion.topicId, correct, timeSpent, '')
+                            recordSeenQuestionLocal(currentQuestion.topicId, currentQuestion.q, correct)
+                            saveTopicScore(currentQuestion.topicId, correct ? 1 : 0, 1)
+                            updateStats(correct ? 1 : 0, 1, '')
                           }}
                           style={{
                             width: '100%', padding: '10px 0', borderRadius: 10,
