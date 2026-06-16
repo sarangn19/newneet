@@ -47,6 +47,7 @@ export default function UpscHome() {
   const qrStartTime = useRef(null)
   const recentTopics = useRef([])
   const qrHistory = useRef({})
+  const lastQrTopic = useRef(null)
 
   const pickNextTopic = () => {
     const scored = allTopics
@@ -74,6 +75,7 @@ export default function UpscHome() {
     const topic = pickNextTopic()
     if (!topic) { setSessionDone(true); return }
     usedTopicIds.current.add(topic.id)
+    lastQrTopic.current = topic
     recentTopics.current = [...recentTopics.current.slice(-3), topic.id]
     setQuestionLoading(true)
     setQrSelected(null)
@@ -427,18 +429,32 @@ export default function UpscHome() {
                     <div style={{ fontSize: 12, color: 'var(--text-2)', textAlign: 'center' }}>
                       You've answered 5 questions targeting your weak areas.
                     </div>
-                    <motion.button
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => { beginSession(); loadQuestion() }}
-                      style={{
-                        padding: '10px 24px', borderRadius: 10,
-                        border: 'none', background: 'var(--primary)', color: '#fff',
-                        fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
-                        cursor: 'pointer', marginTop: 4,
-                      }}
-                    >
-                      Generate More Questions
-                    </motion.button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => { lastQrTopic.current && openRevision(lastQrTopic.current) }}
+                        style={{
+                          padding: '10px 24px', borderRadius: 10,
+                          border: 'none', background: 'var(--primary)', color: '#fff',
+                          fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Open Full Practice →
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => { beginSession(); loadQuestion() }}
+                        style={{
+                          padding: '8px 16px', borderRadius: 10,
+                          border: 'none', background: 'transparent', color: 'var(--text-3)',
+                          fontSize: 12, fontWeight: 500, fontFamily: 'inherit',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Generate More Questions
+                      </motion.button>
+                    </div>
                   </div>
                 )}
               </div>
