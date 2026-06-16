@@ -65,22 +65,30 @@ export default function Navbar() {
               {tabs.map((tab, i) => {
                 const IconComp = iconMap[tab.icon];
                 return (
-                  <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
+                    <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} style={{
                     textDecoration: 'none', WebkitTapHighlightColor: 'transparent', fontFamily: 'inherit',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    position: 'relative', width: 44, height: 44, borderRadius: 86,
+                    position: 'relative', width: 44, height: 44,
                   }}>
                     {({ isActive }) => (
-                      <div style={{
-                        width: isActive ? 60.9 : 44, height: isActive ? 60.9 : 44,
-                        borderRadius: '50%',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: isActive ? '#F0F0F0' : 'transparent',
-                      }}>
-                        <IconComp size={20}
-                          color={isActive ? '#000000' : '#C0C0C0'}
-                        />
-                      </div>
+                      <>
+                        {isActive && (
+                          <div style={{
+                            position: 'absolute', width: 61, height: 61,
+                            top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                            background: '#F0F0F0', borderRadius: '50%',
+                          }} />
+                        )}
+                        <div style={{
+                          width: 44, height: 44, borderRadius: '50%',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          position: 'relative', zIndex: 1,
+                        }}>
+                          <IconComp size={20}
+                            color={isActive ? '#000000' : '#C0C0C0'}
+                          />
+                        </div>
+                      </>
                     )}
                   </NavLink>
                 );
