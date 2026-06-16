@@ -395,7 +395,7 @@ export default function CurrentAffairs() {
             <Card onClick={e => e.stopPropagation()} style={{
                 width: '100%', maxWidth: 400, maxHeight: '85vh',
                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)', padding: 0,
               }}>
                 <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
                   {selectedArticle.category && (
