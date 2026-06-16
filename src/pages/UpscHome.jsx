@@ -262,7 +262,7 @@ export default function UpscHome() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 20 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
               <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
             </div>
 
@@ -299,14 +299,13 @@ export default function UpscHome() {
                     transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     style={{
                       width: '100%', borderRadius: 24, background: '#FFFFFF',
-                      boxShadow: `0px 0px 16.9px rgba(0,0,0,0.25)`,
                       padding: '24px 16px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                       cursor: 'pointer', transformOrigin: 'center top',
                       position: 'relative', zIndex: i + 1,
                     }}
                   >
-                    <div style={{ fontSize: 17, fontWeight: 200, color: '#000', lineHeight: '24px' }}>{t.name}</div>
+                    <div style={{ fontSize: 16, fontWeight: 200, color: '#000', lineHeight: '24px' }}>{t.name}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0, gap: 64 }}>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                         <span style={{ padding: '0 10px', background: '#F5F5F5', borderRadius: 25, fontSize: 12, fontWeight: 500, lineHeight: '22px', color: '#838383', height: 22 }}>{subjCode}</span>
