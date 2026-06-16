@@ -96,9 +96,11 @@ Instruction: ${focus}
 
 Requirements:
 - Question must be specifically about ${topic.name}
+- Pick a different subtopic or angle than the most obvious/common one
 - All four options must be plausible but only one correct
 - Explanation must clarify WHY the correct answer is right and why the others are wrong
-- Keep the question concise (under 25 words if possible)`
+- Keep the question concise (under 25 words if possible)
+- Seed: ${Date.now() % 100000}`
 
   let text = null
   if (GROQ_API_KEY) text = await callGroq(systemPrompt, userPrompt)

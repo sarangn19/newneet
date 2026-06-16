@@ -45,24 +45,35 @@ export default function UpscHome() {
   const [qrCorrect, setQrCorrect] = useState(false)
   const usedTopicIds = useRef(new Set())
   const qrStartTime = useRef(null)
+  const recentTopics = useRef([])
 
   const pickNextTopic = () => {
     const scored = allTopics
       .map(t => ({ ...t, ...calculatePriorityScore(t.id, topicScores, revisionSchedule) }))
-      .sort((a, b) => b.score - a.score)
-    const candidates = scored.filter(t => !usedTopicIds.current.has(t.id))
-    if (candidates.length === 0) return scored[0]
-    const topN = candidates.slice(0, Math.min(3, candidates.length))
-    const r = Math.random()
-    if (r < 0.5) return topN[0]
-    if (r < 0.8) return topN[1] || topN[0]
-    return topN[2] || topN[0]
+    let candidates = scored.filter(t => !usedTopicIds.current.has(t.id))
+    if (candidates.length === 0) candidates = scored
+
+    const recent = recentTopics.current
+    candidates = candidates.map(t => ({
+      ...t,
+      adjustedScore: recent.includes(t.id) ? t.score * 0.3 : t.score,
+    }))
+
+    const totalScore = candidates.reduce((s, t) => s + t.adjustedScore, 0)
+    if (totalScore <= 0) return candidates[0]
+    let r = Math.random() * totalScore
+    for (const t of candidates) {
+      r -= t.adjustedScore
+      if (r <= 0) return t
+    }
+    return candidates[candidates.length - 1]
   }
 
   const loadQuestion = async () => {
     const topic = pickNextTopic()
     if (!topic) { setSessionDone(true); return }
     usedTopicIds.current.add(topic.id)
+    recentTopics.current = [...recentTopics.current.slice(-3), topic.id]
     setQuestionLoading(true)
     setQrSelected(null)
     setQrSubmitted(false)
