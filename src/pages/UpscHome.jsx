@@ -18,7 +18,6 @@ export default function UpscHome() {
   const todayStr = new Date().toISOString().slice(0, 10)
   const [pageReady, setPageReady] = useState(false)
   const [dailyMix, setDailyMix] = useState([])
-  const [feedIdx, setFeedIdx] = useState(0)
   const [feedDone, setFeedDone] = useState(() => new Set(
     Object.entries(revisionSchedule)
       .filter(([_, v]) => v.lastReviewed === todayStr)
@@ -33,32 +32,7 @@ export default function UpscHome() {
   }, [allTopics, topicScores, revisionSchedule])
 
   const remainingFeed = useMemo(() => dailyMix.filter(t => !feedDone.has(t.id)), [dailyMix, feedDone])
-  const currentTopic = remainingFeed[feedIdx]
-  const remainingCount = remainingFeed.length - feedIdx
-
-  const priorityInfo = useMemo(() => {
-    if (!currentTopic) return {}
-    return calculatePriorityScore(currentTopic.id, topicScores, revisionSchedule)
-  }, [currentTopic, topicScores, revisionSchedule])
-
-  // Day of week format
-  const dayOfWeek = new Date().getDay()
-  const dayLabels = { 0: 'Weekly Review', 1: 'Flashcards', 2: 'MCQ Revision', 3: 'Mind Maps', 4: 'Summary', 5: 'AI Q&A', 6: 'Mixed Test' }
-  const greeting = () => {
-    const h = new Date().getHours()
-    if (h < 12) return 'Good morning'
-    if (h < 17) return 'Good afternoon'
-    return 'Good evening'
-  }
-
-  const skipTopic = () => { if (feedIdx < remainingFeed.length - 1) setFeedIdx(i => i + 1) }
-  const touchStartX = useRef(0)
-  const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
-  const onTouchEnd = (e) => {
-    const diff = touchStartX.current - e.changedTouches[0].clientX
-    if (diff > 50 && feedIdx < remainingFeed.length - 1) setFeedIdx(i => i + 1)
-    else if (diff < -50 && feedIdx > 0) setFeedIdx(i => i - 1)
-  }
+  const remainingCount = remainingFeed.length
 
   // Today's Question — AI-generated, based on performance
   const [currentQuestion, setCurrentQuestion] = useState(null)
@@ -434,103 +408,91 @@ export default function UpscHome() {
           )}
         </AnimatePresence>
 
-        {/* Today's Revision Carousel */}
+        {/* Revision Cards — horizontal scroll */}
         {remainingFeed.length > 0 && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0', touchAction: 'none', userSelect: 'none' }}
-            onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
-          >
-            <div style={{ position: 'relative', width: '100%', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {[-1, 0, 1].map((offset) => {
-                const idx = feedIdx + offset
-                if (idx < 0 || idx >= remainingFeed.length) return null
-                const t = remainingFeed[idx]
-                const isCenter = offset === 0
-                const pi = isCenter ? priorityInfo : calculatePriorityScore(t.id, topicScores, revisionSchedule)
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '8px 0 4px 20px' }}>
+            <div className="hide-scrollbar" style={{
+              display: 'flex', gap: 24, overflowX: 'auto',
+              paddingRight: 20, scrollbarWidth: 'none', msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch',
+            }}>
+              {remainingFeed.map((t) => {
+                const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'
-                const badgeBg = pi?.weakness >= 0.6 ? 'var(--error-light)' : pi?.forgetting >= 0.5 ? 'var(--warning-light)' : 'var(--primary-light)'
-                const badgeColor = pi?.weakness >= 0.6 ? 'var(--error)' : pi?.forgetting >= 0.5 ? 'var(--warning)' : 'var(--primary)'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjGradient = subj?.gradient || 'linear-gradient(135deg, var(--primary-dark), var(--primary))'
                 return (
-                  <motion.div key={t.id}
-                    animate={{ x: offset * 200, scale: isCenter ? 1 : 0.85, opacity: isCenter ? 1 : 0.4, zIndex: isCenter ? 10 : 5 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    onClick={() => { if (isCenter) openRevision(t); else setFeedIdx(idx) }}
-                    style={{ position: 'absolute', width: 340, cursor: 'pointer', perspective: 1200 }}
-                    whileHover={isCenter ? { scale: 1.02 } : {}}
-                  >
-                    <motion.div style={{
-                      background: 'var(--card-bg)',
-                      border: isCenter ? '1px solid rgba(99,102,241,0.15)' : '1px solid var(--border)',
-                      backdropFilter: 'blur(40px)',
-                      borderRadius: 32,
-                      overflow: 'hidden',
-                      boxShadow: isCenter ? '0 30px 60px -15px rgba(0,0,0,0.5)' : '0 8px 20px -8px rgba(0,0,0,0.3)',
+                  <motion.div key={t.id} style={{
+                    width: 213, height: 253, flexShrink: 0,
+                    background: '#F1F1F1', border: '5px solid #FFFFFF',
+                    boxShadow: '0px 0px 24px rgba(0,0,0,0.08)',
+                    borderRadius: 16, display: 'flex', flexDirection: 'column',
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      height: 143, background: subjGradient,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      borderRadius: '16px 16px 0 0',
                     }}>
-                      {/* Image area G�� no padding */}
                       <div style={{
-                        height: 150, width: '100%', background: subjGradient,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        position: 'relative', overflow: 'hidden',
+                        fontSize: 36, fontWeight: 900, color: 'rgba(255,255,255,0.15)',
+                        textTransform: 'uppercase', userSelect: 'none',
                       }}>
-                        <div style={{
-                          position: 'absolute', inset: 0,
-                          backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0%, transparent 60%), radial-gradient(circle at 70% 60%, rgba(255,255,255,0.06) 0%, transparent 50%)',
-                        }} />
-                        <div style={{
-                          fontSize: 48, fontWeight: 900, color: 'rgba(255,255,255,0.12)',
-                          letterSpacing: '-0.06em', userSelect: 'none',
-                          textTransform: 'uppercase',
-                        }}>{t.subjectName}</div>
+                        {subj?.name || ''}
                       </div>
-
-                      <div style={{ padding: 20 }}>
-                        {/* Subject + badge */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.subjectName}</div>
-                          <div style={{ padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: 700, background: badgeBg, color: badgeColor }}>{badgeLabel}</div>
-                        </div>
-
-                        {/* Topic name */}
-                        <div style={{ fontSize: isCenter ? 18 : 16, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginTop: 5, letterSpacing: '-0.02em' }}>{t.name}</div>
-
-
-
-                        {/* Action */}
-                        <div style={{ marginTop: 16 }}>
-                          {isCenter ? (
-                            <motion.button whileTap={{ scale: 0.97 }} onClick={(e) => { e.stopPropagation(); openRevision(t) }}
-                              style={{
-                                width: '100%', padding: '13px 0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
-                                cursor: 'pointer', border: 'none', background: 'var(--primary)', color: '#fff',
-                                borderRadius: 12, letterSpacing: '0.01em',
-                              }}
-                            >Start Practice</motion.button>
-                          ) : (
-                            <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em' }}>Tap to view G��</div>
-                          )}
-                        </div>
+                    </div>
+                    <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+                      <div style={{
+                        fontFamily: "'Stack Sans Headline'", fontWeight: 200,
+                        fontSize: 16, color: '#000000', lineHeight: '26px',
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      }}>
+                        {t.name}
                       </div>
-                    </motion.div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <div style={{
+                            padding: '0 12px', height: 26,
+                            background: '#FFFFFF', borderRadius: 25,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 12, fontWeight: 500, color: '#838383',
+                            fontFamily: "'Stack Sans Headline'",
+                          }}>
+                            {subj?.name || ''}
+                          </div>
+                          <div style={{
+                            padding: '0 12px', height: 26,
+                            background: '#FFFFFF', borderRadius: 25,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 12, fontWeight: 500, color: '#838383',
+                            fontFamily: "'Stack Sans Headline'",
+                          }}>
+                            {badgeLabel}
+                          </div>
+                        </div>
+                        <motion.div
+                          whileTap={{ scale: 0.9 }}
+                          onClick={(e) => { e.stopPropagation(); openRevision(t) }}
+                          style={{
+                            width: 44, height: 43.04, background: '#F6F6F6',
+                            borderRadius: 41, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', transform: 'rotate(90deg)',
+                          }}
+                        >
+                          <svg width="13" height="14" viewBox="0 0 13 14" fill="none">
+                            <path d="M4 2.5L9 7L4 11.5" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </motion.div>
+                      </div>
+                    </div>
                   </motion.div>
                 )
               })}
             </div>
-
-            {/* Dot indicators */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10 }}>
-              {remainingFeed.slice(0, 10).map((_, i) => (
-                <div key={i} onClick={() => setFeedIdx(i)} style={{
-                  width: i === feedIdx ? 22 : 6, height: 6, borderRadius: 3,
-                  background: i === feedIdx ? 'var(--primary)' : 'var(--text-3)',
-                  transition: 'all 0.3s', cursor: 'pointer', opacity: i === feedIdx ? 1 : 0.5,
-                }} />
-              ))}
-            </div>
           </div>
         )}
 
-        {/* Empty G�� all done */}
+        {/* All done */}
         {dailyMix.length > 0 && remainingCount === 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
             <div style={{ textAlign: 'center' }}>

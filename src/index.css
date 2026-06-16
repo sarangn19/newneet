@@ -905,3 +905,5 @@ button, [role="button"], .card-tap {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+.hide-scrollbar::-webkit-scrollbar { display: none; }
