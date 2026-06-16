@@ -48,7 +48,13 @@ export default function UpscHome() {
     const scored = allTopics
       .map(t => ({ ...t, ...calculatePriorityScore(t.id, topicScores, revisionSchedule) }))
       .sort((a, b) => b.score - a.score)
-    return scored.find(t => !usedTopicIds.current.has(t.id)) || scored[0]
+    const candidates = scored.filter(t => !usedTopicIds.current.has(t.id))
+    if (candidates.length === 0) return scored[0]
+    const topN = candidates.slice(0, Math.min(3, candidates.length))
+    const r = Math.random()
+    if (r < 0.5) return topN[0]
+    if (r < 0.8) return topN[1] || topN[0]
+    return topN[2] || topN[0]
   }
 
   const loadQuestion = async () => {
@@ -71,7 +77,15 @@ export default function UpscHome() {
     setCurrentQuestion(null)
   }
 
-  useEffect(() => { if (allTopics.length > 0) { beginSession(); loadQuestion() } }, [])
+  const initialized = useRef(false)
+
+  useEffect(() => {
+    if (allTopics.length > 0 && !initialized.current) {
+      initialized.current = true
+      beginSession()
+      loadQuestion()
+    }
+  }, [allTopics.length])
 
   const advanceQuestion = () => {
     const next = sessionCount + 1
@@ -408,16 +422,29 @@ export default function UpscHome() {
                     </div>
                     <motion.button
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => { beginSession(); loadQuestion() }}
+                      onClick={() => {
+                        const scored = allTopics.map(t => ({...t, ...calculatePriorityScore(t.id, topicScores, revisionSchedule)})).sort((a,b) => b.score - a.score)
+                        if (scored[0]) openRevision(scored[0])
+                      }}
                       style={{
                         padding: '10px 24px', borderRadius: 10,
                         border: 'none', background: 'var(--primary)', color: '#fff',
                         fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
-                        cursor: 'pointer', marginTop: 4,
+                        cursor: 'pointer',
                       }}
                     >
-                      Generate More Questions
+                      Practice in Depth →
                     </motion.button>
+                    <button
+                      onClick={() => { beginSession(); loadQuestion() }}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        fontSize: 12, color: 'var(--text-3)', fontFamily: 'inherit',
+                        fontWeight: 500, textDecoration: 'underline',
+                      }}
+                    >
+                      New Questions
+                    </button>
                   </div>
                 )}
               </div>
