@@ -3,12 +3,11 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { useRecommendations } from '../lib/useRecommendations'
-import { usePerformanceAlerts } from '../lib/usePerformanceAlerts'
 import { generateRevisionContent } from '../lib/revisionAI'
 import { upscMCQs } from '../data/upsc/questions'
 import { upscSubjects } from '../data/upsc/subjects'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
-import { Flame, BarChart3, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingDown, TrendingUp, Clock, Search, FileText } from 'lucide-react'
+import { Flame, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingUp, Search, FileText } from 'lucide-react'
 import { useSequentialReveal, easePreset, skeletonBreath } from '../hooks/useSequentialReveal'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 
@@ -61,7 +60,23 @@ export default function UpscHome() {
     else if (diff < -50 && feedIdx > 0) setFeedIdx(i => i - 1)
   }
 
-  const alerts = usePerformanceAlerts('upsc')
+  // Quick Revision state
+  const [qrQuestion, setQrQuestion] = useState(null)
+  const [qrSelected, setQrSelected] = useState(null)
+  const [qrSubmitted, setQrSubmitted] = useState(false)
+  const [qrCorrect, setQrCorrect] = useState(false)
+
+  useEffect(() => {
+    if (currentTopic) {
+      const qs = getTailoredQuestions(currentTopic.id, 1)
+      setQrQuestion(qs.length > 0 ? qs[0] : null)
+      setQrSelected(null)
+      setQrSubmitted(false)
+      setQrCorrect(false)
+    } else {
+      setQrQuestion(null)
+    }
+  }, [currentTopic?.id])
   const [revisionPopupTopic, setRevisionPopupTopic] = useState(null)
   const [revisionContent, setRevisionContent] = useState(null)
   const [revisionLoading, setRevisionLoading] = useState(false)
@@ -206,29 +221,162 @@ export default function UpscHome() {
           </motion.div>
         </motion.div>
 
-        {/* G��G�� ALERTS G��G�� */}
-        {alerts.length > 0 && (
-          <div style={{ padding: '12px 20px 0' }}>
-            <AnimatePresence>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {alerts.slice(0, 1).map((alert, i) => {
-                  const iconMap = { critical: TrendingDown, weak: AlertTriangle, declining: TrendingDown, streak: Flame, inactive: Clock, consistency: BarChart3 }
-                  const colorMap = { critical: 'var(--error)', weak: 'var(--warning)', declining: 'var(--error)', streak: '#B45309', inactive: 'var(--text-3)', consistency: 'var(--primary-dark)' }
-                  const bgMap = { critical: 'var(--error-light)', weak: 'var(--warning-light)', declining: 'var(--error-light)', streak: 'var(--warning-light)', inactive: 'var(--surface-alt)', consistency: 'var(--primary-light)' }
-                  const Icon = iconMap[alert.type] || AlertTriangle
-                  return (
-                    <div key={i} style={{ padding: '6px 10px', borderRadius: 8, background: bgMap[alert.type], display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.4 }}>
-                      <Icon size={13} color={colorMap[alert.type]} style={{ flexShrink: 0 }} />
-                      {alert.message}
-                    </div>
-                  )
-                })}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        )}
+        {/* Quick Revision */}
+        <AnimatePresence>
+          {qrQuestion && currentTopic && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              style={{ padding: '12px 20px 0' }}
+            >
+              <div style={{
+                background: 'var(--card-bg)', borderRadius: 16,
+                padding: 16, border: '1px solid var(--border)',
+                display: 'flex', flexDirection: 'column', gap: 12,
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{
+                    fontSize: 11, fontWeight: 600, color: 'var(--primary)',
+                    textTransform: 'uppercase', letterSpacing: '0.05em',
+                  }}>
+                    {(() => {
+                      const subj = upscSubjects.find(s => s.id === currentTopic.subjectId)
+                      return subj?.name || 'Revision'
+                    })()}
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      if (feedIdx < remainingFeed.length - 1) setFeedIdx(i => i + 1)
+                      else setQrQuestion(null)
+                    }}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: 11, color: 'var(--text-3)', fontFamily: 'inherit',
+                      fontWeight: 500, padding: '2px 6px',
+                    }}
+                  >
+                    Skip →
+                  </motion.button>
+                </div>
 
-        {/* G��G�� TODAY'S REVISION CAROUSEL G��G�� */}
+                {/* Question */}
+                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', lineHeight: 1.5 }}>
+                  {qrQuestion.q}
+                </div>
+
+                {!qrSubmitted ? (
+                  <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {qrQuestion.options.map((opt, oi) => {
+                        const isSel = qrSelected === oi
+                        return (
+                          <motion.div
+                            key={oi}
+                            onClick={() => setQrSelected(oi)}
+                            whileTap={{ scale: 0.98 }}
+                            style={{
+                              padding: '10px 12px', borderRadius: 10,
+                              border: `1.5px solid ${isSel ? 'var(--primary)' : 'var(--border)'}`,
+                              background: isSel ? 'var(--primary-light)' : 'var(--surface-alt)',
+                              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,
+                              fontSize: 12, color: isSel ? 'var(--primary)' : 'var(--text)',
+                              fontWeight: isSel ? 600 : 400,
+                            }}
+                          >
+                            <div style={{
+                              width: 18, height: 18, borderRadius: '50%',
+                              border: `1.5px solid ${isSel ? 'var(--primary)' : 'var(--border)'}`,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 9, fontWeight: 700,
+                              background: isSel ? 'var(--primary)' : 'transparent',
+                              color: isSel ? '#fff' : 'var(--text-3)',
+                              flexShrink: 0,
+                            }}>
+                              {String.fromCharCode(65 + oi)}
+                            </div>
+                            {opt}
+                          </motion.div>
+                        )
+                      })}
+                    </div>
+
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => {
+                        if (qrSelected === null) return
+                        setQrSubmitted(true)
+                        setQrCorrect(qrSelected === qrQuestion.ans)
+                      }}
+                      style={{
+                        width: '100%', padding: '10px 0', borderRadius: 10,
+                        border: 'none',
+                        background: qrSelected !== null ? 'var(--primary)' : 'var(--border)',
+                        color: qrSelected !== null ? '#fff' : 'var(--text-3)',
+                        fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
+                        cursor: qrSelected !== null ? 'pointer' : 'default',
+                      }}
+                    >
+                      Check Answer
+                    </motion.button>
+                  </>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div style={{
+                      padding: '10px 12px', borderRadius: 10,
+                      background: qrCorrect ? 'var(--success-light)' : 'var(--error-light)',
+                      display: 'flex', alignItems: 'flex-start', gap: 8,
+                    }}>
+                      {qrCorrect ? (
+                        <CheckCircle size={16} color="var(--success)" style={{ flexShrink: 0, marginTop: 2 }} />
+                      ) : (
+                        <AlertTriangle size={16} color="var(--error)" style={{ flexShrink: 0, marginTop: 2 }} />
+                      )}
+                      <div>
+                        <div style={{
+                          fontSize: 13, fontWeight: 700,
+                          color: qrCorrect ? 'var(--success-dark)' : 'var(--error)',
+                        }}>
+                          {qrCorrect ? 'Correct' : 'Incorrect'}
+                        </div>
+                        {!qrCorrect && (
+                          <div style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 2 }}>
+                            Answer: {String.fromCharCode(65 + qrQuestion.ans)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {qrQuestion.explanation && (
+                      <div style={{
+                        fontSize: 11, color: 'var(--text-2)', lineHeight: 1.6,
+                      }}>
+                        {qrQuestion.explanation}
+                      </div>
+                    )}
+
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => openRevision(currentTopic)}
+                      style={{
+                        width: '100%', padding: '10px 0', borderRadius: 10,
+                        border: 'none', background: 'var(--primary)', color: '#fff',
+                        fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {qrCorrect ? 'Continue \u2192 Full Revision' : 'Review Topic \u2192 Full Revision'}
+                    </motion.button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Today's Revision Carousel */}
         {remainingFeed.length > 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0', touchAction: 'none', userSelect: 'none' }}
             onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
