@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, CheckCircle, AlertTriangle, Flame } from 'lucide-react'
 import useStore from '../store/useStore'
 import { useRecommendations } from '../lib/useRecommendations'
 import { calcPriority } from '../lib/revisionEngine'
@@ -19,6 +19,8 @@ export default function AdaptivePractice() {
   const [correct, setCorrect] = useState(false)
   const [currentTopic, setCurrentTopic] = useState(null)
   const [counts, setCounts] = useState({ total: 0, correct: 0 })
+  const [streak, setStreak] = useState(0)
+  const [bestStreak, setBestStreak] = useState(0)
 
   const qrHistory = useRef({})
   const qrStartTime = useRef(null)
@@ -58,6 +60,11 @@ export default function AdaptivePractice() {
     setSubmitted(true)
     setCorrect(isCorrect)
     setCounts(p => ({ total: p.total + 1, correct: p.correct + (isCorrect ? 1 : 0) }))
+    if (isCorrect) {
+      setStreak(s => { const n = s + 1; if (n > bestStreak) setBestStreak(n); return n })
+    } else {
+      setStreak(0)
+    }
 
     const timeSpent = qrStartTime.current ? Math.round((Date.now() - qrStartTime.current) / 1000) : 0
     const tid = currentQuestion.topicId
@@ -93,6 +100,11 @@ export default function AdaptivePractice() {
             {currentTopic && <span> &middot; <strong>{currentTopic.name}</strong></span>}
           </div>
         </div>
+        <motion.div key={streak} initial={{ scale: 1.3 }} animate={{ scale: 1 }} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 99, background: streak >= 3 ? 'rgba(249,115,22,0.12)' : 'var(--surface-alt)' }}>
+          <Flame size={16} color={streak >= 3 ? '#f97316' : streak > 0 ? '#fb923c' : 'var(--text-3)'} />
+          <span style={{ fontSize: 15, fontWeight: 800, color: streak >= 3 ? '#f97316' : 'var(--text)' }}>{streak}</span>
+          {bestStreak >= 3 && <span style={{ fontSize: 9, color: 'var(--text-3)', marginLeft: 2 }}>best {bestStreak}</span>}
+        </motion.div>
       </div>
 
       {/* Question card */}
