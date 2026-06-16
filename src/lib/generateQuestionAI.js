@@ -1,6 +1,15 @@
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || ''
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 
+let lastGeminiCall = 0
+
+async function waitForGeminiSlot() {
+  const now = Date.now()
+  const gap = 1100 - (now - lastGeminiCall)
+  if (gap > 0) await new Promise(r => setTimeout(r, gap))
+  lastGeminiCall = Date.now()
+}
+
 async function callGroq(systemPrompt, userPrompt) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -21,6 +30,7 @@ async function callGroq(systemPrompt, userPrompt) {
 }
 
 async function callGemini(systemPrompt, userPrompt) {
+  await waitForGeminiSlot()
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
     {
