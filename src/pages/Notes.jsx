@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, Plus, Trash2, FileText } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ChevronLeft, Plus, Trash2, FileText, BookOpen } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import useStore from '../store/useStore'
 import Card from '../components/Card'
@@ -86,18 +87,53 @@ export default function Notes() {
             <div style={{ fontSize: 12, color: '#B0B7C3' }}>Start by saving a note above.</div>
           </div>
         ) : (
-          notes.map(n => (
-            <Card key={n.id} onClick={() => navigate('/note/' + n.id)} style={{ marginBottom: 10, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>{n.title || 'Note'}</div>
-                <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{n.content}</div>
-                <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 6 }}>{new Date(n.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-              </div>
-              <button onClick={(e) => { e.stopPropagation(); deleteNote(n.id) }} style={{
-                background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, color: 'var(--text-3)',
-              }}><Trash2 size={15} /></button>
-            </Card>
-          ))
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {notes.map(n => (
+              <motion.div key={n.id}
+                whileHover={{ y: -3 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/note/' + n.id)}
+                style={{ marginBottom: 10, cursor: 'pointer' }}
+              >
+                <Card padding={20} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: 15, fontWeight: 700, color: 'var(--text)',
+                        lineHeight: 1.35,
+                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                      }}>
+                        {n.title || 'Untitled Note'}
+                      </div>
+                    </div>
+                    <div onClick={e => { e.stopPropagation(); deleteNote(n.id) }}
+                      style={{
+                        width: 32, height: 32, borderRadius: 8,
+                        background: 'var(--surface-alt)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', flexShrink: 0,
+                      }}>
+                      <Trash2 size={13} color="var(--text-3)" />
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6,
+                    display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                  }}>
+                    {n.content}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500 }}>
+                      {new Date(n.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)' }}>
+                      Open Note →
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         )}
       </div>
     </div>
