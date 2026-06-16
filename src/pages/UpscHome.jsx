@@ -4,44 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import { useRecommendations } from '../lib/useRecommendations'
 import { generateRevisionContent } from '../lib/revisionAI'
-import { upscMCQs } from '../data/upsc/questions'
 import { upscSubjects } from '../data/upsc/subjects'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
+import { generateAIRQuestion } from '../lib/generateQuestionAI'
 import { Flame, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingUp, Search, FileText } from 'lucide-react'
 import { useSequentialReveal, easePreset, skeletonBreath } from '../hooks/useSequentialReveal'
 import { SkeletonBlock } from '../components/SkeletonBlock'
-
-function buildAdaptiveQuestionQueue(topicScores, revisionSchedule, revisionSeenQuestions, revisionMastery, allTopics, mcqPool, subjects) {
-  const shuffled = a => { const s = [...a]; for (let i = s.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [s[i], s[j]] = [s[j], s[i]] } return s }
-  const scored = allTopics.map(t => {
-    const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
-    return { ...t, ...pi }
-  }).filter(t => t.score > 0 || t.total === 0)
-  scored.sort((a, b) => b.score - a.score)
-  const queue = []
-  const seenKeys = new Set()
-  for (const topic of scored) {
-    if (queue.length >= 5) break
-    const topicQ = mcqPool.filter(q => q.chapter === topic.id && !seenKeys.has(q.q.slice(0, 40)))
-    if (topicQ.length === 0) continue
-    const topicSeen = revisionSeenQuestions[topic.id] || {}
-    const enriched = topicQ.map(q => {
-      const key = q.q.slice(0, 40)
-      const s = topicSeen[key]
-      return { ...q, _key: key, _seen: s?.seen || 0, _wrong: (s?.seen || 0) - (s?.correct || 0) }
-    })
-    const unseen = shuffled(enriched.filter(q => q._seen === 0))
-    const wrong = shuffled(enriched.filter(q => q._wrong > 0))
-    const rest = shuffled(enriched.filter(q => !seenKeys.has(q._key)))
-    const pick = unseen[0] || wrong[0] || rest[0]
-    if (pick) {
-      seenKeys.add(pick._key)
-      const subj = subjects.find(s => s.id === topic.subjectId)
-      queue.push({ ...pick, topicId: topic.id, topicName: topic.name, subjectId: topic.subjectId, subjectName: subj?.name || topic.subjectName })
-    }
-  }
-  return queue
-}
 
 export default function UpscHome() {
   const navigate = useNavigate()
@@ -92,38 +60,53 @@ export default function UpscHome() {
     else if (diff < -50 && feedIdx > 0) setFeedIdx(i => i - 1)
   }
 
-  // Today's Question — independent queue
-  const [questionQueue, setQuestionQueue] = useState([])
-  const [questionIndex, setQuestionIndex] = useState(0)
+  // Today's Question — AI-generated, based on performance
+  const [currentQuestion, setCurrentQuestion] = useState(null)
+  const [questionLoading, setQuestionLoading] = useState(false)
+  const [sessionCount, setSessionCount] = useState(0)
+  const [sessionDone, setSessionDone] = useState(false)
   const [qrSelected, setQrSelected] = useState(null)
   const [qrSubmitted, setQrSubmitted] = useState(false)
   const [qrCorrect, setQrCorrect] = useState(false)
-  const [queueCompleted, setQueueCompleted] = useState(false)
+  const usedTopicIds = useRef(new Set())
 
-  const hasQuestion = questionQueue.length > 0 && questionIndex < questionQueue.length
-  const currentQuestion = hasQuestion ? questionQueue[questionIndex] : null
+  const pickNextTopic = () => {
+    const scored = allTopics
+      .map(t => ({ ...t, ...calculatePriorityScore(t.id, topicScores, revisionSchedule) }))
+      .sort((a, b) => b.score - a.score)
+    return scored.find(t => !usedTopicIds.current.has(t.id)) || scored[0]
+  }
 
-  const generateQueue = () => {
-    const queue = buildAdaptiveQuestionQueue(topicScores, revisionSchedule, revisionSeenQuestions, revisionMastery, allTopics, upscMCQs, upscSubjects)
-    setQuestionQueue(queue)
-    setQuestionIndex(0)
+  const loadQuestion = async () => {
+    const topic = pickNextTopic()
+    if (!topic) { setSessionDone(true); return }
+    usedTopicIds.current.add(topic.id)
+    setQuestionLoading(true)
     setQrSelected(null)
     setQrSubmitted(false)
     setQrCorrect(false)
-    setQueueCompleted(false)
+    const q = await generateAIRQuestion(topic, topicScores)
+    setCurrentQuestion(q)
+    setQuestionLoading(false)
   }
 
-  useEffect(() => { if (allTopics.length > 0) generateQueue() }, [])
+  const beginSession = () => {
+    usedTopicIds.current = new Set()
+    setSessionCount(0)
+    setSessionDone(false)
+    setCurrentQuestion(null)
+  }
+
+  useEffect(() => { if (allTopics.length > 0) { beginSession(); loadQuestion() } }, [])
 
   const advanceQuestion = () => {
-    const next = questionIndex + 1
-    if (next < questionQueue.length) {
-      setQuestionIndex(next)
-      setQrSelected(null)
-      setQrSubmitted(false)
-      setQrCorrect(false)
+    const next = sessionCount + 1
+    if (next < 5) {
+      setSessionCount(next)
+      loadQuestion()
     } else {
-      setQueueCompleted(true)
+      setSessionDone(true)
+      setCurrentQuestion(null)
     }
   }
   const [revisionPopupTopic, setRevisionPopupTopic] = useState(null)
@@ -270,9 +253,9 @@ export default function UpscHome() {
           </motion.div>
         </motion.div>
 
-        {/* Quick Revision — independent queue */}
+        {/* Quick Revision — AI-generated performance-based */}
         <AnimatePresence>
-          {(currentQuestion || queueCompleted) && (
+          {(currentQuestion || sessionDone || questionLoading) && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -285,14 +268,19 @@ export default function UpscHome() {
                 padding: 16, border: '1px solid var(--border)',
                 display: 'flex', flexDirection: 'column', gap: 12,
               }}>
-                {currentQuestion ? (
+                {questionLoading && !currentQuestion ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center', padding: '16px 0' }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--primary)', animation: 'spin 0.8s linear infinite' }} />
+                    <div style={{ fontSize: 12, color: 'var(--text-2)' }}>Generating question for you...</div>
+                  </div>
+                ) : currentQuestion ? (
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{
                         fontSize: 11, fontWeight: 600, color: 'var(--primary)',
                         textTransform: 'uppercase', letterSpacing: '0.05em',
                       }}>
-                        {currentQuestion.subjectName || 'Revision'}
+                        {currentQuestion.subjectName || currentQuestion.topicName || 'Revision'}
                       </div>
                       <motion.button
                         whileTap={{ scale: 0.95 }}
@@ -411,7 +399,7 @@ export default function UpscHome() {
                             cursor: 'pointer',
                           }}
                         >
-                          {questionIndex < questionQueue.length - 1 ? 'Next Question \u2192' : 'Finish'}
+                          {sessionCount < 4 ? 'Next Question \u2192' : 'Finish'}
                         </motion.button>
                       </div>
                     )}
@@ -422,14 +410,14 @@ export default function UpscHome() {
                       <CheckCircle size={22} color="var(--success)" />
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', textAlign: 'center' }}>
-                      You've reviewed all questions
+                      Session complete!
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--text-2)', textAlign: 'center' }}>
-                      Great work! Come back later for more.
+                      You've answered 5 questions targeting your weak areas.
                     </div>
                     <motion.button
                       whileTap={{ scale: 0.97 }}
-                      onClick={generateQueue}
+                      onClick={() => { beginSession(); loadQuestion() }}
                       style={{
                         padding: '10px 24px', borderRadius: 10,
                         border: 'none', background: 'var(--primary)', color: '#fff',

@@ -901,3 +901,7 @@ button, [role="button"], .card-tap {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
