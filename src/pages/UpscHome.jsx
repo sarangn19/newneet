@@ -8,7 +8,7 @@ import { upscSubjects } from '../data/upsc/subjects'
 import { upscMCQs } from '../data/upsc/questions'
 import { calcPriority as calculatePriorityScore, generateDailyMix as getRevisionMix, getMasteryLevel as getMastery } from '../lib/revisionEngine'
 import { generateAIRQuestion } from '../lib/generateQuestionAI'
-import { Flame, AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingUp, FileText } from 'lucide-react'
+import { AlertTriangle, X, Loader, Lightbulb, CheckCircle, TrendingUp, FileText } from 'lucide-react'
 import { useSequentialReveal, easePreset, skeletonBreath } from '../hooks/useSequentialReveal'
 import { SkeletonBlock } from '../components/SkeletonBlock'
 
@@ -124,7 +124,6 @@ export default function UpscHome() {
   const [practiceSubmitted, setPracticeSubmitted] = useState(false)
   const [practiceDone, setPracticeDone] = useState(false)
 
-  const streak = user?.streak || 0
   const [questionStartTime, setQuestionStartTime] = useState(null)
 
   const getTailoredQuestions = (topicId, count) => {
@@ -242,16 +241,9 @@ export default function UpscHome() {
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28 }}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '48px 20px 8px' }}>
 
-          <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 28, delay: 0.1 }}
-            style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', cursor: 'pointer', background: 'var(--surface-alt)', borderRadius: 9999, border: '2px solid var(--border)' }}>
-              <Flame size={14} color="#f97316" />
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{streak}</span>
-            </motion.button>
-            <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" onClick={() => navigate('/profile')} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'var(--primary-light)', borderRadius: 9999, border: '2px solid var(--border)', overflow: 'hidden', fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>
-              {user?.name?.[0] || 'U'}
-            </motion.button>
-          </motion.div>
+          <motion.button whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }} className="pill-3d" onClick={() => navigate('/profile')} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'var(--primary-light)', borderRadius: 9999, border: '2px solid var(--border)', overflow: 'hidden', fontSize: 12, fontWeight: 700, color: 'var(--primary)', marginLeft: 'auto' }}>
+            {user?.name?.[0] || 'U'}
+          </motion.button>
         </motion.div>
 
         {/* Quick Revision — AI-generated performance-based */}
