@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, Plus, Trash2, BookOpen, FileText } from 'lucide-react'
+import { ChevronLeft, Plus, Trash2, FileText } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import useStore from '../store/useStore'
-import { card as cardStyle } from '../lib/designTokens'
+import Card from '../components/Card'
 
 export default function Notes() {
   const navigate = useNavigate()
@@ -56,7 +56,7 @@ export default function Notes() {
 
       <div style={{ padding: '14px 14px 100px' }}>
         {/* ══ ADD NOTE ══ */}
-        <div style={{ ...cardStyle, padding: 16, marginBottom: 14 }}>
+        <Card style={{ marginBottom: 14 }}>
           <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Note title (optional)"
             style={{ width: '100%', border: 'none', outline: 'none', fontSize: 14, fontWeight: 700, marginBottom: 10, fontFamily: 'inherit', color: '#111827', background: 'transparent' }} />
           <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Write your note..."
@@ -74,7 +74,7 @@ export default function Notes() {
           }}>
             <Plus size={15} /> Save Note
           </button>
-        </div>
+        </Card>
 
         {/* ══ NOTES LIST ══ */}
         {loading ? (
@@ -87,7 +87,7 @@ export default function Notes() {
           </div>
         ) : (
           notes.map(n => (
-            <div key={n.id} style={{ ...cardStyle, padding: 14, marginBottom: 10, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <Card key={n.id} style={{ marginBottom: 10, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 600, color: '#111827', marginBottom: 4 }}>{n.title || 'Note'}</div>
                 <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{n.content}</div>
@@ -96,7 +96,7 @@ export default function Notes() {
               <button onClick={() => deleteNote(n.id)} style={{
                 background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, color: '#D1D5DB',
               }}><Trash2 size={15} /></button>
-            </div>
+            </Card>
           ))
         )}
       </div>
