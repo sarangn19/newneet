@@ -395,37 +395,39 @@ export default function CurrentAffairs() {
             <Card onClick={e => e.stopPropagation()} style={{
                 width: '100%', maxWidth: 400, maxHeight: '85vh',
                 display: 'flex', flexDirection: 'column', overflow: 'hidden',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.3)', padding: 0,
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
               }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
                   {selectedArticle.category && (
                     <Badge color={categoryColors[selectedArticle.category] || 'var(--text-3)'} bg={(categoryColors[selectedArticle.category] || 'var(--text-3)') + '15'}>
                       {selectedArticle.category}
                     </Badge>
                   )}
-                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4 }}>{selectedArticle.title}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4, marginTop: 8 }}>{selectedArticle.title}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 12 }}>
                     {selectedArticle.date} · {selectedArticle.source}
                   </div>
 
-                {/* Summary */}
-                <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
-                  {selectedArticle.summary || 'Full article content would appear here. Fetch the complete story from the source link below.'}
+                  {/* Summary */}
+                  <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 14, whiteSpace: 'pre-wrap' }}>
+                    {selectedArticle.summary || 'Full article content would appear here. Fetch the complete story from the source link below.'}
+                  </div>
+
+                  {/* Tags */}
+                  {selectedArticle.tags?.length > 0 && (
+                    <div style={{ marginBottom: 14 }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Tags</div>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {selectedArticle.tags.map((t, i) => (
+                          <Badge key={i} bg="var(--surface-alt)" color="var(--text-3)">{t}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Tags */}
-                {selectedArticle.tags?.length > 0 && (
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Tags</div>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      {selectedArticle.tags.map((t, i) => (
-                        <Badge key={i} bg="var(--surface-alt)" color="var(--text-3)">{t}</Badge>
-                      ))}
-              </div>
-            </div>
-                  )}
-
                 {/* Actions */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '0 20px 20px' }}>
                   <PrimaryButton disabled={mcqLoading} onClick={() => generateMCQs(selectedArticle)} style={{ padding: '10px 0' }}>
               <Sparkles size={14} /> {mcqLoading ? 'Generating...' : 'Practice Related MCQs'}
             </PrimaryButton>
