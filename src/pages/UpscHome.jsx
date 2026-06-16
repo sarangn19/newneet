@@ -433,71 +433,83 @@ export default function UpscHome() {
               paddingRight: 20, scrollbarWidth: 'none', msOverflowStyle: 'none',
               WebkitOverflowScrolling: 'touch',
             }}>
-              {remainingFeed.map((t) => {
+              {remainingFeed.map((t, idx) => {
                 const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.5 ? 'Forgotten' : 'Review'
+                const badgeStyle = pi?.weakness >= 0.6 ? { background: 'var(--error-light)', color: 'var(--error)' } :
+                  pi?.forgetting >= 0.5 ? { background: 'var(--warning-light)', color: 'var(--warning)' } :
+                  { background: 'var(--surface-alt)', color: 'var(--text-2)' }
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjGradient = subj?.gradient || 'linear-gradient(135deg, var(--primary-dark), var(--primary))'
                 return (
-                  <motion.div key={t.id} style={{
-                    width: 213, height: 253, flexShrink: 0,
-                    background: '#F1F1F1', border: '5px solid #FFFFFF',
-                    boxShadow: '0px 0px 24px rgba(0,0,0,0.08)',
-                    borderRadius: 16, display: 'flex', flexDirection: 'column',
-                    overflow: 'hidden',
-                  }}>
+                  <motion.div key={t.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 28, delay: idx * 0.05 }}
+                    style={{
+                      width: 213, flexShrink: 0,
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--border)',
+                      boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                      borderRadius: 16, display: 'flex', flexDirection: 'column',
+                      overflow: 'hidden',
+                    }}>
                     <div style={{
-                      height: 143, background: subjGradient,
+                      height: 125, background: subjGradient,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      borderRadius: '16px 16px 0 0',
+                      position: 'relative', overflow: 'hidden',
                     }}>
                       <div style={{
-                        fontSize: 36, fontWeight: 900, color: 'rgba(255,255,255,0.15)',
+                        position: 'absolute', inset: 0,
+                        backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0%, transparent 60%)',
+                      }} />
+                      <div style={{
+                        fontSize: 32, fontWeight: 900, color: 'rgba(255,255,255,0.13)',
                         textTransform: 'uppercase', userSelect: 'none',
                       }}>
                         {subj?.name || ''}
                       </div>
                     </div>
-                    <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+                    <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
                       <div style={{
                         fontFamily: "'Stack Sans Headline'", fontWeight: 200,
-                        fontSize: 16, color: '#000000', lineHeight: '26px',
-                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        fontSize: 15, color: 'var(--text)', lineHeight: 1.3,
+                        overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                       }}>
                         {t.name}
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                        <div style={{ display: 'flex', gap: 8 }}>
+                        <div style={{ display: 'flex', gap: 6 }}>
                           <div style={{
-                            padding: '0 12px', height: 26,
-                            background: '#FFFFFF', borderRadius: 25,
+                            padding: '0 10px', height: 24,
+                            background: 'var(--surface-alt)', borderRadius: 25,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 12, fontWeight: 500, color: '#838383',
+                            fontSize: 11, fontWeight: 500, color: 'var(--text-2)',
                             fontFamily: "'Stack Sans Headline'",
                           }}>
                             {subj?.name || ''}
                           </div>
                           <div style={{
-                            padding: '0 12px', height: 26,
-                            background: '#FFFFFF', borderRadius: 25,
+                            padding: '0 10px', height: 24, borderRadius: 25,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 12, fontWeight: 500, color: '#838383',
+                            fontSize: 11, fontWeight: 500,
                             fontFamily: "'Stack Sans Headline'",
+                            ...badgeStyle,
                           }}>
                             {badgeLabel}
                           </div>
                         </div>
                         <motion.div
-                          whileTap={{ scale: 0.9 }}
+                          whileTap={{ scale: 0.85 }}
                           onClick={(e) => { e.stopPropagation(); openRevision(t) }}
                           style={{
-                            width: 44, height: 43.04, background: '#F6F6F6',
-                            borderRadius: 41, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: 'pointer', transform: 'rotate(90deg)',
+                            width: 36, height: 36, background: 'var(--surface-alt)',
+                            borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer',
                           }}
                         >
-                          <svg width="13" height="14" viewBox="0 0 13 14" fill="none">
-                            <path d="M4 2.5L9 7L4 11.5" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M4 2L8 6L4 10" stroke="var(--text-2)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         </motion.div>
                       </div>
