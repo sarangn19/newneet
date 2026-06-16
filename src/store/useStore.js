@@ -869,6 +869,7 @@ const useStore = create(
         // Push to Supabase for cross-device sync
         if (userId) {
           pushQuestionToSupabase(userId, entry)
+          upsertTodayStats({ userId, examType: et, deltaQ: 1, deltaCorrect: correct ? 1 : 0, deltaTime: timeSpent })
         }
       },
 
