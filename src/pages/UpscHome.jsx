@@ -257,12 +257,12 @@ export default function UpscHome() {
             }}
           >
             {/* Handle */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }} onClick={toggleSheet}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }} onClick={toggleSheet}>
               <div style={{ width: 32, height: 4, background: '#D4D4D4', borderRadius: 99 }} />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 32 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 500, color: '#000', margin: 0, fontFamily: "'Stack Sans Headline', sans-serif" }}>Revision</h2>
               <div style={{ fontSize: 13, color: '#838383', fontWeight: 500 }}>{dailyMix.length > 0 ? remainingFeed.length : '4'} left</div>
             </div>
 
@@ -280,26 +280,26 @@ export default function UpscHome() {
                 </div>
               )}
 
-              {displayTopics.map((t, i) => {
+              {displayTopics.slice(0, sheetOpen ? displayTopics.length : 3).map((t, i) => {
                 const pi = calculatePriorityScore(t.id, topicScores, revisionSchedule)
                 const badgeLabel = pi?.weakness >= 0.6 ? 'Weak' : pi?.forgetting >= 0.8 ? 'Forgotten' : pi?.forgetting >= 0.5 ? 'Due' : 'Review'
                 const subj = upscSubjects.find(s => s.id === t.subjectId)
                 const subjCode = subj?.id?.toUpperCase() || 'GS'
-                const closedMargin = i === 0 ? 0 : -110
+                const closedMargin = i === 0 ? 0 : i === 1 ? -125 : i === 2 ? -113 : -101
                 return (
                   <motion.div key={t.id}
                     onClick={() => openRevision(t)}
                     initial={false}
                     animate={{
-                      height: 134,
-                      marginTop: i === 0 ? 0 : sheetOpen ? 12 : closedMargin,
+                      height: sheetOpen ? 134 : 156,
+                      marginTop: i === 0 ? 0 : sheetOpen ? 6 : closedMargin,
                       scale: sheetOpen ? 1 : 1 - i * 0.02,
                       opacity: sheetOpen ? 1 : 1 - i * 0.05,
                     }}
                     transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                     style={{
-                      width: '100%', borderRadius: 16, background: '#FFFFFF',
-                      boxShadow: `0px ${1 + i}px ${30.2 + i * 4}px rgba(0,0,0,${0.08 + i * 0.02})`,
+                      width: '100%', borderRadius: 24, background: '#FFFFFF',
+                      boxShadow: `0px 0px 16.9px rgba(0,0,0,0.25)`,
                       padding: '24px 16px 16px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                       cursor: 'pointer', transformOrigin: 'center top',
